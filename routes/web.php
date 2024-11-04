@@ -1,12 +1,13 @@
-<?php 
+<?php
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\AdminController; 
-use App\Http\Controllers\EmployeeController; 
-use App\Http\Controllers\GuestController; 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\GuestController;
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -24,8 +25,16 @@ Route::get('/dashboard', function () {
 
 // Rotas específicas para diferentes níveis de acesso
 Route::middleware('auth')->group(function () {
+    //Admin
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/user-types', [AdminController::class, 'userTypes'])->name('admin.user-types');
+
+
+
+    //Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');
+
+    //Guest
     Route::get('/guest/dashboard', [GuestController::class, 'index'])->name('guest.dashboard');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
