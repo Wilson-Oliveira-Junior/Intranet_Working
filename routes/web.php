@@ -27,7 +27,8 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     //Admin
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
-    Route::get('/admin/user-types', [AdminController::class, 'userTypes'])->name('admin.user-types');
+    Route::get('/admin/usertypes', [AdminController::class, 'userTypes'])->name('admin.usertypes');
+    Route::post('/admin/user-types', [AdminController::class, 'store']);
 
 
 

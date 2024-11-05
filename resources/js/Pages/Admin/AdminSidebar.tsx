@@ -2,7 +2,8 @@ import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import "../../../css/components/Sidebar.css"
 
-const AdminSidebar = () => {
+
+const AdminSidebar = ({ setActivePage }) => {
     const [openMenus, setOpenMenus] = useState({
         meuEspaco: false,
         tarefa: false,
@@ -13,7 +14,6 @@ const AdminSidebar = () => {
         financeiro: false
     });
 
-    const [activePage, setActivePage] = useState('');
 
     const toggleMenu = (menu) => {
         setOpenMenus((prevState) => ({
