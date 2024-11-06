@@ -4,7 +4,7 @@ interface ApplicationLogoProps extends ImgHTMLAttributes<HTMLImageElement> {
     size?: string;
 }
 
-export default function ApplicationLogo({ size = '200px', ...props }: ApplicationLogoProps) {
+export default function ApplicationLogo({ size = 'auto', ...props }: ApplicationLogoProps) {
     return (
         <img
             src="/img/logo.png"

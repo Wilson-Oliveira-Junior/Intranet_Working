@@ -22,6 +22,7 @@ const UserTypes: React.FC = () => {
     const [successMessage, setSuccessMessage] = useState<string>('');
     const [isPermissionModalOpen, setPermissionModalOpen] = useState(false);
     const [selectedUserType, setSelectedUserType] = useState<UserType | null>(null);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false); // Novo estado para controle do modal de adição
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -38,6 +39,7 @@ const UserTypes: React.FC = () => {
             onSuccess: () => {
                 setSuccessMessage('Tipo de usuário adicionado com sucesso!');
                 setNewUserType({ name: '', description: '' });
+                setIsAddModalOpen(false); // Fecha o modal após a criação
             },
             preserveState: true,
             preserveScroll: true,
@@ -89,27 +91,6 @@ const UserTypes: React.FC = () => {
 
                 {successMessage && <div className="alert alert-success">{successMessage}</div>}
 
-                <form onSubmit={editingUserType ? handleSubmitEdit : handleSubmit}>
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="Nome"
-                        value={editingUserType ? editingUserType.name : newUserType.name}
-                        onChange={handleChange}
-                        required
-                    />
-                    <textarea
-                        name="description"
-                        placeholder="Descrição"
-                        value={editingUserType ? editingUserType.description : newUserType.description}
-                        onChange={handleChange}
-                        required
-                    />
-                    <button type="submit" className="btn novo">
-                        {editingUserType ? 'Atualizar Tipo de Usuário' : 'Adicionar Novo Tipo de Usuário'}
-                    </button>
-                </form>
-
                 <table>
                     <thead>
                         <tr>
@@ -146,6 +127,43 @@ const UserTypes: React.FC = () => {
                         )}
                     </tbody>
                 </table>
+
+                {/* Botão para abrir o modal de adição */}
+                <button className="btn novo" onClick={() => setIsAddModalOpen(true)}>
+                    Adicionar Novo Tipo de Usuário
+                </button>
+
+                {/* Modal de Adição de Tipo de Usuário */}
+                {isAddModalOpen && (
+                    <div className="modal-overlay">
+                        <div className="modal">
+                            <h2>{editingUserType ? 'Editar Tipo de Usuário' : 'Adicionar Novo Tipo de Usuário'}</h2>
+                            <form onSubmit={editingUserType ? handleSubmitEdit : handleSubmit}>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    placeholder="Nome"
+                                    value={editingUserType ? editingUserType.name : newUserType.name}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <textarea
+                                    name="description"
+                                    placeholder="Descrição"
+                                    value={editingUserType ? editingUserType.description : newUserType.description}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <button type="submit" className="btn novo">
+                                    {editingUserType ? 'Atualizar Tipo de Usuário' : 'Adicionar Tipo de Usuário'}
+                                </button>
+                                <button type="button" onClick={() => setIsAddModalOpen(false)} className="btn fechar">
+                                    Fechar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                )}
 
                 {/* Modal de Permissões */}
                 {isPermissionModalOpen && (
