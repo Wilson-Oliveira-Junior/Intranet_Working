@@ -1,9 +1,8 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
-import SidebarADM from '@/Pages/Admin/AdminSidebar';
-import { usePage } from '@inertiajs/react';
 import { Suspense, lazy, useState } from 'react';
+import { usePage } from '@inertiajs/react';
 
+
+// Carregar as páginas dinamicamente
 const DynamicHomeAdm = lazy(() => import('@/Pages/Admin/HomeAdm'));
 const DynamicUserTypes = lazy(() => import('@/Pages/Admin/UserTypes'));
 
@@ -11,7 +10,7 @@ export default function DashboardADM() {
     const { auth } = usePage().props;
     const [activePage, setActivePage] = useState("home");
 
-
+    // Função para renderizar a página ativa
     const renderPage = () => {
         switch (activePage) {
             case "userTypes":
@@ -22,17 +21,12 @@ export default function DashboardADM() {
     };
 
     return (
-        <AuthenticatedLayout>
-            <Head title="Dashboard Admin" />
-
-            <div className="flex">
-                <SidebarADM user={auth.user} setActivePage={setActivePage} />
-                <div className="flex-1 py-12">
-                    <Suspense fallback={<div>Carregando...</div>}>
-                        {renderPage()}
-                    </Suspense>
-                </div>
+        <div className="flex">
+            <div>
+                <Suspense fallback={<div>Carregando...</div>}>
+                    {renderPage()}
+                </Suspense>
             </div>
-        </AuthenticatedLayout>
+        </div>
     );
 }

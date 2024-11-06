@@ -2,7 +2,6 @@ import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import "../../../css/components/Sidebar.css"
 
-
 const AdminSidebar = ({ setActivePage }) => {
     const [openMenus, setOpenMenus] = useState({
         meuEspaco: false,
@@ -13,7 +12,6 @@ const AdminSidebar = ({ setActivePage }) => {
         gatilhos: false,
         financeiro: false
     });
-
 
     const toggleMenu = (menu) => {
         setOpenMenus((prevState) => ({
@@ -119,9 +117,10 @@ const AdminSidebar = ({ setActivePage }) => {
                     </button>
                     {openMenus.gestao && (
                         <div className="pl-6">
-                            <button onClick={() => setActivePage("userTypes")} className="flex items-center py-2">
+                            {/* Link para Tipos de Usuários */}
+                            <Link href="/admin/usertypes" className="flex items-center py-2">
                                 <i className="fas fa-tasks" aria-label="Tipos de Usuários"></i> Tipos de Usuários
-                            </button>
+                            </Link>
                             <button onClick={() => setActivePage("usuarios")} className="py-2">Usuários</button>
                             <button onClick={() => setActivePage("setores")} className="py-2">Setores</button>
                             <button onClick={() => setActivePage("permissoes")} className="py-2">Permissões</button>
@@ -166,17 +165,13 @@ const AdminSidebar = ({ setActivePage }) => {
                     <i className="fab fa-instagram" aria-label="Instagram"></i>
                     Instagram
                 </a>
-                <a href="https://www.linkedin.com/company/agencialogicadigital/" className="flex items-center py-2">
+                <a href="https://www.linkedin.com/company/logicadigital" className="flex items-center py-2">
                     <i className="fab fa-linkedin" aria-label="LinkedIn"></i>
                     LinkedIn
-                </a>
-                <a href="https://www.youtube.com/channel/UC7Y9vUmplKu-1eMm0ksd4Kg" className="flex items-center py-2">
-                    <i className="fab fa-youtube" aria-label="YouTube"></i>
-                    YouTube
                 </a>
             </div>
         </div>
     );
-};
+}
 
 export default AdminSidebar;

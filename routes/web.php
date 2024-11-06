@@ -8,7 +8,6 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\GuestController;
 
-
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -25,17 +24,18 @@ Route::get('/dashboard', function () {
 
 // Rotas específicas para diferentes níveis de acesso
 Route::middleware('auth')->group(function () {
-    //Admin
+    // Admin
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/usertypes', [AdminController::class, 'userTypes'])->name('admin.usertypes');
     Route::post('/admin/user-types', [AdminController::class, 'store']);
+    Route::get('/admin/user-types/{id}/edit', [AdminController::class, 'edit'])->name('admin.userTypes.edit');
+    Route::put('/admin/user-types/{id}', [AdminController::class, 'update'])->name('admin.userTypes.update');
+    Route::delete('/admin/user-types/{id}', [AdminController::class, 'destroy'])->name('admin.userTypes.destroy');
 
-
-
-    //Employee
+    // Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');
 
-    //Guest
+    // Guest
     Route::get('/guest/dashboard', [GuestController::class, 'index'])->name('guest.dashboard');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
