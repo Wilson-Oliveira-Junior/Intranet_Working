@@ -23,7 +23,7 @@ const AdminSidebar = ({ setActivePage }) => {
     return (
         <div className="sidebar">
             <div id="teste" className="teste w-64 bg-white shadow-md p-4">
-                <Link href="/" className="flex items-center py-2">
+                <Link href="/admin/dashboard" className="flex items-center py-2">
                     <i className="fas fa-tv"></i> Dashboard
                 </Link>
                 <Link href="/cronograma" className="flex items-center py-2">
