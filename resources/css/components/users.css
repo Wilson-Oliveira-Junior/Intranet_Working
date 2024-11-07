@@ -168,6 +168,37 @@ table tbody tr:nth-child(even) {
     transform: scale(0.98);
 }
 
+
+/* Estilos para o botão de status */
+.btn.status {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn.status.on {
+    background-color: #28a745;
+    /* Verde para Ativo */
+    color: white;
+}
+
+.btn.status.on:hover {
+    background-color: #218838;
+}
+
+.btn.status.off {
+    background-color: #dc3545;
+    /* Vermelho para Inativo */
+    color: white;
+}
+
+.btn.status.off:hover {
+    background-color: #c82333;
+}
+
+
 /* Estilos do modal */
 .modal-overlay {
     position: fixed;
@@ -212,7 +243,8 @@ table tbody tr:nth-child(even) {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin-right: 10px; /* Adiciona um espaçamento à direita */
+    margin-right: 10px;
+    /* Adiciona um espaçamento à direita */
     transition: background-color 0.3s;
 }
 
@@ -222,15 +254,17 @@ table tbody tr:nth-child(even) {
 
 /* Estilo personalizado para o botão "Cancelar" */
 .modal-content .cancelar {
-    background-color: #dc3545; /* Cor de fundo vermelha */
+    background-color: #dc3545;
+    /* Cor de fundo vermelha */
 }
 
 .modal-content .cancelar:hover {
-    background-color: #c82333; /* Cor de fundo vermelha mais escura ao passar o mouse */
+    background-color: #c82333;
+    /* Cor de fundo vermelha mais escura ao passar o mouse */
 }
 
 /* Ajuste de espaçamento entre os botões */
 .modal-content button:last-child {
-    margin-right: 0; /* Remove o espaçamento do último botão */
+    margin-right: 0;
+    /* Remove o espaçamento do último botão */
 }
-

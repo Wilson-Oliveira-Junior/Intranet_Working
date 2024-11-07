@@ -33,7 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/admin/user-types/{id}', [AdminController::class, 'destroy'])->name('admin.userTypes.destroy');
     Route::get('/admin/users', [AdminController::class, 'userControl'])->name('admin.users');
     Route::put('/admin/users/{id}/assign-role', [AdminController::class, 'assignRole'])->name('admin.users.assignRole');
-
+    Route::put('/admin/users/{id}/status', [AdminController::class, 'updateStatus'])->name('admin.users.updateStatus');
 
     // Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');

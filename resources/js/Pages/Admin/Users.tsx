@@ -30,10 +30,13 @@ const Users: React.FC = () => {
     const [selectedUserType, setSelectedUserType] = useState<number | null>(null);
     const [userId, setUserId] = useState<number | null>(null);
 
-    // Função para alternar o status
     const toggleStatus = (id: number, currentStatus: string) => {
         const newStatus = currentStatus === 'Ativo' ? 'Inativo' : 'Ativo';
-        Inertia.put(`/admin/users/${id}/status`, { status: newStatus }, {
+
+        // Verifique se a URL está correta
+        const url = `/admin/users/${id}/status`;
+
+        Inertia.put(url, { status: newStatus }, {
             onSuccess: () => {
                 setSuccessMessage(`Status do usuário atualizado para ${newStatus}!`);
             },
@@ -43,7 +46,7 @@ const Users: React.FC = () => {
         });
     };
 
-    // Função para deletar o usuário
+
     const handleDeleteUser = (id: number) => {
         if (window.confirm('Tem certeza de que deseja deletar este usuário?')) {
             Inertia.delete(`/admin/users/${id}`, {
@@ -57,7 +60,6 @@ const Users: React.FC = () => {
         }
     };
 
-    // Função para atribuir papel ao usuário
     const handleAssignRole = () => {
         if (selectedUserType && userId) {
             Inertia.put(`/admin/users/${userId}/assign-role`, { user_type_id: selectedUserType }, {
