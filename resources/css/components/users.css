@@ -313,3 +313,121 @@ input[type="checkbox"]:not(:checked) {
     background-color: var(--false); /* Cor de fundo quando o switch está 'off' */
 }
 
+/* Modal geral */
+.modal-overlay.edit-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.edit-modal-overlay.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Modal content */
+.edit-modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 900px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Abas */
+.edit-modal-tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 2px solid #007bff; /* Cor de borda ajustada para o azul do botão */
+
+    justify-content: flex-start; /* Alinha as abas à esquerda */
+}
+
+/* Estilos dos botões das abas */
+.edit-modal-tabs .tab-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #333;
+    background-color: transparent;  /* Fundo transparente */
+    border: 1px solid #ccc; /* Borda leve */
+    border-radius: 5px 5px 0 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.edit-modal-tabs .tab-button.active {
+    background-color: #007bff; /* Cor de fundo para a aba ativa */
+    color: #fff; /* Cor do texto para a aba ativa */
+    border-color: #007bff; /* Borda da aba ativa */
+}
+
+/* Estilo ao passar o mouse sobre os botões das abas */
+.edit-modal-tabs .tab-button:hover {
+    background-color: #e0e0e0; /* Cor mais clara ao passar o mouse */
+    opacity: 0.8;
+}
+
+
+/* Formulários */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.form-group {
+    width: 30%;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.form-group .form-control {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+textarea.form-control {
+    height: 150px;
+}
+
+/* Botões */
+.d-flex .btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.d-flex .btn-primary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+}
+
+.d-flex .btn-secondary {
+    background-color: #ccc;
+    color: black;
+    border: none;
+}
+
+.d-flex .btn:hover {
+    opacity: 0.8;
+}
+

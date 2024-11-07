@@ -11,6 +11,22 @@ interface User {
     sector: string;
     status: string;
     image?: string;
+    middlename?: string;
+    lastname?: string;
+    sex?: string;
+    birthday?: string;
+    cellphone?: string;
+    profilepicture?: string;
+    password?: string;
+    ramal?: string;
+    cep?: string;
+    rua?: string;
+    bairro?: string;
+    cidade?: string;
+    estado?: string;
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
 }
 
 interface UserType {
@@ -26,24 +42,46 @@ const Users: React.FC = () => {
     }
 
     const [successMessage, setSuccessMessage] = useState<string>('');
-    const [showModal, setShowModal] = useState<boolean>(false);
+    const [showRoleModal, setShowRoleModal] = useState<boolean>(false);
+    const [showDetailsModal, setShowDetailsModal] = useState<boolean>(false);
     const [selectedUserType, setSelectedUserType] = useState<number | null>(null);
     const [userId, setUserId] = useState<number | null>(null);
-    const [usersState, setUsersState] = useState<User[]>(users);  // Estado local para armazenar os usuários
+    const [usersState, setUsersState] = useState<User[]>(users);
+    const [activeTab, setActiveTab] = useState<'details' | 'address' | 'redesociais' | 'sobre'>('details');
+
+    const [userDetails, setUserDetails] = useState<User>({
+        id: 0,
+        name: '',
+        email: '',
+        sector: '',
+        status: '',
+        middlename: '',
+        lastname: '',
+        sex: '',
+        birthday: '',
+        cellphone: '',
+        profilepicture: '',
+        password: '',
+        ramal: '',
+        cep: '',
+        rua: '',
+        bairro: '',
+        cidade: '',
+        estado: '',
+        facebook: '',
+        instagram: '',
+        linkedin: '',
+    });
 
     const toggleStatus = (id: number, currentStatus: string) => {
         const newStatus = currentStatus === 'Ativo' ? 'Inativo' : 'Ativo';
-
-        // Atualize o estado local diretamente
         setUsersState((prevState) =>
             prevState.map((user) =>
                 user.id === id ? { ...user, status: newStatus } : user
             )
         );
 
-        // Verifique se a URL está correta
         const url = `/admin/users/${id}/status`;
-
         Inertia.put(url, { status: newStatus }, {
             onSuccess: () => {
                 setSuccessMessage(`Status do usuário atualizado para ${newStatus}!`);
@@ -71,13 +109,43 @@ const Users: React.FC = () => {
         if (selectedUserType && userId) {
             Inertia.put(`/admin/users/${userId}/assign-role`, { user_type_id: selectedUserType }, {
                 onSuccess: () => {
-                    setShowModal(false);
+                    setShowRoleModal(false);
                     setSuccessMessage('Papel atribuído com sucesso!');
                 },
                 preserveState: true,
                 preserveScroll: true,
             });
         }
+    };
+
+    const handleEditUser = (id: number) => {
+        const userToEdit = usersState.find((u) => u.id === id);
+        if (userToEdit) {
+            setUserDetails(userToEdit);
+        }
+        setUserId(id);
+        setShowDetailsModal(true);
+    };
+
+    const handleSaveDetails = () => {
+        Inertia.put(`/admin/users/${userId}`, userDetails, {
+            onSuccess: () => {
+                setShowDetailsModal(false);
+                setSuccessMessage('Detalhes do usuário atualizados!');
+            },
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
+
+    const handleCloseModal = () => {
+        setShowDetailsModal(false);
+    };
+
+
+    const handleSaveChanges = () => {
+        console.log('Salvando mudanças...');
+        handleCloseModal();
     };
 
     return (
@@ -125,12 +193,17 @@ const Users: React.FC = () => {
                                         </label>
                                     </td>
                                     <td>
-                                        <button className="btn editar">Editar</button>
+                                        <button
+                                            className="btn editar"
+                                            onClick={() => handleEditUser(user.id)}
+                                        >
+                                            Editar
+                                        </button>
                                         <button
                                             className="btn papel"
                                             onClick={() => {
                                                 setUserId(user.id);
-                                                setShowModal(true);
+                                                setShowRoleModal(true);
                                             }}
                                         >
                                             Papel
@@ -154,8 +227,8 @@ const Users: React.FC = () => {
                     </tbody>
                 </table>
 
-                {showModal && (
-                    <div className={`modal-overlay ${showModal ? 'show' : ''}`}>
+                {showRoleModal && (
+                    <div className={`modal-overlay ${showRoleModal ? 'show' : ''}`}>
                         <div className="modal-content">
                             <h2>Atribuir Papel</h2>
                             <select
@@ -170,12 +243,284 @@ const Users: React.FC = () => {
                                 ))}
                             </select>
                             <button onClick={handleAssignRole}>Atribuir</button>
-                            <button onClick={() => setShowModal(false)} className="cancelar">
+                            <button onClick={() => setShowRoleModal(false)} className="cancelar">
                                 Cancelar
                             </button>
                         </div>
                     </div>
                 )}
+
+                {showDetailsModal && (
+                    <div className={`modal-overlay edit-modal-overlay ${showDetailsModal ? 'show' : ''}`}>
+                        <div className="edit-modal-content">
+                            {/* Abas de navegação */}
+                            <div className="edit-modal-tabs">
+                                <button
+                                    className={`tab-button ${activeTab === 'details' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('details')}
+                                >
+                                    Informações do Usuário
+                                </button>
+                                <button
+                                    className={`tab-button ${activeTab === 'address' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('address')}
+                                >
+                                    Endereço
+                                </button>
+                                <button
+                                    className={`tab-button ${activeTab === 'redesociais' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('redesociais')}
+                                >
+                                    Redes Sociais
+                                </button>
+                                <button
+                                    className={`tab-button ${activeTab === 'sobre' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('sobre')}
+                                >
+                                    Curiosidade
+                                </button>
+                            </div>
+
+                            {/* Informações do Usuário */}
+                            {activeTab === 'details' && (
+                                <div className="tab-content">
+                                    <h2>Informações do Usuário</h2>
+                                    <div className="form-row">
+                                        <div className="form-group col-4">
+                                            <label>Nome:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.name}
+                                                onChange={(e) => setUserDetails({ ...userDetails, name: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                        <div className="form-group col-4">
+                                            <label>Sobrenome:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.middlename}
+                                                onChange={(e) => setUserDetails({ ...userDetails, middlename: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                        <div className="form-group col-4">
+                                            <label>Último Nome:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.lastname}
+                                                onChange={(e) => setUserDetails({ ...userDetails, lastname: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-row">
+                                        <div className="form-group col-4">
+                                            <label>E-mail:</label>
+                                            <input
+                                                type="email"
+                                                value={userDetails.email}
+                                                onChange={(e) => setUserDetails({ ...userDetails, email: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                        <div className="form-group col-4">
+                                            <label>Sexo:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.sex}
+                                                onChange={(e) => setUserDetails({ ...userDetails, sex: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                        <div className="form-group col-4">
+                                            <label>Setor:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.sector}
+                                                onChange={(e) => setUserDetails({ ...userDetails, sector: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-row">
+                                        <div className="form-group col-4">
+                                            <label>Data de Nascimento:</label>
+                                            <input
+                                                type="date"
+                                                value={userDetails.birthday}
+                                                onChange={(e) => setUserDetails({ ...userDetails, birthday: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                        <div className="form-group col-4">
+                                            <label>Celular:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.cellphone}
+                                                onChange={(e) => setUserDetails({ ...userDetails, cellphone: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                        <div className="form-group col-4">
+                                            <label>Foto de Perfil:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.profilepicture}
+                                                onChange={(e) => setUserDetails({ ...userDetails, profilepicture: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-row">
+                                        <div className="form-group col-4">
+                                            <label>Senha:</label>
+                                            <input
+                                                type="password"
+                                                value={userDetails.password}
+                                                onChange={(e) => setUserDetails({ ...userDetails, password: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                        <div className="form-group col-4">
+                                            <label>Ramal:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.ramal}
+                                                onChange={(e) => setUserDetails({ ...userDetails, ramal: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Endereço */}
+                            {activeTab === 'address' && (
+                                <div className="tab-content">
+                                    <h2>Endereço do Usuário</h2>
+                                    <div className="form-row">
+                                        <div className="form-group col-4">
+                                            <label>CEP:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.cep}
+                                                onChange={(e) => setUserDetails({ ...userDetails, cep: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                        <div className="form-group col-4">
+                                            <label>Rua:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.rua}
+                                                onChange={(e) => setUserDetails({ ...userDetails, rua: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                        <div className="form-group col-4">
+                                            <label>Bairro:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.bairro}
+                                                onChange={(e) => setUserDetails({ ...userDetails, bairro: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-row">
+                                        <div className="form-group col-4">
+                                            <label>Cidade:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.cidade}
+                                                onChange={(e) => setUserDetails({ ...userDetails, cidade: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                        <div className="form-group col-4">
+                                            <label>Estado:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.estado}
+                                                onChange={(e) => setUserDetails({ ...userDetails, estado: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Redes Sociais */}
+                            {activeTab === 'redesociais' && (
+                                <div className="tab-content">
+                                    <h2>Redes Sociais</h2>
+                                    <div className="form-row">
+                                        <div className="form-group col-4">
+                                            <label>Facebook:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.facebook}
+                                                onChange={(e) => setUserDetails({ ...userDetails, facebook: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                        <div className="form-group col-4">
+                                            <label>Instagram:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.instagram}
+                                                onChange={(e) => setUserDetails({ ...userDetails, instagram: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                        <div className="form-group col-4">
+                                            <label>LinkedIn:</label>
+                                            <input
+                                                type="text"
+                                                value={userDetails.linkedin}
+                                                onChange={(e) => setUserDetails({ ...userDetails, linkedin: e.target.value })}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Curiosidades sobre o Usuário */}
+                            {activeTab === 'sobre' && (
+                                <div className="tab-content">
+                                    <h2>Curiosidades sobre Você</h2>
+                                    <div className="form-group">
+                                        <textarea
+                                            value={userDetails.sobre}
+                                            onChange={(e) => setUserDetails({ ...userDetails, sobre: e.target.value })}
+                                            className="form-control"
+                                        ></textarea>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Botões de ação */}
+                            <div className="d-flex justify-content-end">
+                                <button
+                                    className="btn btn-secondary"
+                                    onClick={handleCloseModal}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    className="btn btn-primary ml-2"
+                                    onClick={handleSaveChanges}
+                                >
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+
 
             </div>
         </AuthenticatedLayout>
