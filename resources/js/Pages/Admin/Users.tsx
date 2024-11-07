@@ -132,11 +132,19 @@ const Users: React.FC = () => {
             onSuccess: () => {
                 setShowDetailsModal(false);
                 setSuccessMessage('Detalhes do usuário atualizados!');
+                setTimeout(() => setSuccessMessage(''), 3000);
+            },
+            onError: (errors) => {
+                console.error(errors);
+                setErrorMessage('Erro ao atualizar os detalhes do usuário. Tente novamente.');
+                setTimeout(() => setErrorMessage(''), 3000);
             },
             preserveState: true,
             preserveScroll: true,
         });
     };
+
+
 
     const handleCloseModal = () => {
         setShowDetailsModal(false);
@@ -519,9 +527,6 @@ const Users: React.FC = () => {
                         </div>
                     </div>
                 )}
-
-
-
             </div>
         </AuthenticatedLayout>
     );

@@ -350,7 +350,6 @@ input[type="checkbox"]:not(:checked) {
     display: flex;
     gap: 2px;
     border-bottom: 2px solid #007bff; /* Cor de borda ajustada para o azul do botão */
-
     justify-content: flex-start; /* Alinha as abas à esquerda */
 }
 
