@@ -1,4 +1,4 @@
-/* Estilização geral */
+/* Estilo geral do container */
 .container {
     max-width: 1150px;
     margin: 0 auto;
@@ -6,10 +6,9 @@
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
 }
 
-/* Título */
+/* Estilo do título */
 h1 {
     text-align: center;
     color: #333;
@@ -17,7 +16,7 @@ h1 {
     margin-bottom: 20px;
 }
 
-/* Alertas de sucesso */
+/* Estilo do alerta de sucesso */
 .alert-success {
     color: #155724;
     background-color: #d4edda;
@@ -28,7 +27,7 @@ h1 {
     margin-bottom: 20px;
 }
 
-/* Estilos do formulário */
+/* Estilo do formulário */
 form {
     display: flex;
     flex-direction: column;
@@ -61,7 +60,7 @@ form button:hover {
     background-color: #0056b3;
 }
 
-/* Estilos da tabela */
+/* Estilo da tabela */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -86,7 +85,7 @@ table tbody tr:nth-child(even) {
     background-color: #fafafa;
 }
 
-/* Estilos dos botões de ações */
+/* Estilo dos botões */
 .btn {
     padding: 8px 12px;
     font-size: 14px;
@@ -122,30 +121,51 @@ table tbody tr:nth-child(even) {
     background-color: #c82333;
 }
 
-/* Centralizar a mensagem de vazio na tabela */
+/* Estilo do texto centralizado */
 .text-center {
     text-align: center;
     color: #666;
     font-style: italic;
 }
 
-/* Estilos para o botão "Adicionar Novo Tipo de Usuário" */
+/* Estilo do botão "Novo" */
 .btn.novo {
-    background-color: #007bff; /* Cor de fundo azul */
-    color: white; /* Cor do texto */
-    padding: 12px 24px; /* Mais espaçamento interno */
-    font-size: 16px; /* Tamanho da fonte */
-    border-radius: 5px; /* Bordas arredondadas */
+    background-color: #007bff;
+    color: white;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 5px;
     cursor: pointer;
-    margin-top: 20px; /* Espaçamento entre a tabela e o botão */
-    width: auto; /* Largura automática */
-    display: inline-block; /* Mostrar o botão inline */
-    transition: background-color 0.3s ease; /* Efeito de transição */
+    margin-top: 20px;
+    width: auto;
+    display: inline-block;
+    transition: background-color 0.3s ease;
 }
 
-/* Efeito hover no botão de adicionar */
 .btn.novo:hover {
-    background-color: #0056b3; /* Cor de fundo mais escura */
+    background-color: #0056b3;
+}
+
+/* Estilo do botão "Papel" */
+.btn.papel {
+    background-color: #f0ad4e;
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0 4px;
+    display: inline-block;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.btn.papel:hover {
+    background-color: #ec971f;
+    transform: scale(1.05);
+}
+
+.btn.papel:active {
+    transform: scale(0.98);
 }
 
 /* Estilos do modal */
@@ -155,27 +175,62 @@ table tbody tr:nth-child(even) {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.modal {
-    background: #fff;
+.modal-overlay.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.modal-content {
+    background: white;
     padding: 20px;
     border-radius: 8px;
     width: 400px;
-    max-width: 90%;
     text-align: center;
 }
 
-.modal h2 {
-    margin-bottom: 20px;
+.modal-content select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
 }
 
-.btn.fechar {
+.modal-content button {
+    padding: 10px 20px;
     margin-top: 10px;
-    background-color: #ccc;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px; /* Adiciona um espaçamento à direita */
+    transition: background-color 0.3s;
 }
+
+.modal-content button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo personalizado para o botão "Cancelar" */
+.modal-content .cancelar {
+    background-color: #dc3545; /* Cor de fundo vermelha */
+}
+
+.modal-content .cancelar:hover {
+    background-color: #c82333; /* Cor de fundo vermelha mais escura ao passar o mouse */
+}
+
+/* Ajuste de espaçamento entre os botões */
+.modal-content button:last-child {
+    margin-right: 0; /* Remove o espaçamento do último botão */
+}
+

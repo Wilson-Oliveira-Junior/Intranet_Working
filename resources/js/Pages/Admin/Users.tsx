@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import { Inertia } from '@inertiajs/inertia';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import '../../../css/components/users.css';
 
 interface User {
     id: number;
@@ -12,14 +13,22 @@ interface User {
     image?: string;
 }
 
+interface UserType {
+    id: number;
+    name: string;
+}
+
 const Users: React.FC = () => {
-    const { users, user } = usePage().props as { users: User[], user: any };
+    const { users, user, userTypes } = usePage().props as { users: User[], user: any, userTypes: UserType[] };
 
     if (!user) {
         return <div>Usuário não encontrado ou não autenticado.</div>;
     }
 
     const [successMessage, setSuccessMessage] = useState<string>('');
+    const [showModal, setShowModal] = useState<boolean>(false);
+    const [selectedUserType, setSelectedUserType] = useState<number | null>(null);
+    const [userId, setUserId] = useState<number | null>(null);
 
     // Função para alternar o status
     const toggleStatus = (id: number, currentStatus: string) => {
@@ -44,6 +53,20 @@ const Users: React.FC = () => {
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,
+            });
+        }
+    };
+
+    // Função para atribuir papel ao usuário
+    const handleAssignRole = () => {
+        if (selectedUserType && userId) {
+            Inertia.put(`/admin/users/${userId}/assign-role`, { user_type_id: selectedUserType }, {
+                onSuccess: () => {
+                    setShowModal(false);
+                    setSuccessMessage('Papel atribuído com sucesso!');
+                },
+                preserveState: true,
+                preserveScroll: true,
             });
         }
     };
@@ -92,7 +115,15 @@ const Users: React.FC = () => {
                                     </td>
                                     <td>
                                         <button className="btn editar">Editar</button>
-                                        <button className="btn papel">Papel</button>
+                                        <button
+                                            className="btn papel"
+                                            onClick={() => {
+                                                setUserId(user.id);
+                                                setShowModal(true);
+                                            }}
+                                        >
+                                            Papel
+                                        </button>
                                         <button
                                             className="btn deletar"
                                             onClick={() => handleDeleteUser(user.id)}
@@ -111,6 +142,30 @@ const Users: React.FC = () => {
                         )}
                     </tbody>
                 </table>
+
+                {showModal && (
+                    <div className={`modal-overlay ${showModal ? 'show' : ''}`}>
+                        <div className="modal-content">
+                            <h2>Atribuir Papel</h2>
+                            <select
+                                onChange={(e) => setSelectedUserType(Number(e.target.value))}
+                                value={selectedUserType || ''}
+                            >
+                                <option value="">Selecione um tipo de usuário</option>
+                                {userTypes.map(type => (
+                                    <option key={type.id} value={type.id}>
+                                        {type.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <button onClick={handleAssignRole}>Atribuir</button>
+                            <button onClick={() => setShowModal(false)} className="cancelar">
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                )}
+
             </div>
         </AuthenticatedLayout>
     );

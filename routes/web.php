@@ -31,6 +31,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/user-types/{id}/edit', [AdminController::class, 'edit'])->name('admin.userTypes.edit');
     Route::put('/admin/user-types/{id}', [AdminController::class, 'update'])->name('admin.userTypes.update');
     Route::delete('/admin/user-types/{id}', [AdminController::class, 'destroy'])->name('admin.userTypes.destroy');
+    Route::get('/admin/users', [AdminController::class, 'userControl'])->name('admin.users');
+    Route::put('/admin/users/{id}/assign-role', [AdminController::class, 'assignRole'])->name('admin.users.assignRole');
+
 
     // Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');
@@ -43,4 +46,5 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+
+require __DIR__ . '/auth.php';

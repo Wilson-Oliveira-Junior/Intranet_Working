@@ -117,13 +117,18 @@ const AdminSidebar = ({ setActivePage }) => {
                     </button>
                     {openMenus.gestao && (
                         <div className="pl-6">
-                            {/* Link para Tipos de Usuários */}
                             <Link href="/admin/usertypes" className="flex items-center py-2">
                                 <i className="fas fa-tasks" aria-label="Tipos de Usuários"></i> Tipos de Usuários
                             </Link>
-                            <button onClick={() => setActivePage("usuarios")} className="py-2">Usuários</button>
-                            <button onClick={() => setActivePage("setores")} className="py-2">Setores</button>
-                            <button onClick={() => setActivePage("permissoes")} className="py-2">Permissões</button>
+                            <Link href="/admin/users" className="flex items-center py-2">
+                                <i className="fas fa-users" aria-label="Usuários"></i> Usuários
+                            </Link>
+                            <Link href="/admin/setores" className="flex items-center py-2">
+                                <i className="fas fa-building" aria-label="Setores"></i> Setores
+                            </Link>
+                            <Link href="/admin/permissoes" className="flex items-center py-2">
+                                <i className="fas fa-lock" aria-label="Permissões"></i> Permissões
+                            </Link>
 
                             {/* Sub-menu Gatilhos */}
                             <div className="flex flex-col">
