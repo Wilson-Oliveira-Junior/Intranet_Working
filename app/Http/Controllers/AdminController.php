@@ -124,17 +124,17 @@ class AdminController extends Controller
     }
 
     public function updateStatus(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
-        $user->status = $request->status;
-        $user->save();
+{
+    $user = User::findOrFail($id);
+    $user->status = $request->status;
+    $user->save();
 
+    return Inertia::render('Admin/Users', [
+        'users' => User::all(),
+        'user' => Auth::user(),
+        'successMessage' => 'Status atualizado com sucesso!',
+    ]);
+}
 
-        return Inertia::render('Admin/Users', [
-            'users' => User::all(),
-            'user' => Auth::user(),
-            'successMessage' => 'Status atualizado com sucesso!',
-        ]);
-    }
 
 }

@@ -29,9 +29,17 @@ const Users: React.FC = () => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [selectedUserType, setSelectedUserType] = useState<number | null>(null);
     const [userId, setUserId] = useState<number | null>(null);
+    const [usersState, setUsersState] = useState<User[]>(users);  // Estado local para armazenar os usuários
 
     const toggleStatus = (id: number, currentStatus: string) => {
         const newStatus = currentStatus === 'Ativo' ? 'Inativo' : 'Ativo';
+
+        // Atualize o estado local diretamente
+        setUsersState((prevState) =>
+            prevState.map((user) =>
+                user.id === id ? { ...user, status: newStatus } : user
+            )
+        );
 
         // Verifique se a URL está correta
         const url = `/admin/users/${id}/status`;
@@ -45,7 +53,6 @@ const Users: React.FC = () => {
             replace: true,
         });
     };
-
 
     const handleDeleteUser = (id: number) => {
         if (window.confirm('Tem certeza de que deseja deletar este usuário?')) {
@@ -93,8 +100,8 @@ const Users: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {Array.isArray(users) && users.length > 0 ? (
-                            users.map((user) => (
+                        {Array.isArray(usersState) && usersState.length > 0 ? (
+                            usersState.map((user) => (
                                 <tr key={user.id}>
                                     <td>{user.id}</td>
                                     <td>
@@ -108,12 +115,14 @@ const Users: React.FC = () => {
                                     <td>{user.email}</td>
                                     <td>{user.sector}</td>
                                     <td>
-                                        <button
-                                            className={`btn status ${user.status === 'Ativo' ? 'on' : 'off'}`}
-                                            onClick={() => toggleStatus(user.id, user.status)}
-                                        >
-                                            {user.status}
-                                        </button>
+                                        <label className="switch">
+                                            <input
+                                                type="checkbox"
+                                                checked={user.status === 'Ativo'}
+                                                onChange={() => toggleStatus(user.id, user.status)}
+                                            />
+                                            <span className="slider"></span>
+                                        </label>
                                     </td>
                                     <td>
                                         <button className="btn editar">Editar</button>
