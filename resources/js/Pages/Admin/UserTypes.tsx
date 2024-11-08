@@ -22,7 +22,7 @@ const UserTypes: React.FC = () => {
     const [successMessage, setSuccessMessage] = useState<string>('');
     const [isPermissionModalOpen, setPermissionModalOpen] = useState(false);
     const [selectedUserType, setSelectedUserType] = useState<UserType | null>(null);
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false); // Novo estado para controle do modal de adição
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -54,6 +54,7 @@ const UserTypes: React.FC = () => {
                 onSuccess: () => {
                     setSuccessMessage('Tipo de usuário atualizado com sucesso!');
                     setEditingUserType(null);
+                    setIsAddModalOpen(false); // Fecha o modal após a edição
                 },
                 preserveState: true,
                 preserveScroll: true,
@@ -64,6 +65,7 @@ const UserTypes: React.FC = () => {
 
     const editarUsuario = (userType: UserType) => {
         setEditingUserType(userType);
+        setIsAddModalOpen(true); // Abre o modal para edição
     };
 
     const gerenciarPermissoes = (userType: UserType) => {

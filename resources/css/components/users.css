@@ -6,6 +6,7 @@
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: fit-content;
 }
 
 /* Estilo do título */
@@ -430,3 +431,66 @@ textarea.form-control {
     opacity: 0.8;
 }
 
+
+/* Estilo para o grupo de formulário */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+/* Estilo específico para o rótulo do grupo */
+.form-group label {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+/* Estilo do contêiner dos botões de rádio */
+.form-group div {
+    display: flex;
+    gap: 20px; /* Espaço entre os botões de rádio */
+    align-items: center;
+}
+
+/* Estilo de cada label dentro do grupo */
+.form-group label input[type="radio"] {
+    margin-right: 8px; /* Espaço entre o botão de rádio e o texto */
+    cursor: pointer;
+}
+
+/* Estilo do texto ao lado do botão de rádio */
+.form-group label {
+    font-size: 1rem;
+    color: #555;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Estilo de margem entre os labels */
+.form-group label.ml-3 {
+    margin-left: 20px;
+}
+
+/* Estilo de um radio button quando está em foco */
+.form-group input[type="radio"]:focus {
+    outline: none;
+    border: 2px solid #007bff; /* Cor azul de destaque */
+}
+
+/* Estilo do radio button quando está selecionado */
+.form-group input[type="radio"]:checked {
+    background-color: #007bff; /* Cor de fundo azul */
+    border-color: #007bff;
+}
+
+/* Adicionando hover para uma interação mais suave */
+.form-group label:hover {
+    color: #007bff;
+}
+
+/* Adicionando estilo de foco ao label (para melhorar a acessibilidade) */
+.form-group input[type="radio"]:focus + label {
+    color: #007bff;
+}

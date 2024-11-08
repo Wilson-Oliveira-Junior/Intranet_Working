@@ -4,6 +4,7 @@ import { Inertia } from '@inertiajs/inertia';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import '../../../css/components/users.css';
 
+
 interface User {
     id: number;
     name: string;
@@ -14,7 +15,7 @@ interface User {
     middlename?: string;
     lastname?: string;
     sex?: string;
-    birthday?: string;
+    birth_date?: string;
     cellphone?: string;
     profilepicture?: string;
     password?: string;
@@ -35,7 +36,7 @@ interface UserType {
 }
 
 const Users: React.FC = () => {
-    const { users, user, userTypes } = usePage().props as { users: User[], user: any, userTypes: UserType[] };
+    const { users, user, userTypes } = usePage().props as { users: User[], user: User, userTypes: UserType[] };
 
     if (!user) {
         return <div>Usuário não encontrado ou não autenticado.</div>;
@@ -58,7 +59,7 @@ const Users: React.FC = () => {
         middlename: '',
         lastname: '',
         sex: '',
-        birthday: '',
+        birth_date: '',
         cellphone: '',
         profilepicture: '',
         password: '',
@@ -128,16 +129,16 @@ const Users: React.FC = () => {
     };
 
     const handleSaveDetails = () => {
-        Inertia.put(`/admin/users/${userId}`, userDetails, {
+        Inertia.put(`/admin/users/${userId}/update-profile`, userDetails, {
             onSuccess: () => {
                 setShowDetailsModal(false);
-                setSuccessMessage('Detalhes do usuário atualizados!');
+                setSuccessMessage('Detalhes do usuário atualizados com sucesso!');
                 setTimeout(() => setSuccessMessage(''), 3000);
             },
             onError: (errors) => {
                 console.error(errors);
-                setErrorMessage('Erro ao atualizar os detalhes do usuário. Tente novamente.');
-                setTimeout(() => setErrorMessage(''), 3000);
+                setSuccessMessage('Erro ao atualizar os detalhes do usuário. Tente novamente.');
+                setTimeout(() => setSuccessMessage(''), 3000);
             },
             preserveState: true,
             preserveScroll: true,
@@ -145,15 +146,8 @@ const Users: React.FC = () => {
     };
 
 
-
     const handleCloseModal = () => {
         setShowDetailsModal(false);
-    };
-
-
-    const handleSaveChanges = () => {
-        console.log('Salvando mudanças...');
-        handleCloseModal();
     };
 
     return (
@@ -289,8 +283,8 @@ const Users: React.FC = () => {
                                 </button>
                             </div>
 
-                            {/* Informações do Usuário */}
-                            {activeTab === 'details' && (
+                          {/* Informações do Usuário */}
+                          {activeTab === 'details' && (
                                 <div className="tab-content">
                                     <h2>Informações do Usuário</h2>
                                     <div className="form-row">
@@ -334,12 +328,26 @@ const Users: React.FC = () => {
                                         </div>
                                         <div className="form-group col-4">
                                             <label>Sexo:</label>
-                                            <input
-                                                type="text"
-                                                value={userDetails.sex}
-                                                onChange={(e) => setUserDetails({ ...userDetails, sex: e.target.value })}
-                                                className="form-control"
-                                            />
+                                            <div>
+                                                <label>
+                                                    <input
+                                                        type="radio"
+                                                        value="Masculino"
+                                                        checked={userDetails.sex === 'Masculino'}
+                                                        onChange={(e) => setUserDetails({ ...userDetails, sex: e.target.value })}
+                                                    />
+                                                    Masculino
+                                                </label>
+                                                <label className="ml-3">
+                                                    <input
+                                                        type="radio"
+                                                        value="Feminino"
+                                                        checked={userDetails.sex === 'Feminino'}
+                                                        onChange={(e) => setUserDetails({ ...userDetails, sex: e.target.value })}
+                                                    />
+                                                    Feminino
+                                                </label>
+                                            </div>
                                         </div>
                                         <div className="form-group col-4">
                                             <label>Setor:</label>
@@ -348,7 +356,14 @@ const Users: React.FC = () => {
                                                 value={userDetails.sector}
                                                 onChange={(e) => setUserDetails({ ...userDetails, sector: e.target.value })}
                                                 className="form-control"
+                                                list="sectorSuggestions"
                                             />
+                                            <datalist id="sectorSuggestions">
+                                                <option value="Financeiro" />
+                                                <option value="Recursos Humanos" />
+                                                <option value="Tecnologia" />
+                                                <option value="Marketing" />
+                                            </datalist>
                                         </div>
                                     </div>
                                     <div className="form-row">
@@ -356,8 +371,8 @@ const Users: React.FC = () => {
                                             <label>Data de Nascimento:</label>
                                             <input
                                                 type="date"
-                                                value={userDetails.birthday}
-                                                onChange={(e) => setUserDetails({ ...userDetails, birthday: e.target.value })}
+                                                value={userDetails.birth_date}
+                                                onChange={(e) => setUserDetails({ ...userDetails, birth_date: e.target.value })}
                                                 className="form-control"
                                             />
                                         </div>
@@ -373,11 +388,17 @@ const Users: React.FC = () => {
                                         <div className="form-group col-4">
                                             <label>Foto de Perfil:</label>
                                             <input
-                                                type="text"
-                                                value={userDetails.profilepicture}
-                                                onChange={(e) => setUserDetails({ ...userDetails, profilepicture: e.target.value })}
+                                                type="file"
+                                                onChange={(e) => handleProfilePictureChange(e)}
                                                 className="form-control"
                                             />
+                                            {userDetails.profilepicture && (
+                                                <img
+                                                    src={userDetails.profilepicture}
+                                                    alt="Pré-visualização da Foto de Perfil"
+                                                    style={{ width: "100px", height: "100px", marginTop: "10px" }}
+                                                />
+                                            )}
                                         </div>
                                     </div>
                                     <div className="form-row">
@@ -519,7 +540,7 @@ const Users: React.FC = () => {
                                 </button>
                                 <button
                                     className="btn btn-primary ml-2"
-                                    onClick={handleSaveChanges}
+                                    onClick={handleSaveDetails}
                                 >
                                     Salvar
                                 </button>

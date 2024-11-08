@@ -13,9 +13,6 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
     public function edit(Request $request): Response
     {
         return Inertia::render('Profile/Edit', [
@@ -24,38 +21,48 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
-{
-    // Preencher o usuário com os dados validados
-    $user = $request->user();
-    $user->fill($request->validated());  // Inclui os novos campos como middlename, address, etc.
+    {
+        $user = $request->user();
+        $user->fill($request->validated());
 
-    // Verificar se o email foi alterado e, se sim, limpar a verificação do email
-    if ($user->isDirty('email')) {
-        $user->email_verified_at = null;
+        // Se o e-mail foi alterado, desmarque a verificação
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        // Salvar a imagem de perfil, se fornecida
+        if ($request->hasFile('profilepicture')) {
+            $imagePath = $request->file('profilepicture')->store('profile_images', 'public');
+            $user->image = $imagePath; // A imagem é salva com o nome 'image' no banco
+        }
+
+        // Salvar outros dados, como celular, ramal e outros campos
+        $user->cellphone = $request->input('cellphone');
+        $user->ramal = $request->input('ramal');
+        $user->cep = $request->input('cep');
+        $user->address = $request->input('address');
+        $user->social_media = $request->input('social_media');
+        $user->curiosity = $request->input('curiosity');
+        $user->facebook = $request->input('facebook');
+        $user->instagram = $request->input('instagram');
+        $user->linkedin = $request->input('linkedin');
+        $user->sector = $request->input('sector');
+        $user->birth_date = $request->input('birth_date');
+        $user->middlename = $request->input('middlename');
+        $user->lastname = $request->input('lastname');
+
+        // Salvar as alterações
+        $user->save();
+
+        return Redirect::route('profile.edit')->with('status', 'Profile updated successfully!');
     }
 
-    // Salvar as alterações no banco de dados
-    $user->save();
-
-    // Redirecionar de volta para o formulário de edição do perfil
-    return Redirect::route('profile.edit')->with('status', 'Profile updated successfully!');
-}
-
-    /**
-     * Delete the user's account.
-     */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validate([
-            'password' => ['required', 'current_password'],
-        ]);
+        $request->validate(['password' => ['required', 'current_password']]);
 
         $user = $request->user();
-
         Auth::logout();
 
         $user->delete();

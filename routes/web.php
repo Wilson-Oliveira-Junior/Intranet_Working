@@ -27,13 +27,23 @@ Route::middleware('auth')->group(function () {
     // Admin
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/usertypes', [AdminController::class, 'userTypes'])->name('admin.usertypes');
+    //Tipos de Usuarios
     Route::post('/admin/user-types', [AdminController::class, 'store']);
     Route::get('/admin/user-types/{id}/edit', [AdminController::class, 'edit'])->name('admin.userTypes.edit');
     Route::put('/admin/user-types/{id}', [AdminController::class, 'update'])->name('admin.userTypes.update');
     Route::delete('/admin/user-types/{id}', [AdminController::class, 'destroy'])->name('admin.userTypes.destroy');
+    //Usuarios
     Route::get('/admin/users', [AdminController::class, 'userControl'])->name('admin.users');
     Route::put('/admin/users/{id}/assign-role', [AdminController::class, 'assignRole'])->name('admin.users.assignRole');
     Route::put('/admin/users/{id}/status', [AdminController::class, 'updateStatus'])->name('admin.users.updateStatus');
+    Route::put('/admin/users/{id}/update-profile', [AdminController::class, 'updateUserProfile'])->name('admin.users.updateProfile');
+    Route::get('/admin/users/{id}/get-user-details', [AdminController::class, 'getUserDetails']);
+    //Setores
+    Route::get('/admin/setores', [AdminController::class, 'indexSectors'])->name('admin.sectors');
+    Route::post('/admin/setores', [AdminController::class, 'storeSector']);
+    Route::get('/admin/setores/{id}/edit', [AdminController::class, 'editSector']);
+    Route::put('/admin/setores/{id}', [AdminController::class, 'updateSector']);
+    Route::delete('/admin/setores/{id}', [AdminController::class, 'destroySector']);
 
     // Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');
@@ -45,6 +55,5 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
 
 require __DIR__ . '/auth.php';

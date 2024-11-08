@@ -12,12 +12,22 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
+        'middlename',
+        'lastname',
+        'address',
+        'social_media',
+        'curiosity',
         'email',
         'password',
-        'image',
+        'image',          // Foto de perfil
         'status',
         'user_type_id',
         'sector',
+        'birth_date',
+        'cellphone',      // Novo campo para celular
+        'ramal',          // Novo campo para ramal
+        'cep',            // Novo campo para CEP
+        'profilepicture', // Novo campo para a imagem de perfil
     ];
 
     protected $hidden = [
@@ -28,15 +38,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'birth_date' => 'date',
     ];
 
-    // Relação com UserType
     public function userType()
     {
         return $this->belongsTo(UserType::class);
     }
 
-    // Relação com Permissions (muitos para muitos)
     public function permissions()
     {
         return $this->belongsToMany(Permission::class, 'permission_user');
