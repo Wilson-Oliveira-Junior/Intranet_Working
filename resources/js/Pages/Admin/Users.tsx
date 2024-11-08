@@ -4,7 +4,6 @@ import { Inertia } from '@inertiajs/inertia';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import '../../../css/components/users.css';
 
-
 interface User {
     id: number;
     name: string;
@@ -35,8 +34,19 @@ interface UserType {
     name: string;
 }
 
+interface Sector {
+    id: number;
+    name: string;
+}
+
 const Users: React.FC = () => {
-    const { users, user, userTypes } = usePage().props as { users: User[], user: User, userTypes: UserType[] };
+    const { users, user, userTypes, sectors } = usePage().props as {
+        users: User[],
+        user: User,
+        userTypes: UserType[],
+        sectors: Sector[]
+    };
+    console.log(sectors);
 
     if (!user) {
         return <div>Usuário não encontrado ou não autenticado.</div>;
@@ -145,9 +155,13 @@ const Users: React.FC = () => {
         });
     };
 
-
     const handleCloseModal = () => {
         setShowDetailsModal(false);
+    };
+
+    // Função de manipulação do campo 'setor'
+    const handleSectorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setUserDetails({ ...userDetails, sector: e.target.value });
     };
 
     return (
@@ -283,8 +297,8 @@ const Users: React.FC = () => {
                                 </button>
                             </div>
 
-                          {/* Informações do Usuário */}
-                          {activeTab === 'details' && (
+                            {/* Informações do Usuário */}
+                            {activeTab === 'details' && (
                                 <div className="tab-content">
                                     <h2>Informações do Usuário</h2>
                                     <div className="form-row">
@@ -359,10 +373,9 @@ const Users: React.FC = () => {
                                                 list="sectorSuggestions"
                                             />
                                             <datalist id="sectorSuggestions">
-                                                <option value="Financeiro" />
-                                                <option value="Recursos Humanos" />
-                                                <option value="Tecnologia" />
-                                                <option value="Marketing" />
+                                                {sectors.map((sector) => (
+                                                    <option key={sector.id} value={sector.name} />
+                                                ))}
                                             </datalist>
                                         </div>
                                     </div>

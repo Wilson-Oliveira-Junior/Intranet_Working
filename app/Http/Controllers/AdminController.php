@@ -14,10 +14,11 @@ class AdminController extends Controller
     public function index()
     {
         $user = Auth::user();
-
+        $sectors = Sector::all();
         return Inertia::render('Admin/DashboardADM', [
             'component' => 'Admin/HomeAdm',
             'user' => $user,
+            'sectors' => $sectors,
         ]);
     }
 
@@ -106,11 +107,13 @@ class AdminController extends Controller
         $users = User::all();
         $user = Auth::user();
         $userTypes = UserType::all();
+        $sectors = Sector::all();
 
         return Inertia::render('Admin/Users', [
             'users' => $users,
             'user' => $user,
             'userTypes' => $userTypes,
+            'sectors' => $sectors,
         ]);
     }
 
@@ -175,8 +178,14 @@ class AdminController extends Controller
 
         $user->save();
 
-        return Inertia::location(route('profile.edit'));
+        $sectors = Sector::all(); // Carregar os setores para o modal
+
+        return Inertia::render('Admin/EditProfile', [
+            'user' => $user,
+            'sectors' => $sectors, // Passar os setores para a view
+        ]);
     }
+
 
 
     // Página de setores
@@ -226,23 +235,23 @@ class AdminController extends Controller
 
     // Atualizar um setor
     public function updateSector(Request $request, $id)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'description' => 'required|string',
-        'email' => 'required|email|max:255', // validação
-    ]);
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'email' => 'required|email|max:255', // validação
+        ]);
 
-    $sector = Sector::findOrFail($id);
-    $sector->update([
-        'name' => $request->name,
-        'email' => $request->email, // atualizando o email
-        'description' => $request->description,
-    ]);
+        $sector = Sector::findOrFail($id);
+        $sector->update([
+            'name' => $request->name,
+            'email' => $request->email, // atualizando o email
+            'description' => $request->description,
+        ]);
 
-    return redirect()->route('admin.sectors')
-        ->with('successMessage', 'Setor atualizado com sucesso!');
-}
+        return redirect()->route('admin.sectors')
+            ->with('successMessage', 'Setor atualizado com sucesso!');
+    }
     // Deletar um setor
     public function destroySector($id)
     {
@@ -252,6 +261,4 @@ class AdminController extends Controller
         return redirect()->route('admin.sectors')
             ->with('successMessage', 'Setor deletado com sucesso!');
     }
-
-
 }
