@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Inertia\Inertia;
 use App\Models\UserType;
 use App\Models\User;
+use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Sector;
@@ -260,5 +261,56 @@ class AdminController extends Controller
 
         return redirect()->route('admin.sectors')
             ->with('successMessage', 'Setor deletado com sucesso!');
+    }
+
+    // Exibe lista de permissões
+    public function indexPermissions()
+    {
+        $user = Auth::user();
+        $permissions = Permission::all();
+        return Inertia::render('Admin/Permissions', ['permissions' => $permissions, 'user' => $user,]);
+    }
+
+    // Armazena uma nova permissão
+    public function storePermission(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'label' => 'required|string',
+        ]);
+
+        Permission::create($request->all());
+
+        return redirect()->route('admin.permissions.index')->with('success', 'Permissão adicionada com sucesso.');
+    }
+
+    // Edita uma permissão existente
+    public function editPermission($id)
+    {
+        $permission = Permission::findOrFail($id);
+        return Inertia::render('Admin/EditPermission', ['permission' => $permission]);
+    }
+
+    // Atualiza uma permissão existente
+    public function updatePermission(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'label' => 'required|string',
+        ]);
+
+        $permission = Permission::findOrFail($id);
+        $permission->update($request->all());
+
+        return redirect()->route('admin.permissions.index')->with('success', 'Permissão atualizada com sucesso.');
+    }
+
+    // Deleta uma permissão
+    public function destroyPermission($id)
+    {
+        $permission = Permission::findOrFail($id);
+        $permission->delete();
+
+        return redirect()->route('admin.permissions.index')->with('success', 'Permissão excluída com sucesso.');
     }
 }

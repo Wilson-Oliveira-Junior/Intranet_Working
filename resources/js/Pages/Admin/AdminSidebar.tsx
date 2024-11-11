@@ -129,20 +129,12 @@ const AdminSidebar = ({ setActivePage }) => {
                             <Link href="/admin/permissoes" className="flex items-center py-2">
                                 <i className="fas fa-lock" aria-label="Permissões"></i> Permissões
                             </Link>
-
-                            {/* Sub-menu Gatilhos */}
-                            <div className="flex flex-col">
-                                <button onClick={() => toggleMenu('gatilhos')} className="flex items-center py-2">
-                                    Gatilhos
-                                    <i className={`fas fa-chevron-right ml-auto ${openMenus.gatilhos ? 'rotate-90' : ''}`}></i>
-                                </button>
-                                {openMenus.gatilhos && (
-                                    <div className="pl-6">
-                                        <button onClick={() => setActivePage("gatilhosGerais")} className="py-2">Gatilhos Gerais</button>
-                                        <button onClick={() => setActivePage("configuracao")} className="py-2">Configuração</button>
-                                    </div>
-                                )}
-                            </div>
+                            <Link href="/admin/gatilhos" className="flex items-center py-2">
+                                <i className="fas fa-lock" aria-label="Gatilhos"></i> Gatilhos
+                            </Link>
+                            <Link href="/admin/configuracao" className="flex items-center py-2">
+                                <i className="fas fa-lock" aria-label="Configuração"></i> Configuração
+                            </Link>
                         </div>
                     )}
                 </div>
