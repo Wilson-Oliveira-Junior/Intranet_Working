@@ -21,6 +21,8 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/active-users-count', [AdminController::class, 'getActiveUsersCount']);
+
 
 // Rotas específicas para diferentes níveis de acesso
 Route::middleware('auth')->group(function () {

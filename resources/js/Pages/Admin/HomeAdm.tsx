@@ -1,14 +1,30 @@
+import { useState, useEffect } from 'react';
 import '../../../css/components/Homepage.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import axios from 'axios';
 
 const HomeAdm: React.FC = () => {
-    const { user, activeUsersCount } = usePage().props as { user: User, activeUsersCount: number };
+  const { user, activeUsersCount: activeUsersCountFromProps } = usePage().props as { user: User, activeUsersCount: number };
 
-    if (!user) {
-      return <div>Erro: Usuário não encontrado. Verifique a autenticação.</div>;
-    }
+
+  const [activeUsersCount, setActiveUsersCount] = useState<number>(activeUsersCountFromProps || 0);
+
+  if (!user) {
+    return <div>Erro: Usuário não encontrado. Verifique a autenticação.</div>;
+  }
+
+
+  useEffect(() => {
+    axios.get('/active-users-count')
+      .then(response => {
+        setActiveUsersCount(response.data.count);
+      })
+      .catch(error => {
+        console.error('Erro ao carregar dados de usuários ativos', error);
+      });
+  }, []);
 
   return (
     <AuthenticatedLayout user={user}>
@@ -29,7 +45,7 @@ const HomeAdm: React.FC = () => {
           <div className="col-md-3 mb-4">
             <div className="card">
               <h2>USUÁRIOS</h2>
-              <p>{activeUsersCount}</p> {/* Exibe o número de usuários ativos */}
+              <p>{activeUsersCount}</p>
             </div>
           </div>
           <div className="col-md-3 mb-4">

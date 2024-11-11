@@ -23,13 +23,13 @@ class AdminController extends Controller
         ]);
     }
 
-
-    public function dashboard()
+    public function getActiveUsersCount()
     {
-        $activeUsersCount = User::where('status', 'active')->count();
-        return Inertia::render('Admin/HomeAdm', [
-            'user' => auth()->user(),
-            'activeUsersCount' => $activeUsersCount,
+        // Contar o número de usuários com status 'active'
+        $activeUsersCount = User::where('status', 'Ativo')->count();
+
+        return response()->json([
+            'count' => $activeUsersCount
         ]);
     }
 
