@@ -56,6 +56,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/admin/permissoes/{id}', [AdminController::class, 'destroyPermission'])->name('admin.permissions.destroy');
     Route::post('/admin/user-types/{id}/permissions', [AdminController::class, 'storePermissions']);
 
+    //Gatilhos
+
+
     // Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');
 

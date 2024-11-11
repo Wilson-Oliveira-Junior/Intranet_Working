@@ -22,6 +22,18 @@ class AdminController extends Controller
             'sectors' => $sectors,
         ]);
     }
+
+
+    public function dashboard()
+    {
+        $activeUsersCount = User::where('status', 'active')->count();
+        return Inertia::render('Admin/HomeAdm', [
+            'user' => auth()->user(),
+            'activeUsersCount' => $activeUsersCount,
+        ]);
+    }
+
+
     public function userTypes()
     {
         $userTypes = UserType::with('permissions')->get();
@@ -143,6 +155,7 @@ class AdminController extends Controller
     public function userControl()
     {
         $users = User::paginate(10);
+        $users = User::all();
         $user = Auth::user();
         $userTypes = UserType::all();
         $sectors = Sector::all();

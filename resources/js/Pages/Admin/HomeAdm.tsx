@@ -1,16 +1,14 @@
 import '../../../css/components/Homepage.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { usePage } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
+const HomeAdm: React.FC = () => {
+    const { user, activeUsersCount } = usePage().props as { user: User, activeUsersCount: number };
 
-const HomeAdm = () => {
-  // Pegar o usuário da página (via Inertia.js)
-  const { user } = usePage().props;
-
-  if (!user) {
-    return <div>Erro: Usuário não encontrado. Verifique a autenticação.</div>;
-  }
+    if (!user) {
+      return <div>Erro: Usuário não encontrado. Verifique a autenticação.</div>;
+    }
 
   return (
     <AuthenticatedLayout user={user}>
@@ -31,7 +29,7 @@ const HomeAdm = () => {
           <div className="col-md-3 mb-4">
             <div className="card">
               <h2>USUÁRIOS</h2>
-              <p>{/* valor para usuários */}</p>
+              <p>{activeUsersCount}</p> {/* Exibe o número de usuários ativos */}
             </div>
           </div>
           <div className="col-md-3 mb-4">
