@@ -22,50 +22,82 @@ class AdminController extends Controller
             'sectors' => $sectors,
         ]);
     }
-
     public function userTypes()
     {
-        $userTypes = UserType::all();
+        $userTypes = UserType::with('permissions')->get();
+        $permissions = Permission::all();
         $user = Auth::user();
 
         return Inertia::render('Admin/UserTypes', [
             'userTypes' => $userTypes,
+            'permissions' => $permissions,
             'user' => $user,
         ]);
     }
+
 
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
+            'permissions' => 'array',
         ]);
 
-        UserType::create([
+        $userType = UserType::create([
             'name' => $request->name,
             'description' => $request->description,
         ]);
+
+        // Associa as permissões ao UserType
+        if ($request->has('permissions')) {
+            $userType->permissions()->sync($request->permissions); // Sincroniza as permissões selecionadas
+        }
 
         return redirect()->route('admin.usertypes')
             ->with('successMessage', 'Tipo de usuário adicionado com sucesso!');
     }
 
+
+
     public function edit($id)
     {
-        $userType = UserType::findOrFail($id);
+        $userType = UserType::with('permissions')->findOrFail($id);
+        $permissions = Permission::all();
         $user = Auth::user();
 
         return Inertia::render('Admin/EditUserType', [
             'userType' => $userType,
+            'permissions' => $permissions,
             'user' => $user,
         ]);
     }
+
+    public function assignPermissions(Request $request, $userTypeId)
+    {
+        // Validações para garantir que as permissões sejam passadas corretamente
+        $validated = $request->validate([
+            'permissions' => 'required|array', // Espera um array de IDs de permissões
+            'permissions.*' => 'exists:permissions,id', // Verifica se cada ID de permissão existe
+        ]);
+
+        // Encontra o tipo de usuário
+        $userType = UserType::findOrFail($userTypeId);
+
+        // Sincroniza as permissões com o tipo de usuário (associa ou desassocia as permissões)
+        $userType->permissions()->sync($validated['permissions']);
+
+        // Retorna uma resposta, pode ser um JSON para frontend
+        return response()->json(['message' => 'Permissões atualizadas com sucesso!']);
+    }
+
 
     public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
+            'permissions' => 'array', // Recebe um array de permissões
         ]);
 
         $userType = UserType::findOrFail($id);
@@ -73,6 +105,11 @@ class AdminController extends Controller
             'name' => $request->name,
             'description' => $request->description,
         ]);
+
+        // Atualiza as permissões associadas ao UserType
+        if ($request->has('permissions')) {
+            $userType->permissions()->sync($request->permissions); // Sincroniza as permissões selecionadas
+        }
 
         return redirect()->route('admin.usertypes')
             ->with('successMessage', 'Tipo de usuário atualizado com sucesso!');
@@ -105,7 +142,7 @@ class AdminController extends Controller
 
     public function userControl()
     {
-        $users = User::all();
+        $users = User::paginate(10);
         $user = Auth::user();
         $userTypes = UserType::all();
         $sectors = Sector::all();
@@ -117,6 +154,7 @@ class AdminController extends Controller
             'sectors' => $sectors,
         ]);
     }
+
 
     public function assignRole(Request $request, $id)
     {
@@ -192,11 +230,11 @@ class AdminController extends Controller
 
         $user->save();
 
-        $sectors = Sector::all(); // Carregar os setores para o modal
+        $sectors = Sector::all();
 
         return Inertia::render('Admin/EditProfile', [
             'user' => $user,
-            'sectors' => $sectors, // Passar os setores para a view
+            'sectors' => $sectors,
         ]);
     }
 
@@ -284,17 +322,23 @@ class AdminController extends Controller
     }
 
     // Armazena uma nova permissão
-    public function storePermission(Request $request)
+    public function storePermissions(Request $request, $userTypeId)
     {
+        $userType = UserType::findOrFail($userTypeId);
+        $permissions = $request->input('permissions');
+
+        // Validate permissions input
         $request->validate([
-            'name' => 'required|string',
-            'label' => 'required|string',
+            'permissions' => 'required|array',
+            'permissions.*' => 'exists:permissions,id',
         ]);
 
-        Permission::create($request->all());
+        // Update the pivot table by syncing the permissions
+        $userType->permissions()->sync($permissions);
 
-        return redirect()->route('admin.permissions.index')->with('success', 'Permissão adicionada com sucesso.');
+        return redirect()->route('admin.usertypes')->with('success', 'Permissões atualizadas com sucesso.');
     }
+
 
     // Edita uma permissão existente
     public function editPermission($id)
@@ -325,4 +369,5 @@ class AdminController extends Controller
 
         return redirect()->route('admin.permissions.index')->with('success', 'Permissão excluída com sucesso.');
     }
+
 }

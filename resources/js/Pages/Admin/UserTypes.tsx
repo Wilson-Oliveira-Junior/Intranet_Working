@@ -1,14 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
 import { Inertia } from '@inertiajs/inertia';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import '../../../css/components/usertypes.css';
-
-interface UserType {
-    id?: number;
-    name: string;
-    description: string;
-}
 
 interface Permission {
     id: number;
@@ -16,43 +10,57 @@ interface Permission {
     label: string;
 }
 
+interface UserType {
+    id: number;
+    name: string;
+    description: string;
+    permissions: Permission[];
+}
+
 const UserTypes: React.FC = () => {
-    // Pegando os dados do props passado pela página
     const { userTypes, user, permissions } = usePage().props as { userTypes: UserType[], user: any, permissions: Permission[] };
 
-    // Se o usuário não estiver autenticado, exibe uma mensagem
     if (!user) {
         return <div>Usuário não encontrado ou não autenticado.</div>;
     }
 
-    // Estado para o tipo de usuário selecionado e o estado de abertura do modal
     const [selectedUserType, setSelectedUserType] = useState<UserType | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isPermissionModalOpen, setPermissionModalOpen] = useState(false);
     const [newUserType, setNewUserType] = useState<UserType>({ name: '', description: '' });
     const [editingUserType, setEditingUserType] = useState<UserType | null>(null);
+    const [userTypePermissions, setUserTypePermissions] = useState<number[]>([]); // Apenas IDs das permissões
+    const [currentPage, setCurrentPage] = useState(1);
+    const [permissionsPerPage] = useState(10);
 
-    // Função para abrir o modal de permissões
+    // Correção do cálculo dos índices de permissão
+    const totalPermissions = permissions.length;
+    const indexOfLastPermission = currentPage * permissionsPerPage;
+    const indexOfFirstPermission = indexOfLastPermission - permissionsPerPage;
+
+    const currentPermissions = permissions.slice(indexOfFirstPermission, indexOfLastPermission);
+
     const gerenciarPermissoes = (userType: UserType) => {
-        setSelectedUserType(userType);  // Define o tipo de usuário selecionado
-        setPermissionModalOpen(true);    // Abre o modal de permissões
+        setSelectedUserType(userType);
+        setPermissionModalOpen(true);
+        // Definindo as permissões selecionadas do tipo de usuário
+        setUserTypePermissions(userType.permissions.map(p => p.id));
     };
 
-    // Função para deletar a permissão de um tipo de usuário
     const deletarPermissao = (permissionId: number) => {
         if (window.confirm('Tem certeza de que deseja deletar esta permissão?')) {
             Inertia.delete(`/admin/user-types/${selectedUserType?.id}/permissions/${permissionId}`, {
                 onSuccess: () => {
                     alert('Permissão deletada com sucesso!');
+                    // Atualizar a lista de permissões após a exclusão
+                    setUserTypePermissions(prevPermissions => prevPermissions.filter(p => p !== permissionId));
                 },
-                preserveState: true,  // Preserva o estado atual da página
-                preserveScroll: true, // Preserva o scroll
-                replace: true,         // Substitui o conteúdo da página
+                preserveState: true,
+                preserveScroll: true,
             });
         }
     };
 
-    // Função para manipular mudanças nos inputs
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         if (editingUserType) {
@@ -68,11 +76,9 @@ const UserTypes: React.FC = () => {
         }
     };
 
-    // Função de envio para criar ou editar tipo de usuário
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (editingUserType) {
-            // Submissão para editar tipo de usuário
             Inertia.put(`/admin/user-types/${editingUserType.id}`, editingUserType, {
                 onSuccess: () => {
                     setEditingUserType(null);
@@ -80,7 +86,6 @@ const UserTypes: React.FC = () => {
                 }
             });
         } else {
-            // Submissão para adicionar novo tipo de usuário
             Inertia.post('/admin/user-types', newUserType, {
                 onSuccess: () => {
                     setIsAddModalOpen(false);
@@ -89,10 +94,39 @@ const UserTypes: React.FC = () => {
         }
     };
 
-    // Função para abrir o modal de edição
     const abrirEditarModal = (userType: UserType) => {
         setEditingUserType(userType);
         setIsAddModalOpen(true);
+    };
+
+    const associarPermissoes = (selectedPermissions: number[]) => {
+        Inertia.post(`/admin/user-types/${selectedUserType.id}/permissions`, {
+            permissions: selectedPermissions,
+        }, {
+            onSuccess: () => {
+                alert('Permissões associadas com sucesso!');
+                setPermissionModalOpen(false);
+                setUserTypePermissions(selectedPermissions);
+            },
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
+
+    const handlePermissionToggle = (permissionId: number) => {
+        setUserTypePermissions(prevPermissions => {
+            if (prevPermissions.includes(permissionId)) {
+                return prevPermissions.filter(id => id !== permissionId);
+            } else {
+                return [...prevPermissions, permissionId];
+            }
+        });
+    };
+
+    const paginate = (pageNumber: number) => {
+        if (pageNumber > 0 && pageNumber <= Math.ceil(totalPermissions / permissionsPerPage)) {
+            setCurrentPage(pageNumber);
+        }
     };
 
     return (
@@ -100,7 +134,6 @@ const UserTypes: React.FC = () => {
             <div className="container">
                 <h1>Tipos de Usuários</h1>
 
-                {/* Tabela para exibir todos os tipos de usuários */}
                 <table>
                     <thead>
                         <tr>
@@ -110,51 +143,28 @@ const UserTypes: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {Array.isArray(userTypes) && userTypes.length > 0 ? (
-                            userTypes.map((userType) => (
-                                <tr key={userType.id}>
-                                    <td>{userType.name}</td>
-                                    <td>{userType.description}</td>
-                                    <td>
-                                        {/* Botão para editar tipo de usuário */}
-                                        <button className="btn editar" onClick={() => abrirEditarModal(userType)}>
-                                            Editar
-                                        </button>
-                                          {/* Botão para gerenciar permissões do tipo de usuário */}
-                                          <button className="btn permissoes" onClick={() => gerenciarPermissoes(userType)}>
-                                            Permissões
-                                        </button>
-                                        {/* Botão para deletar tipo de usuário */}
-                                        <button
-                                            className="btn deletar"
-                                            onClick={() =>
-                                                window.confirm('Tem certeza de que deseja excluir este tipo de usuário?') &&
-                                                Inertia.delete(`/admin/user-types/${userType.id}`, {
-                                                    onSuccess: () => alert('Tipo de Usuário deletado com sucesso!'),
-                                                })
-                                            }
-                                        >
-                                            Deletar
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan={3} className="text-center">
-                                    Nenhum tipo de usuário encontrado.
+                        {userTypes.map((userType) => (
+                            <tr key={userType.id}>
+                                <td>{userType.name}</td>
+                                <td>{userType.description}</td>
+                                <td>
+                                    <button className="btn editar" onClick={() => abrirEditarModal(userType)}>Editar</button>
+                                    <button className="btn permissoes" onClick={() => gerenciarPermissoes(userType)}>Permissões</button>
+                                    <button className="btn deletar" onClick={() => {
+                                        if (window.confirm('Tem certeza de que deseja excluir este tipo de usuário?')) {
+                                            Inertia.delete(`/admin/user-types/${userType.id}`, {
+                                                onSuccess: () => alert('Tipo de Usuário deletado com sucesso!'),
+                                            });
+                                        }
+                                    }}>Deletar</button>
                                 </td>
                             </tr>
-                        )}
+                        ))}
                     </tbody>
                 </table>
 
-                {/* Botão para abrir o modal de adição */}
-                <button className="btn novo" onClick={() => setIsAddModalOpen(true)}>
-                    Adicionar Novo Tipo de Usuário
-                </button>
+                <button className="btn novo" onClick={() => setIsAddModalOpen(true)}>Adicionar Novo Tipo de Usuário</button>
 
-                {/* Modal de Adição de Tipo de Usuário */}
                 {isAddModalOpen && (
                     <div className="modal-overlay">
                         <div className="modal">
@@ -175,63 +185,55 @@ const UserTypes: React.FC = () => {
                                     onChange={handleChange}
                                     required
                                 />
-                                <button type="submit" className="btn novo">
-                                    {editingUserType ? 'Atualizar Tipo de Usuário' : 'Adicionar Tipo de Usuário'}
-                                </button>
-                                <button type="button" onClick={() => setIsAddModalOpen(false)} className="btn fechar">
-                                    Fechar
-                                </button>
+                                <button type="submit" className="btn novo">{editingUserType ? 'Atualizar Tipo de Usuário' : 'Adicionar Tipo de Usuário'}</button>
+                                <button type="button" onClick={() => setIsAddModalOpen(false)} className="btn fechar">Fechar</button>
                             </form>
                         </div>
                     </div>
                 )}
 
-                {/* Modal de Permissões */}
-                {isPermissionModalOpen && selectedUserType && (
+                {isPermissionModalOpen && (
                     <div className="modal-overlay">
                         <div className="modal">
-                            <h2>Permissões para {selectedUserType.name}</h2>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Nome</th>
-                                        <th>Label</th>
-                                        <th>Ação</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {permissions && permissions.length > 0 ? (
-                                        permissions.map((permission) => (
+                            <h2>Gerenciar Permissões para: {selectedUserType?.name}</h2>
+                            <form
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    associarPermissoes(userTypePermissions);
+                                }}
+                            >
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Permissão</th>
+                                            <th>Adicionar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {currentPermissions.map((permission) => (
                                             <tr key={permission.id}>
-                                                <td>{permission.id}</td>
-                                                <td>{permission.name}</td>
                                                 <td>{permission.label}</td>
                                                 <td>
-                                                    {/* Botão de deletar a permissão */}
-                                                    <button
-                                                        className="btn deletar"
-                                                        onClick={() => deletarPermissao(permission.id)}
-                                                    >
-                                                        Deletar
-                                                    </button>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={userTypePermissions.includes(permission.id)}
+                                                        onChange={() => handlePermissionToggle(permission.id)}
+                                                    />
                                                 </td>
                                             </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={4} className="text-center">
-                                                Nenhuma permissão encontrada.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                        ))}
+                                    </tbody>
+                                </table>
 
-                            {/* Botão para fechar o modal */}
-                            <button onClick={() => setPermissionModalOpen(false)} className="btn fechar">
-                                Fechar
-                            </button>
+                                <div className="pagination">
+                                    <button type="button" onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>Anterior</button>
+                                    <span>Página {currentPage}</span>
+                                    <button type="button" onClick={() => paginate(currentPage + 1)} disabled={indexOfLastPermission >= totalPermissions}>Próxima</button>
+                                </div>
+
+                                <button type="submit" className="btn associar">Salvar Permissões</button>
+                                <button type="button" onClick={() => setPermissionModalOpen(false)} className="btn fechar">Fechar</button>
+                            </form>
                         </div>
                     </div>
                 )}
