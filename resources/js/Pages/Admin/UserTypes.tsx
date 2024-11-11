@@ -10,80 +10,89 @@ interface UserType {
     description: string;
 }
 
-const UserTypes: React.FC = () => {
-    const { userTypes, user } = usePage().props as { userTypes: UserType[], user: any };
+interface Permission {
+    id: number;
+    name: string;
+    label: string;
+}
 
+const UserTypes: React.FC = () => {
+    // Pegando os dados do props passado pela página
+    const { userTypes, user, permissions } = usePage().props as { userTypes: UserType[], user: any, permissions: Permission[] };
+
+    // Se o usuário não estiver autenticado, exibe uma mensagem
     if (!user) {
         return <div>Usuário não encontrado ou não autenticado.</div>;
     }
 
-    const [newUserType, setNewUserType] = useState<UserType>({ name: '', description: '' });
-    const [editingUserType, setEditingUserType] = useState<UserType | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string>('');
-    const [isPermissionModalOpen, setPermissionModalOpen] = useState(false);
+    // Estado para o tipo de usuário selecionado e o estado de abertura do modal
     const [selectedUserType, setSelectedUserType] = useState<UserType | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isPermissionModalOpen, setPermissionModalOpen] = useState(false);
+    const [newUserType, setNewUserType] = useState<UserType>({ name: '', description: '' });
+    const [editingUserType, setEditingUserType] = useState<UserType | null>(null);
 
+    // Função para abrir o modal de permissões
+    const gerenciarPermissoes = (userType: UserType) => {
+        setSelectedUserType(userType);  // Define o tipo de usuário selecionado
+        setPermissionModalOpen(true);    // Abre o modal de permissões
+    };
+
+    // Função para deletar a permissão de um tipo de usuário
+    const deletarPermissao = (permissionId: number) => {
+        if (window.confirm('Tem certeza de que deseja deletar esta permissão?')) {
+            Inertia.delete(`/admin/user-types/${selectedUserType?.id}/permissions/${permissionId}`, {
+                onSuccess: () => {
+                    alert('Permissão deletada com sucesso!');
+                },
+                preserveState: true,  // Preserva o estado atual da página
+                preserveScroll: true, // Preserva o scroll
+                replace: true,         // Substitui o conteúdo da página
+            });
+        }
+    };
+
+    // Função para manipular mudanças nos inputs
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         if (editingUserType) {
-            setEditingUserType(prevState => ({ ...prevState, [name]: value }));
+            setEditingUserType({
+                ...editingUserType,
+                [name]: value,
+            });
         } else {
-            setNewUserType(prevState => ({ ...prevState, [name]: value }));
+            setNewUserType({
+                ...newUserType,
+                [name]: value,
+            });
         }
     };
 
+    // Função de envio para criar ou editar tipo de usuário
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        Inertia.post('/admin/user-types', newUserType, {
-            onSuccess: () => {
-                setSuccessMessage('Tipo de usuário adicionado com sucesso!');
-                setNewUserType({ name: '', description: '' });
-                setIsAddModalOpen(false); // Fecha o modal após a criação
-            },
-            preserveState: true,
-            preserveScroll: true,
-            replace: true,
-        });
-    };
-
-    const handleSubmitEdit = (e: React.FormEvent) => {
-        e.preventDefault();
         if (editingUserType) {
+            // Submissão para editar tipo de usuário
             Inertia.put(`/admin/user-types/${editingUserType.id}`, editingUserType, {
                 onSuccess: () => {
-                    setSuccessMessage('Tipo de usuário atualizado com sucesso!');
                     setEditingUserType(null);
-                    setIsAddModalOpen(false); // Fecha o modal após a edição
-                },
-                preserveState: true,
-                preserveScroll: true,
-                replace: true,
+                    setIsAddModalOpen(false);
+                }
             });
-        }
-    };
-
-    const editarUsuario = (userType: UserType) => {
-        setEditingUserType(userType);
-        setIsAddModalOpen(true); // Abre o modal para edição
-    };
-
-    const gerenciarPermissoes = (userType: UserType) => {
-        setSelectedUserType(userType);
-        setPermissionModalOpen(true);
-    };
-
-    const deletarUsuario = (id: number) => {
-        if (window.confirm('Tem certeza de que deseja deletar este tipo de usuário?')) {
-            Inertia.delete(`/admin/user-types/${id}`, {
+        } else {
+            // Submissão para adicionar novo tipo de usuário
+            Inertia.post('/admin/user-types', newUserType, {
                 onSuccess: () => {
-                    setSuccessMessage('Tipo de usuário deletado com sucesso!');
-                },
-                preserveState: true,
-                preserveScroll: true,
-                replace: true,
+                    setIsAddModalOpen(false);
+                }
             });
         }
+    };
+
+    // Função para abrir o modal de edição
+    const abrirEditarModal = (userType: UserType) => {
+        setEditingUserType(userType);
+        setIsAddModalOpen(true);
     };
 
     return (
@@ -91,8 +100,7 @@ const UserTypes: React.FC = () => {
             <div className="container">
                 <h1>Tipos de Usuários</h1>
 
-                {successMessage && <div className="alert alert-success">{successMessage}</div>}
-
+                {/* Tabela para exibir todos os tipos de usuários */}
                 <table>
                     <thead>
                         <tr>
@@ -108,13 +116,24 @@ const UserTypes: React.FC = () => {
                                     <td>{userType.name}</td>
                                     <td>{userType.description}</td>
                                     <td>
-                                        <button className="btn editar" onClick={() => editarUsuario(userType)}>
+                                        {/* Botão para editar tipo de usuário */}
+                                        <button className="btn editar" onClick={() => abrirEditarModal(userType)}>
                                             Editar
                                         </button>
-                                        <button className="btn permissoes" onClick={() => gerenciarPermissoes(userType)}>
+                                          {/* Botão para gerenciar permissões do tipo de usuário */}
+                                          <button className="btn permissoes" onClick={() => gerenciarPermissoes(userType)}>
                                             Permissões
                                         </button>
-                                        <button className="btn deletar" onClick={() => deletarUsuario(userType.id!)}>
+                                        {/* Botão para deletar tipo de usuário */}
+                                        <button
+                                            className="btn deletar"
+                                            onClick={() =>
+                                                window.confirm('Tem certeza de que deseja excluir este tipo de usuário?') &&
+                                                Inertia.delete(`/admin/user-types/${userType.id}`, {
+                                                    onSuccess: () => alert('Tipo de Usuário deletado com sucesso!'),
+                                                })
+                                            }
+                                        >
                                             Deletar
                                         </button>
                                     </td>
@@ -140,7 +159,7 @@ const UserTypes: React.FC = () => {
                     <div className="modal-overlay">
                         <div className="modal">
                             <h2>{editingUserType ? 'Editar Tipo de Usuário' : 'Adicionar Novo Tipo de Usuário'}</h2>
-                            <form onSubmit={editingUserType ? handleSubmitEdit : handleSubmit}>
+                            <form onSubmit={handleSubmit}>
                                 <input
                                     type="text"
                                     name="name"
@@ -168,12 +187,48 @@ const UserTypes: React.FC = () => {
                 )}
 
                 {/* Modal de Permissões */}
-                {isPermissionModalOpen && (
+                {isPermissionModalOpen && selectedUserType && (
                     <div className="modal-overlay">
                         <div className="modal">
-                            <h2>Permissões para {selectedUserType?.name}</h2>
-                            <p>Aqui você pode gerenciar as permissões para este tipo de usuário.</p>
-                            {/* Conteúdo do modal */}
+                            <h2>Permissões para {selectedUserType.name}</h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nome</th>
+                                        <th>Label</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {permissions && permissions.length > 0 ? (
+                                        permissions.map((permission) => (
+                                            <tr key={permission.id}>
+                                                <td>{permission.id}</td>
+                                                <td>{permission.name}</td>
+                                                <td>{permission.label}</td>
+                                                <td>
+                                                    {/* Botão de deletar a permissão */}
+                                                    <button
+                                                        className="btn deletar"
+                                                        onClick={() => deletarPermissao(permission.id)}
+                                                    >
+                                                        Deletar
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={4} className="text-center">
+                                                Nenhuma permissão encontrada.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+
+                            {/* Botão para fechar o modal */}
                             <button onClick={() => setPermissionModalOpen(false)} className="btn fechar">
                                 Fechar
                             </button>
