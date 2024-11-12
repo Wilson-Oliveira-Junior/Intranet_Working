@@ -22,6 +22,8 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/active-users-count', [AdminController::class, 'getActiveUsersCount']);
+Route::get('/birthdays-this-month', [AdminController::class, 'getBirthdaysThisMonth']);
+
 
 
 // Rotas específicas para diferentes níveis de acesso
@@ -57,9 +59,6 @@ Route::middleware('auth')->group(function () {
     Route::put('/admin/permissoes/{id}', [AdminController::class, 'updatePermission'])->name('admin.permissions.update');
     Route::delete('/admin/permissoes/{id}', [AdminController::class, 'destroyPermission'])->name('admin.permissions.destroy');
     Route::post('/admin/user-types/{id}/permissions', [AdminController::class, 'storePermissions']);
-
-    //Gatilhos
-
 
     // Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');

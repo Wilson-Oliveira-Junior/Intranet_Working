@@ -38,15 +38,14 @@ interface Sector {
     id: number;
     name: string;
 }
-
 const Users: React.FC = () => {
+
     const { users, user, userTypes, sectors } = usePage().props as {
         users: User[],
         user: User,
         userTypes: UserType[],
         sectors: Sector[]
     };
-    console.log(sectors);
 
     if (!user) {
         return <div>Usuário não encontrado ou não autenticado.</div>;
@@ -103,6 +102,15 @@ const Users: React.FC = () => {
         });
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setFormData({
+                ...formData,
+                profilepicture: e.target.files[0],
+            });
+        }
+    };
+
     const handleDeleteUser = (id: number) => {
         if (window.confirm('Tem certeza de que deseja deletar este usuário?')) {
             Inertia.delete(`/admin/users/${id}`, {
@@ -139,11 +147,49 @@ const Users: React.FC = () => {
     };
 
     const handleSaveDetails = () => {
-        Inertia.put(`/admin/users/${userId}/update-profile`, userDetails, {
+        const formData = new FormData();
+        formData.append('name', userDetails.name || '');
+        formData.append('email', userDetails.email || '');
+        formData.append('status', userDetails.status || '');
+        formData.append('sector', userDetails.sector || '');
+        formData.append('birth_date', userDetails.birth_date || '');
+        formData.append('middlename', userDetails.middlename || '');
+        formData.append('lastname', userDetails.lastname || '');
+        formData.append('sex', userDetails.sex || '');
+        formData.append('cellphone', userDetails.cellphone || '');
+        formData.append('ramal', userDetails.ramal || '');
+        formData.append('cep', userDetails.cep || '');
+        formData.append('rua', userDetails.rua || '');
+        formData.append('bairro', userDetails.bairro || '');
+        formData.append('cidade', userDetails.cidade || '');
+        formData.append('estado', userDetails.estado || '');
+        formData.append('facebook', userDetails.facebook || '');
+        formData.append('instagram', userDetails.instagram || '');
+        formData.append('linkedin', userDetails.linkedin || '');
+
+        if (userDetails.password) {
+            formData.append('password', userDetails.password);
+            formData.append('password_confirmation', userDetails.password); // Add password confirmation
+        }
+        if (userDetails.profilepicture) {
+            formData.append('profilepicture', userDetails.profilepicture);
+        }
+
+        // Debugging log
+        console.log('Form Data:');
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+
+        Inertia.put(`/admin/users/${userId}/update-profile`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
             onSuccess: () => {
                 setShowDetailsModal(false);
                 setSuccessMessage('Detalhes do usuário atualizados com sucesso!');
                 setTimeout(() => setSuccessMessage(''), 3000);
+                Inertia.visit(`/admin/users`);
             },
             onError: (errors) => {
                 console.error(errors);
@@ -306,7 +352,7 @@ const Users: React.FC = () => {
                                             <label>Nome:</label>
                                             <input
                                                 type="text"
-                                                value={userDetails.name}
+                                                value={userDetails.name || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, name: e.target.value })}
                                                 className="form-control"
                                             />
@@ -315,7 +361,7 @@ const Users: React.FC = () => {
                                             <label>Sobrenome:</label>
                                             <input
                                                 type="text"
-                                                value={userDetails.middlename}
+                                                value={userDetails.middlename || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, middlename: e.target.value })}
                                                 className="form-control"
                                             />
@@ -324,7 +370,7 @@ const Users: React.FC = () => {
                                             <label>Último Nome:</label>
                                             <input
                                                 type="text"
-                                                value={userDetails.lastname}
+                                                value={userDetails.lastname || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, lastname: e.target.value })}
                                                 className="form-control"
                                             />
@@ -335,7 +381,7 @@ const Users: React.FC = () => {
                                             <label>E-mail:</label>
                                             <input
                                                 type="email"
-                                                value={userDetails.email}
+                                                value={userDetails.email || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, email: e.target.value })}
                                                 className="form-control"
                                             />
@@ -367,7 +413,7 @@ const Users: React.FC = () => {
                                             <label>Setor:</label>
                                             <input
                                                 type="text"
-                                                value={userDetails.sector}
+                                                value={userDetails.sector || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, sector: e.target.value })}
                                                 className="form-control"
                                                 list="sectorSuggestions"
@@ -384,7 +430,7 @@ const Users: React.FC = () => {
                                             <label>Data de Nascimento:</label>
                                             <input
                                                 type="date"
-                                                value={userDetails.birth_date}
+                                                value={userDetails.birth_date || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, birth_date: e.target.value })}
                                                 className="form-control"
                                             />
@@ -393,18 +439,21 @@ const Users: React.FC = () => {
                                             <label>Celular:</label>
                                             <input
                                                 type="text"
-                                                value={userDetails.cellphone}
+                                                value={userDetails.cellphone || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, cellphone: e.target.value })}
                                                 className="form-control"
                                             />
                                         </div>
                                         <div className="form-group col-4">
-                                            <label>Foto de Perfil:</label>
+                                            <label htmlFor="profilepicture">Imagem de Perfil:</label>
                                             <input
                                                 type="file"
-                                                onChange={(e) => handleProfilePictureChange(e)}
-                                                className="form-control"
+                                                id="profilepicture"
+                                                name="profilepicture"
+                                                accept="image/*"
+                                                onChange={handleFileChange}
                                             />
+
                                             {userDetails.profilepicture && (
                                                 <img
                                                     src={userDetails.profilepicture}
@@ -419,7 +468,7 @@ const Users: React.FC = () => {
                                             <label>Senha:</label>
                                             <input
                                                 type="password"
-                                                value={userDetails.password}
+                                                value={userDetails.password || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, password: e.target.value })}
                                                 className="form-control"
                                             />
@@ -428,7 +477,7 @@ const Users: React.FC = () => {
                                             <label>Ramal:</label>
                                             <input
                                                 type="text"
-                                                value={userDetails.ramal}
+                                                value={userDetails.ramal || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, ramal: e.target.value })}
                                                 className="form-control"
                                             />
@@ -446,7 +495,7 @@ const Users: React.FC = () => {
                                             <label>CEP:</label>
                                             <input
                                                 type="text"
-                                                value={userDetails.cep}
+                                                value={userDetails.cep || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, cep: e.target.value })}
                                                 className="form-control"
                                             />
@@ -455,7 +504,7 @@ const Users: React.FC = () => {
                                             <label>Rua:</label>
                                             <input
                                                 type="text"
-                                                value={userDetails.rua}
+                                                value={userDetails.rua || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, rua: e.target.value })}
                                                 className="form-control"
                                             />
@@ -464,7 +513,7 @@ const Users: React.FC = () => {
                                             <label>Bairro:</label>
                                             <input
                                                 type="text"
-                                                value={userDetails.bairro}
+                                                value={userDetails.bairro || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, bairro: e.target.value })}
                                                 className="form-control"
                                             />
@@ -475,7 +524,7 @@ const Users: React.FC = () => {
                                             <label>Cidade:</label>
                                             <input
                                                 type="text"
-                                                value={userDetails.cidade}
+                                                value={userDetails.cidade || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, cidade: e.target.value })}
                                                 className="form-control"
                                             />
@@ -484,7 +533,7 @@ const Users: React.FC = () => {
                                             <label>Estado:</label>
                                             <input
                                                 type="text"
-                                                value={userDetails.estado}
+                                                value={userDetails.estado || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, estado: e.target.value })}
                                                 className="form-control"
                                             />
@@ -502,7 +551,7 @@ const Users: React.FC = () => {
                                             <label>Facebook:</label>
                                             <input
                                                 type="text"
-                                                value={userDetails.facebook}
+                                                value={userDetails.facebook || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, facebook: e.target.value })}
                                                 className="form-control"
                                             />
@@ -511,7 +560,7 @@ const Users: React.FC = () => {
                                             <label>Instagram:</label>
                                             <input
                                                 type="text"
-                                                value={userDetails.instagram}
+                                                value={userDetails.instagram || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, instagram: e.target.value })}
                                                 className="form-control"
                                             />
@@ -520,7 +569,7 @@ const Users: React.FC = () => {
                                             <label>LinkedIn:</label>
                                             <input
                                                 type="text"
-                                                value={userDetails.linkedin}
+                                                value={userDetails.linkedin || ''}
                                                 onChange={(e) => setUserDetails({ ...userDetails, linkedin: e.target.value })}
                                                 className="form-control"
                                             />
@@ -535,7 +584,7 @@ const Users: React.FC = () => {
                                     <h2>Curiosidades sobre Você</h2>
                                     <div className="form-group">
                                         <textarea
-                                            value={userDetails.sobre}
+                                            value={userDetails.sobre || ''}
                                             onChange={(e) => setUserDetails({ ...userDetails, sobre: e.target.value })}
                                             className="form-control"
                                         ></textarea>
@@ -553,7 +602,7 @@ const Users: React.FC = () => {
                                 </button>
                                 <button
                                     className="btn btn-primary ml-2"
-                                    onClick={handleSaveDetails}
+                                    onClick={handleSaveDetails} // Ensure this function is called
                                 >
                                     Salvar
                                 </button>

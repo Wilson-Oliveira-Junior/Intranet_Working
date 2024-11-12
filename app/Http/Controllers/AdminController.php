@@ -34,6 +34,16 @@ class AdminController extends Controller
     }
 
 
+    public function getBirthdaysThisMonth()
+    {
+        $currentMonth = date('m');
+
+        // Buscar todos os usuários cujo aniversário seja no mês atual
+        $birthdays = User::whereMonth('birth_date', $currentMonth)->get(['name', 'profilepicture', 'birth_date']);
+
+        return response()->json($birthdays);
+    }
+
     public function userTypes()
     {
         $userTypes = UserType::with('permissions')->get();
@@ -200,57 +210,127 @@ class AdminController extends Controller
 
     public function updateUserProfile(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'middlename' => 'nullable|string|max:255',
-            'lastname' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:255',
-            'social_media' => 'nullable|string|max:255',
-            'curiosity' => 'nullable|string|max:255',
-            'email' => 'required|email|max:255',
-            'sector' => 'nullable|string|max:255',
-            'birth_date' => 'nullable|date',
-            'status' => 'nullable|string',
-            'user_type_id' => 'nullable|exists:user_types,id',
-            'cellphone' => 'nullable|string|max:15',
-            'ramal' => 'nullable|string|max:10',
-            'cep' => 'nullable|string|max:8',
-            'profilepicture' => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
-        ]);
+        \Log::info('updateUserProfile function called');
 
-        $user = User::findOrFail($id);
-        $user->fill($request->only([
-            'name',
-            'middlename',
-            'lastname',
-            'address',
-            'social_media',
-            'curiosity',
-            'email',
-            'status',
-            'user_type_id',
-            'sector',
-            'birth_date',
-            'cellphone',
-            'ramal',
-            'cep',
-        ]));
+        // Log the incoming request data
+        \Log::info('Request data:', $request->all());
 
-        if ($request->hasFile('profilepicture')) {
-            $imagePath = $request->file('profilepicture')->store('profile_images', 'public');
-            $user->image = $imagePath;
+        // Log individual fields to ensure they are being received
+        \Log::info('Name: ' . $request->input('name'));
+        \Log::info('Email: ' . $request->input('email'));
+        \Log::info('Status: ' . $request->input('status'));
+        \Log::info('Sector: ' . $request->input('sector'));
+        \Log::info('Birth Date: ' . $request->input('birth_date'));
+        \Log::info('Middlename: ' . $request->input('middlename'));
+        \Log::info('Lastname: ' . $request->input('lastname'));
+        \Log::info('Sex: ' . $request->input('sex'));
+        \Log::info('Cellphone: ' . $request->input('cellphone'));
+        \Log::info('Ramal: ' . $request->input('ramal'));
+        \Log::info('Cep: ' . $request->input('cep'));
+        \Log::info('Rua: ' . $request->input('rua'));
+        \Log::info('Bairro: ' . $request->input('bairro'));
+        \Log::info('Cidade: ' . $request->input('cidade'));
+        \Log::info('Estado: ' . $request->input('estado'));
+        \Log::info('Facebook: ' . $request->input('facebook'));
+        \Log::info('Instagram: ' . $request->input('instagram'));
+        \Log::info('Linkedin: ' . $request->input('linkedin'));
+
+        try {
+            // Validação dos campos recebidos
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,' . $id,
+                'password' => 'nullable|confirmed|min:8',
+                'status' => 'required|in:Ativo,Inativo',
+                'sector' => 'nullable|string',
+                'birth_date' => 'nullable|date',
+                'middlename' => 'nullable|string',
+                'lastname' => 'nullable|string',
+                'sex' => 'nullable|string',
+                'cellphone' => 'nullable|string',
+                'ramal' => 'nullable|string',
+                'cep' => 'nullable|string',
+                'rua' => 'nullable|string',
+                'bairro' => 'nullable|string',
+                'cidade' => 'nullable|string',
+                'estado' => 'nullable|string',
+                'facebook' => 'nullable|string',
+                'instagram' => 'nullable|string',
+                'linkedin' => 'nullable|string',
+                'profilepicture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+
+            // Log the validated data
+            \Log::info('Validated data:', $validated);
+
+            // Buscar o usuário no banco de dados
+            $user = User::findOrFail($id);
+
+            // Atualizar os campos gerais
+            $user->name = $validated['name'];
+            $user->email = $validated['email'];
+            $user->status = $validated['status'];
+            $user->sector = $validated['sector'];
+            $user->birth_date = $validated['birth_date'];
+            $user->middlename = $validated['middlename'];
+            $user->lastname = $validated['lastname'];
+            $user->sex = $validated['sex'];
+            $user->cellphone = $validated['cellphone'];
+            $user->ramal = $validated['ramal'];
+            $user->cep = $validated['cep'];
+            $user->rua = $validated['rua'];
+            $user->bairro = $validated['bairro'];
+            $user->cidade = $validated['cidade'];
+            $user->estado = $validated['estado'];
+            $user->facebook = $validated['facebook'];
+            $user->instagram = $validated['instagram'];
+            $user->linkedin = $validated['linkedin'];
+
+            if ($request->has('password') && $validated['password']) {
+                $user->password = bcrypt($validated['password']);
+            }
+
+            // Log para verificar o fluxo
+            \Log::info('Tentando fazer o upload da imagem de perfil...');
+
+            // Se houver imagem de perfil, faça o upload
+            if ($request->hasFile('profilepicture')) {
+                // Salva a imagem na pasta 'public/img/usuario'
+                $imagePath = $request->file('profilepicture')->store('img/usuario', 'public');  // Usando 'public' como disco
+
+                \Log::info('Imagem carregada com sucesso: ' . $imagePath);
+
+                // Verifique se a imagem foi armazenada corretamente
+                if ($imagePath) {
+                    $user->profilepicture = 'storage/' . $imagePath;  // Salva o caminho relativo no banco
+                } else {
+                    \Log::error('Erro ao salvar imagem de perfil.');
+                    return back()->withErrors(['profilepicture' => 'Falha ao carregar a imagem de perfil.'])->withInput();
+                }
+            }
+
+            // Salvar as alterações
+            \Log::info('Salvando usuário no banco de dados...');
+            $user->save();
+            \Log::info('Usuário atualizado com sucesso.');
+
+            // Retornar com sucesso
+            return Inertia::render('Admin/Users', [
+                'users' => User::all(),
+                'user' => Auth::user(),
+                'successMessage' => 'Perfil atualizado com sucesso.',
+            ]);
+
+        } catch (\Exception $e) {
+            // Em caso de erro, mostrar mensagem de erro
+            \Log::error('Erro ao atualizar perfil: ' . $e->getMessage());
+            return Inertia::render('Admin/Users', [
+                'users' => User::all(),
+                'user' => Auth::user(),
+                'errorMessage' => 'Ocorreu um erro inesperado ao atualizar o perfil. ' . $e->getMessage(),
+            ]);
         }
-
-        $user->save();
-
-        $sectors = Sector::all();
-
-        return Inertia::render('Admin/EditProfile', [
-            'user' => $user,
-            'sectors' => $sectors,
-        ]);
     }
-
 
     // Página de setores
     public function indexSectors()
@@ -263,8 +343,6 @@ class AdminController extends Controller
             'user' => $user,
         ]);
     }
-
-
 
     // Criar um novo setor
     public function storeSector(Request $request)
@@ -382,5 +460,6 @@ class AdminController extends Controller
 
         return redirect()->route('admin.permissions.index')->with('success', 'Permissão excluída com sucesso.');
     }
+
 
 }

@@ -4,17 +4,24 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import axios from 'axios';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
+
+interface User {
+    name: string;
+    profilepicture: string;
+    birth_date: string;
+}
 
 const HomeAdm: React.FC = () => {
   const { user, activeUsersCount: activeUsersCountFromProps } = usePage().props as { user: User, activeUsersCount: number };
 
-
   const [activeUsersCount, setActiveUsersCount] = useState<number>(activeUsersCountFromProps || 0);
+  const [birthdays, setBirthdays] = useState<User[]>([]);
 
   if (!user) {
     return <div>Erro: Usuário não encontrado. Verifique a autenticação.</div>;
   }
-
 
   useEffect(() => {
     axios.get('/active-users-count')
@@ -24,6 +31,12 @@ const HomeAdm: React.FC = () => {
       .catch(error => {
         console.error('Erro ao carregar dados de usuários ativos', error);
       });
+  }, []);
+
+  useEffect(() => {
+    axios.get('/birthdays-this-month')
+      .then(response => setBirthdays(response.data))
+      .catch(error => console.error('Erro ao carregar aniversariantes', error));
   }, []);
 
   return (
@@ -71,16 +84,27 @@ const HomeAdm: React.FC = () => {
           </div>
           <div className="col-md-4 mb-4">
             <div className="card">
-              <h2>Aniversariante do Mês</h2>
-              <div className="profile">
-                <img
-                  alt="Profile picture of Pedro Pavan"
-                  height="50"
-                  src="https://oaidalleapiprodscus.blob.core.windows.net/private/org-RcpoXHkzChYnDbFAyeQ8tamr/user-ehrvabJ3DufsCu8YJ7PqY5gl/img-M52z0QnaG6sJcPhw7H6PLtKs.png"
-                  width="50"
-                />
-                <p>Pedro Pavan</p>
-              </div>
+              <h2>Aniversariantes do Mês</h2>
+              {birthdays.length > 0 ? (
+                <div className="birthday-list">
+                  {birthdays.map((person, index) => (
+                    <div key={index} className="birthday-item">
+                      <img
+                        alt={`Foto de perfil de ${person.name}`}
+                        src={person.profilepicture || 'https://via.placeholder.com/50'}
+                        width="50"
+                        height="50"
+                      />
+                      <div>
+                        <p>{person.name}</p>
+                        <p>{new Date(person.birth_date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p>Nenhum aniversário este mês.</p>
+              )}
             </div>
           </div>
         </div>
@@ -112,11 +136,11 @@ const HomeAdm: React.FC = () => {
             <div className="card">
               <h2>Ramais</h2>
               <div className="contact">
-                <div><i className="fas fa-phone-alt" style={{ color: '#00c851' }}></i> Marcelo Abib - 7210</div>
-                <div><i className="fas fa-phone-alt" style={{ color: '#33b5e5' }}></i> Rodrigo Camillo - 7211</div>
-                <div><i className="fas fa-phone-alt" style={{ color: '#ff4444' }}></i> Letícia dos Santos Couto - 7201</div>
-                <div><i className="fas fa-phone-alt" style={{ color: '#ff4444' }}></i> José Carvalho - 7202</div>
-                <div><i className="fas fa-phone-alt" style={{ color: '#aa66cc' }}></i> Andre Magalhães - 7209</div>
+                <div><i className="bi bi-telephone-fill" style={{ color: '#00c851' }}></i>Marcelo Abib - 7210</div>
+                <div><i className="bi bi-telephone-fill" style={{ color: '#33b5e5' }}></i> Rodrigo Camillo - 7211</div>
+                <div><i className="bi bi-telephone-fill" style={{ color: '#ff4444' }}></i> Letícia dos Santos Couto - 7201</div>
+                <div><i className="bi bi-telephone-fill" style={{ color: '#ff4444' }}></i> José Carvalho - 7202</div>
+                <div><i className="bi bi-telephone-fill" style={{ color: '#aa66cc' }}></i> Andre Magalhães - 7209</div>
               </div>
             </div>
           </div>

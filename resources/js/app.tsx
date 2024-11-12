@@ -1,5 +1,5 @@
 import '../css/app.css';
-import '../css/components/Sidebar.css'
+import '../css/components/Sidebar.css';
 import './bootstrap';
 
 import { createInertiaApp } from '@inertiajs/react';
@@ -10,14 +10,7 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) => {
-        const page = resolvePageComponent(
-            `./Pages/${name}.tsx`,
-            import.meta.glob('./Pages/**/*.tsx')
-        );
-        return page;
-    },
-
+    resolve: (name) => resolvePageComponent(`./Pages/${name}.tsx`, import.meta.glob('./Pages/**/*.tsx')),
     setup({ el, App, props }) {
         const root = createRoot(el);
         root.render(<App {...props} />);

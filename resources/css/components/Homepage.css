@@ -1,6 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+/* Importação das fontes */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap');
 
-
+/* Estilos principais da página */
 .home {
     background-color: #f8f9fa;
     padding: 10px;
@@ -10,10 +11,10 @@
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     display: flex;
-    overflow-y: hidden;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
+/* Cabeçalho */
 .header {
     display: flex;
     justify-content: space-between;
@@ -26,6 +27,7 @@
     color: #333;
 }
 
+/* Estatísticas */
 .stats {
     display: flex;
     justify-content: flex-start;
@@ -43,7 +45,7 @@
     margin: 5px;
 }
 
-
+/* Cartões */
 .card {
     background-color: white;
     border-radius: 8px;
@@ -70,12 +72,35 @@
     line-height: 1.5;
 }
 
+/* Contatos com ícones de telefone */
+.contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem; /* Reduzindo o espaço entre os contatos */
+}
+
 .contact div {
     display: flex;
     align-items: center;
-    margin: 5px 0;
+    padding: 4px 8px; /* Reduzindo o padding dos itens de contato */
+    font-size: 0.9rem; /* Diminuindo o tamanho da fonte para mais compactação */
 }
 
+.contact i {
+    font-size: 1rem;
+    margin-right: 6px; /* Reduzindo a margem para ícones */
+    color: #00c851;
+    width: 20px; /* Definindo largura fixa para alinhar ícones */
+}
+
+.contact div span {
+    white-space: nowrap; /* Mantém o nome e ramal em uma linha */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* Perfil e fotos */
 .profile {
     display: flex;
     align-items: center;
@@ -89,6 +114,7 @@
     height: 40px;
 }
 
+/* Botões */
 button {
     background-color: #007bff;
     color: white;
@@ -101,4 +127,31 @@ button {
 
 button:hover {
     background-color: #0056b3;
+}
+
+/* Lista de aniversariantes */
+.birthday-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.birthday-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.birthday-item img {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+}
+
+.birthday-item div {
+    display: flex;
+    flex-direction: column;
 }
