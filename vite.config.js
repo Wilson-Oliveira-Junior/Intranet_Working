@@ -17,4 +17,10 @@ export default defineConfig({
             '@components': path.resolve(__dirname, 'resources/js/components'),
         },
     },
+    server: {
+        cors: true,
+        mimeTypes: {
+            'application/javascript': ['js', 'jsx', 'ts', 'tsx'],
+        },
+    },
 });

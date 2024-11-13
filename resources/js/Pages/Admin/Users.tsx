@@ -176,9 +176,9 @@ const Users: React.FC = () => {
         }
 
         // Debugging log
-        console.log('Form Data:');
+        // console.log('Form Data:');
         for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
+            // console.log(`${key}: ${value}`);
         }
 
         Inertia.put(`/admin/users/${userId}/update-profile`, formData, {
@@ -602,7 +602,7 @@ const Users: React.FC = () => {
                                 </button>
                                 <button
                                     className="btn btn-primary ml-2"
-                                    onClick={handleSaveDetails} // Ensure this function is called
+                                    onClick={handleSaveDetails}
                                 >
                                     Salvar
                                 </button>
