@@ -16,10 +16,14 @@ createInertiaApp({
         const pages = import.meta.glob('./Pages/**/*.tsx');
         console.log('Available pages:', Object.keys(pages));
         return resolvePageComponent(name, pages).then((module) => {
+            console.log('Resolved module:', module);
             if (name.startsWith('auth.')) {
                 module.default.layout = AuthenticatedLayout;
             }
             return module;
+        }).catch(error => {
+            console.error('Error resolving component:', error);
+            throw error;
         });
     },
     setup({ el, App, props }) {

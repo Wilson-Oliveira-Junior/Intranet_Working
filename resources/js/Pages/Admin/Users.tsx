@@ -58,6 +58,7 @@ const Users: React.FC = () => {
     const [userId, setUserId] = useState<number | null>(null);
     const [usersState, setUsersState] = useState<User[]>(users);
     const [activeTab, setActiveTab] = useState<'details' | 'address' | 'redesociais' | 'sobre'>('details');
+    const [formData, setFormData] = useState<FormData>(new FormData());
 
     const [userDetails, setUserDetails] = useState<User>({
         id: 0,
@@ -147,49 +148,11 @@ const Users: React.FC = () => {
     };
 
     const handleSaveDetails = () => {
-        const formData = new FormData();
-        formData.append('name', userDetails.name || '');
-        formData.append('email', userDetails.email || '');
-        formData.append('status', userDetails.status || '');
-        formData.append('sector', userDetails.sector || '');
-        formData.append('birth_date', userDetails.birth_date || '');
-        formData.append('middlename', userDetails.middlename || '');
-        formData.append('lastname', userDetails.lastname || '');
-        formData.append('sex', userDetails.sex || '');
-        formData.append('cellphone', userDetails.cellphone || '');
-        formData.append('ramal', userDetails.ramal || '');
-        formData.append('cep', userDetails.cep || '');
-        formData.append('rua', userDetails.rua || '');
-        formData.append('bairro', userDetails.bairro || '');
-        formData.append('cidade', userDetails.cidade || '');
-        formData.append('estado', userDetails.estado || '');
-        formData.append('facebook', userDetails.facebook || '');
-        formData.append('instagram', userDetails.instagram || '');
-        formData.append('linkedin', userDetails.linkedin || '');
-
-        if (userDetails.password) {
-            formData.append('password', userDetails.password);
-            formData.append('password_confirmation', userDetails.password); // Add password confirmation
-        }
-        if (userDetails.profilepicture) {
-            formData.append('profilepicture', userDetails.profilepicture);
-        }
-
-        // Debugging log
-        // console.log('Form Data:');
-        for (let [key, value] of formData.entries()) {
-            // console.log(`${key}: ${value}`);
-        }
-
-        Inertia.put(`/admin/users/${userId}/update-profile`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            },
+        Inertia.put(`/admin/users/${userId}/update-profile`, userDetails, {
             onSuccess: () => {
                 setShowDetailsModal(false);
                 setSuccessMessage('Detalhes do usuário atualizados com sucesso!');
                 setTimeout(() => setSuccessMessage(''), 3000);
-                Inertia.visit(`/admin/users`);
             },
             onError: (errors) => {
                 console.error(errors);
