@@ -28,6 +28,14 @@ class User extends Authenticatable
         'ramal',          // Novo campo para ramal
         'cep',            // Novo campo para CEP
         'profilepicture', // Novo campo para a imagem de perfil
+        'sex',
+        'rua',
+        'bairro',
+        'cidade',
+        'estado',
+        'facebook',
+        'instagram',
+        'linkedin',
     ];
 
     protected $hidden = [

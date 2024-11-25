@@ -141,14 +141,33 @@ const Users: React.FC = () => {
     const handleEditUser = (id: number) => {
         const userToEdit = usersState.find((u) => u.id === id);
         if (userToEdit) {
-            setUserDetails(userToEdit);
+            setUserDetails({
+                ...userToEdit,
+                profilepicture: userToEdit.profilepicture || '',
+                cep: userToEdit.cep || '',
+                rua: userToEdit.rua || '',
+                bairro: userToEdit.bairro || '',
+                cidade: userToEdit.cidade || '',
+                estado: userToEdit.estado || '',
+                facebook: userToEdit.facebook || '',
+                instagram: userToEdit.instagram || '',
+                linkedin: userToEdit.linkedin || '',
+                curiosity: userToEdit.curiosity || '',
+                birth_date: userToEdit.birth_date ? userToEdit.birth_date.split('T')[0] : '',
+                sex: userToEdit.sex || '',
+            });
         }
         setUserId(id);
         setShowDetailsModal(true);
     };
 
     const handleSaveDetails = () => {
-        Inertia.put(`/admin/users/${userId}/update-profile`, userDetails, {
+        const updatedDetails = {
+            ...userDetails,
+            birth_date: userDetails.birth_date ? new Date(userDetails.birth_date).toISOString().split('T')[0] : '',
+        };
+
+        Inertia.put(`/admin/users/${userId}/update-profile`, updatedDetails, {
             onSuccess: () => {
                 setShowDetailsModal(false);
                 setSuccessMessage('Detalhes do usuário atualizados com sucesso!');

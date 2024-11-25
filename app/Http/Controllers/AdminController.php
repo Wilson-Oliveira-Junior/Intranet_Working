@@ -26,7 +26,7 @@ class AdminController extends Controller
 
     public function getActiveUsersCount()
     {
-        // Contar o número de usuários com status 'active'
+
         $activeUsersCount = User::where('status', 'Ativo')->count();
 
         return response()->json([
@@ -39,7 +39,7 @@ class AdminController extends Controller
     {
         $currentMonth = date('m');
 
-        // Buscar todos os usuários cujo aniversário seja no mês atual
+
         $birthdays = User::whereMonth('birth_date', $currentMonth)->get(['name', 'profilepicture', 'birth_date']);
 
         return response()->json($birthdays);
@@ -211,6 +211,8 @@ class AdminController extends Controller
 
     public function updateUserProfile(Request $request, $id)
     {
+        Log::info('Request data:', $request->all()); // Log the request data
+
         $request->validate([
             'name' => 'required|string|max:255',
             'middlename' => 'nullable|string|max:255',
@@ -227,6 +229,14 @@ class AdminController extends Controller
             'ramal' => 'nullable|string|max:10',
             'cep' => 'nullable|string|max:8',
             'profilepicture' => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
+            'sex' => 'nullable|string|max:10',
+            'rua' => 'nullable|string|max:255',
+            'bairro' => 'nullable|string|max:255',
+            'cidade' => 'nullable|string|max:255',
+            'estado' => 'nullable|string|max:255',
+            'facebook' => 'nullable|string|max:255',
+            'instagram' => 'nullable|string|max:255',
+            'linkedin' => 'nullable|string|max:255',
         ]);
 
         $user = User::findOrFail($id);
@@ -245,6 +255,14 @@ class AdminController extends Controller
             'cellphone',
             'ramal',
             'cep',
+            'sex',
+            'rua',
+            'bairro',
+            'cidade',
+            'estado',
+            'facebook',
+            'instagram',
+            'linkedin',
         ]));
 
         if ($request->hasFile('profilepicture')) {
@@ -254,12 +272,7 @@ class AdminController extends Controller
 
         $user->save();
 
-        $sectors = Sector::all();
-
-        return Inertia::render('Admin/EditProfile', [
-            'user' => $user,
-            'sectors' => $sectors,
-        ]);
+        return redirect()->route('admin.users')->with('successMessage', 'Detalhes do usuário atualizados com sucesso!');
     }
 
 
