@@ -496,3 +496,15 @@ textarea.form-control {
 }
 
 
+/* Adicionando as classes CSS */
+.circle {
+    border-radius: 50%;
+}
+
+.rounded {
+    border-radius: 15px;
+}
+
+.default {
+    border-radius: 0;
+}

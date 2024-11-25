@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
     // Admin
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/usertypes', [AdminController::class, 'userTypes'])->name('admin.usertypes');
+    Route::get('/admin/clients', [AdminController::class, 'getClients'])->name('admin.clients');
 
     // Tipos de Usuários
     Route::post('/admin/user-types', [AdminController::class, 'store']);
@@ -59,6 +60,17 @@ Route::middleware('auth')->group(function () {
     Route::put('/admin/permissoes/{id}', [AdminController::class, 'updatePermission'])->name('admin.permissions.update');
     Route::delete('/admin/permissoes/{id}', [AdminController::class, 'destroyPermission'])->name('admin.permissions.destroy');
     Route::post('/admin/user-types/{id}/permissions', [AdminController::class, 'storePermissions']);
+
+    Route::get('/admin/project-types', [AdminController::class, 'getProjectTypes'])->name('admin.projectTypes');
+
+    //Gatilhos
+    Route::get('/admin/gatilhos', [AdminController::class, 'getGatilhosData'])->name('admin.gatilhos');
+    Route::get('/admin/gatilhos/template/{id}', [AdminController::class, 'templateGatilhos'])->name('admin.gatilhos.template');
+    Route::get('/admin/gatilhos/adicionar', [AdminController::class, 'adicionarGatilho'])->name('admin.gatilhos.adicionar');
+    Route::post('/admin/gatilhos/salvar', [AdminController::class, 'salvarGatilho'])->name('admin.gatilhos.salvar');
+    Route::get('/admin/gatilhos/editar/{id}', [AdminController::class, 'editarGatilho'])->name('admin.gatilhos.editar');
+    Route::put('/admin/gatilhos/atualizar/{id}', [AdminController::class, 'atualizarGatilho'])->name('admin.gatilhos.atualizar');
+    Route::delete('/admin/gatilhos/deletar/{id}', [AdminController::class, 'deletarGatilho'])->name('admin.gatilhos.deletar');
 
     // Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');

@@ -10,6 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Sector;
 use Illuminate\Support\Facades\Log;
+use App\Models\Client;
+use App\Models\GatilhoTemplate;
+use Illuminate\Support\Facades\DB; // Adicionar o namespace DB
+use App\Models\TipoProjeto; // Adicionar o namespace TipoProjeto
 
 class AdminController extends Controller
 {
@@ -74,7 +78,7 @@ class AdminController extends Controller
 
         // Associa as permissões ao UserType
         if ($request->has('permissions')) {
-            $userType->permissions()->sync($request->permissions); // Sincroniza as permissões selecionadas
+            $userType->permissions()->sync($request->permissions);
         }
 
         return redirect()->route('admin.usertypes')
@@ -211,7 +215,7 @@ class AdminController extends Controller
 
     public function updateUserProfile(Request $request, $id)
     {
-        Log::info('Request data:', $request->all()); // Log the request data
+
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -220,6 +224,7 @@ class AdminController extends Controller
             'address' => 'nullable|string|max:255',
             'social_media' => 'nullable|string|max:255',
             'curiosity' => 'nullable|string|max:255',
+            'sobre' => 'nullable|string|max:255',
             'email' => 'required|email|max:255',
             'sector' => 'nullable|string|max:255',
             'birth_date' => 'nullable|date',
@@ -247,6 +252,7 @@ class AdminController extends Controller
             'address',
             'social_media',
             'curiosity',
+            'sobre',
             'email',
             'status',
             'user_type_id',
@@ -266,8 +272,8 @@ class AdminController extends Controller
         ]));
 
         if ($request->hasFile('profilepicture')) {
-            $imagePath = $request->file('profilepicture')->store('profile_images', 'public');
-            $user->image = $imagePath;
+            $imagePath = $request->file('profilepicture')->store('img/usuario', 'public');
+            $user->profilepicture = $imagePath; // Ensure the correct field is updated
         }
 
         $user->save();
@@ -403,5 +409,163 @@ class AdminController extends Controller
         $permission->delete();
 
         return redirect()->route('admin.permissions.index')->with('success', 'Permissão excluída com sucesso.');
+    }
+
+
+    //Clientes
+     public function getClients()
+     {
+         $clients = Client::where('status', 'Ativo')->get();
+         return response()->json($clients);
+    }
+
+
+    //Gatilhos
+    public function getGatilhosData()
+    {
+        $clients = Client::where('status', 'Ativo')->get();
+        $userTypes = UserType::all();
+        $sectors = Sector::all();
+        $users = User::all();
+        $projectTypes = TipoProjeto::all(); // Buscar tipos de projeto do banco de dados
+        $user = Auth::user(); // Adicionar a variável user
+
+        return Inertia::render('Admin/Gatilhos', [
+            'clients' => $clients,
+            'userTypes' => $userTypes,
+            'sectors' => $sectors,
+            'users' => $users,
+            'projectTypes' => $projectTypes, // Passar tipos de projeto para o frontend
+            'user' => $user, // Passar o usuário autenticado para a view
+        ]);
+    }
+
+    public function indexGatilhos()
+    {
+        $gatilhos = DB::table('tb_gatilhos_templates')
+            ->leftJoin('tipo_projetos', 'tb_gatilhos_templates.id_tipo_projeto', '=', 'tipo_projetos.id')
+            ->select(
+                'tipo_projetos.id as id_tipo_projeto',
+                'tipo_projetos.nome as nome_tipo_projeto',
+                DB::raw("(SELECT SUM(1) FROM tb_gatilhos_templates
+                    WHERE tb_gatilhos_templates.id_tipo_projeto = tipo_projetos.id) as num_gatilhos"),
+                DB::raw("(SELECT SUM(1) FROM tb_gatilhos_templates
+                    WHERE tb_gatilhos_templates.id_tipo_projeto = tipo_projetos.id
+                    AND tb_gatilhos_templates.tipo_gatilho = 'Equipe') as num_equipe"),
+                DB::raw("(SELECT SUM(1) FROM tb_gatilhos_templates
+                    WHERE tb_gatilhos_templates.id_tipo_projeto = tipo_projetos.id
+                    AND tb_gatilhos_templates.tipo_gatilho = 'Cliente') as num_cliente")
+            )
+            ->groupBy(
+                'tipo_projetos.id',
+                'tipo_projetos.nome'
+            )
+            ->get();
+
+        return Inertia::render('Admin/Gatilhos', compact('gatilhos'));
+    }
+
+    public function templateGatilhos($id)
+    {
+        $gatilhos = DB::table('tb_gatilhos_templates')
+            ->where('tb_gatilhos_templates.id_tipo_projeto', '=', $id)
+            ->leftJoin('tb_tipo_projetos', 'tb_gatilhos_templates.id_tipo_projeto', '=', 'tb_tipo_projetos.id')
+            ->select(
+                'tb_gatilhos_templates.id',
+                'tb_gatilhos_templates.gatilho',
+                'tb_gatilhos_templates.dias_limite_padrao',
+                'tb_gatilhos_templates.dias_limite_50',
+                'tb_gatilhos_templates.dias_limite_40',
+                'tb_gatilhos_templates.dias_limite_30',
+                'tb_gatilhos_templates.tipo_gatilho',
+                'tb_tipo_projetos.id as id_tipo_projeto',
+                'tb_tipo_projetos.nome as nome_tipo_projeto'
+            )
+            ->paginate(20);
+
+        return Inertia::render('Admin/TemplateGatilhos', compact('gatilhos'));
+    }
+
+    public function adicionarGatilho()
+    {
+        $gatilhos = GatilhoTemplate::all();
+        $id_ref = GatilhoTemplate::leftJoin('tb_tipo_projetos', 'tb_gatilhos_templates.id_tipo_projeto', '=', 'tb_tipo_projetos.id')
+            ->select(
+                'tb_gatilhos_templates.id as id_gatilho_template',
+                'tb_gatilhos_templates.gatilho as nome_gatilho',
+                'tb_tipo_projetos.nome as nome_projeto'
+            )
+            ->get();
+
+        $gatilhos_grupos = GatilhoGrupo::all();
+        $tipos_projetos = TipoProjeto::orderBy('nome', 'asc')->get();
+
+        return Inertia::render('Admin/AdicionarGatilho', compact('gatilhos', 'gatilhos_grupos', 'tipos_projetos', 'id_ref'));
+    }
+
+    public function salvarGatilho(Request $request)
+    {
+        $dados = $request->all();
+
+        $gatilhos = new GatilhoTemplate();
+        $gatilhos->gatilho = $dados['gatilho'];
+        $gatilhos->id_tipo_projeto = $dados['id_tipo_projeto'];
+        $gatilhos->tipo_gatilho = $dados['tipo_gatilho'];
+        $gatilhos->dias_limite_padrao = $dados['dias_limite_padrao'];
+        $gatilhos->dias_limite_50 = $dados['dias_limite_50'];
+        $gatilhos->dias_limite_40 = $dados['dias_limite_40'];
+        $gatilhos->dias_limite_30 = $dados['dias_limite_30'];
+        $gatilhos->id_referente = $dados['id_referente'];
+        $gatilhos->id_grupo_gatilho = $dados['id_grupo_gatilho'];
+        $gatilhos->save();
+
+        return redirect()->route('admin.gatilhos')->with('successMessage', 'Gatilho adicionado com sucesso.');
+    }
+
+    public function editarGatilho($id)
+    {
+        $gatilhos = GatilhoTemplate::find($id);
+        $id_ref = GatilhoTemplate::leftJoin('tb_tipo_projetos', 'tb_gatilhos_templates.id_tipo_projeto', '=', 'tb_tipo_projetos.id')
+            ->select(
+                'tb_gatilhos_templates.id as id_gatilho_template',
+                'tb_gatilhos_templates.gatilho as nome_gatilho',
+                'tb_tipo_projetos.nome as nome_projeto'
+            )
+            ->get();
+        $gatilhos_grupos = GatilhoGrupo::all();
+        $tipos_projetos = TipoProjeto::orderBy('nome', 'asc')->get();
+
+        return Inertia::render('Admin/EditarGatilho', compact('gatilhos', 'gatilhos_grupos', 'tipos_projetos', 'id_ref'));
+    }
+
+    public function atualizarGatilho(Request $request, $id)
+    {
+        $gatilhos = GatilhoTemplate::find($id);
+        $dados = $request->all();
+
+        $gatilhos->gatilho = $dados['gatilho'];
+        $gatilhos->id_tipo_projeto = $dados['id_tipo_projeto'];
+        $gatilhos->tipo_gatilho = $dados['tipo_gatilho'];
+        $gatilhos->dias_limite_padrao = $dados['dias_limite_padrao'];
+        $gatilhos->dias_limite_50 = $dados['dias_limite_50'];
+        $gatilhos->dias_limite_40 = $dados['dias_limite_40'];
+        $gatilhos->dias_limite_30 = $dados['dias_limite_30'];
+        $gatilhos->id_referente = $dados['id_referente'];
+        $gatilhos->id_grupo_gatilho = $dados['id_grupo_gatilho'];
+        $gatilhos->update();
+
+        return redirect()->route('admin.gatilhos.editar', $gatilhos->id)->with('successMessage', 'Gatilho editado com sucesso.');
+    }
+
+    public function deletarGatilho($id)
+    {
+        GatilhoTemplate::find($id)->delete();
+        return redirect()->route('admin.gatilhos')->with('successMessage', 'Gatilho deletado com sucesso.');
+    }
+
+    public function getProjectTypes()
+    {
+        $projectTypes = TipoProjeto::all();
+        return response()->json($projectTypes);
     }
 }
