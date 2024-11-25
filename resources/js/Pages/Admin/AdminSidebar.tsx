@@ -83,7 +83,7 @@ const AdminSidebar = ({ setActivePage }) => {
                     </button>
                     {openMenus.relatorios && (
                         <div className="pl-6">
-                            <Link href="/listagem-clientes" className="py-2">Listagem de Clientes</Link>
+                            <Link href="/clients" className="py-2">Listagem de Clientes</Link>
                             <Link href="/listagem-ftps" className="py-2">Listagem de FTPs</Link>
                             <Link href="/registro-senha" className="py-2">Registro de Senha</Link>
                             <Link href="/relatorio-tarefas" className="py-2">Relatório de Tarefas</Link>

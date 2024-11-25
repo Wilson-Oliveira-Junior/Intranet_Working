@@ -2,35 +2,16 @@ import '../css/app.css';
 import '../css/components/Sidebar.css';
 import './bootstrap';
 
-import { createInertiaApp } from '@inertiajs/react';
-import { createRoot } from 'react-dom/client';
-import AuthenticatedLayout from './Layouts/AuthenticatedLayout';
-import { resolvePageComponent } from './resolvePageComponent';
-
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+import React from 'react';
+import { render } from 'react-dom';
+import { createInertiaApp } from '@inertiajs/inertia-react';
+import { InertiaProgress } from '@inertiajs/progress';
 
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
-    resolve: (name) => {
-        console.log('Resolving component for page:', name);
-        const pages = import.meta.glob('./Pages/**/*.tsx');
-        console.log('Available pages:', Object.keys(pages));
-        return resolvePageComponent(name, pages).then((module) => {
-            console.log('Resolved module:', module);
-            if (name.startsWith('auth.')) {
-                module.default.layout = AuthenticatedLayout;
-            }
-            return module;
-        }).catch(error => {
-            console.error('Error resolving component:', error);
-            throw error;
-        });
-    },
+    resolve: name => import(`./Pages/${name}`),
     setup({ el, App, props }) {
-        const root = createRoot(el);
-        root.render(<App {...props} />);
-    },
-    progress: {
-        color: '#4B5563',
+        render(<App {...props} />, el);
     },
 });
+
+InertiaProgress.init({ color: '#4B5563' });

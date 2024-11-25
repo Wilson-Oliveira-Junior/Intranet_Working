@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\GuestController;
+use App\Http\Controllers\ClientController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -77,6 +78,12 @@ Route::middleware('auth')->group(function () {
 
     // Guest
     Route::get('/guest/dashboard', [GuestController::class, 'index'])->name('guest.dashboard');
+
+    // Listagem de Clientes
+    Route::get('/clients', [ClientController::class, 'listClients'])->name('clients.list');
+    Route::middleware('can:editar_cliente')->group(function () {
+        Route::put('/clients/{id}/edit', [ClientController::class, 'editClient'])->name('clients.edit');
+    });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
