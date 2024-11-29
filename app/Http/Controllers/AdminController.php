@@ -12,8 +12,8 @@ use App\Models\Sector;
 use Illuminate\Support\Facades\Log;
 use App\Models\Client;
 use App\Models\GatilhoTemplate;
-use Illuminate\Support\Facades\DB; // Adicionar o namespace DB
-use App\Models\TipoProjeto; // Adicionar o namespace TipoProjeto
+use Illuminate\Support\Facades\DB;
+use App\Models\TipoProjeto;
 
 class AdminController extends Controller
 {
@@ -30,7 +30,6 @@ class AdminController extends Controller
 
     public function getActiveUsersCount()
     {
-
         $activeUsersCount = User::where('status', 'Ativo')->count();
 
         return response()->json([
@@ -38,15 +37,23 @@ class AdminController extends Controller
         ]);
     }
 
+    public function getActiveClientsCount()
+    {
+        $activeClientsCount = Client::where('status', 'Ativo')->count();
+
+        return response()->json([
+            'count' => $activeClientsCount
+        ]);
+    }
 
     public function getBirthdaysThisMonth()
     {
         $currentMonth = date('m');
-
-
         $birthdays = User::whereMonth('birth_date', $currentMonth)->get(['name', 'profilepicture', 'birth_date']);
 
-        return response()->json($birthdays);
+        return Inertia::render('Admin/BirthdaysThisMonth', [
+            'birthdays' => $birthdays
+        ]);
     }
 
     public function userTypes()
@@ -413,12 +420,26 @@ class AdminController extends Controller
 
 
     //Clientes
-     public function getClients()
-     {
-         $clients = Client::where('status', 'Ativo')->get();
-         return response()->json($clients);
+    public function getClients()
+    {
+        $clients = Client::where('status', 'Ativo')->get();
+
+        return Inertia::render('Admin/Clients', [
+            'clients' => $clients
+        ]);
     }
 
+    public function showClientList()
+    {
+        $clients = Client::all();
+        $user = Auth::user();
+
+        return Inertia::render('Clients/List', [
+            'clients' => $clients,
+            'canEdit' => $user->can('edit clients'), // Adjust permission check as needed
+            'auth' => ['user' => $user],
+        ]);
+    }
 
     //Gatilhos
     public function getGatilhosData()

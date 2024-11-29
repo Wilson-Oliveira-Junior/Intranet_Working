@@ -4,14 +4,29 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class ClientController extends Controller
 {
+
+    public function index()
+    {
+        $user = Auth::user();
+        return Inertia::render('Guest/DashboardGuest', [
+            'component' => 'Guest/HomeGuest',
+            'user' => $user,
+        ]);
+    }
     public function listClients()
     {
-        // Logic to list clients
-        $clients = []; // Fetch clients from the database
-        return Inertia::render('Clients/List', ['clients' => $clients]);
+        $clients = User::all(); // Fetch clients from the database
+        $canEdit = Auth::user()->can('editar_cliente');
+        return Inertia::render('Clients/List', [
+            'clients' => $clients,
+            'canEdit' => $canEdit,
+            'auth' => Auth::user()
+        ]);
     }
 
     public function editClient($id, Request $request)

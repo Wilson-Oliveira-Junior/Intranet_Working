@@ -61,12 +61,12 @@ const AdminSidebar = ({ setActivePage }) => {
                 {/* Menu Tarefas */}
                 <div className="flex flex-col">
                     <button onClick={() => toggleMenu('tarefa')} className="flex items-center py-2">
-                        <i className="fas fa-tasks"></i> Tarefas
+                        <i className="fas fa-tasks"></i> Módulo de Tarefas
                         <i className={`fas fa-chevron-right ml-auto ${openMenus.tarefa ? 'rotate-90' : ''}`}></i>
                     </button>
                     {openMenus.tarefa && (
                         <div className="pl-6">
-                            <Link href="/clientes" className="py-2">Clientes</Link>
+                            <Link href="/admin/clients" className="py-2">Clientes</Link>
                             <Link href="/tipo-tarefa" className="py-2">Tipo de Tarefa</Link>
                             <Link href="/status" className="py-2">Status</Link>
                             <Link href="/segmentos-clientes" className="py-2">Segmentos Clientes</Link>
@@ -83,7 +83,7 @@ const AdminSidebar = ({ setActivePage }) => {
                     </button>
                     {openMenus.relatorios && (
                         <div className="pl-6">
-                            <Link href="/clients" className="py-2">Listagem de Clientes</Link>
+                            <Link href="/admin/clients" className="py-2">Listagem de Clientes</Link>
                             <Link href="/listagem-ftps" className="py-2">Listagem de FTPs</Link>
                             <Link href="/registro-senha" className="py-2">Registro de Senha</Link>
                             <Link href="/relatorio-tarefas" className="py-2">Relatório de Tarefas</Link>

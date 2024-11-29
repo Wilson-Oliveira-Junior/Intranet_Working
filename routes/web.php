@@ -7,12 +7,11 @@ use Inertia\Inertia;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\GuestController;
-use App\Http\Controllers\ClientController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
+        'canRegistear' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
@@ -24,6 +23,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/active-users-count', [AdminController::class, 'getActiveUsersCount']);
 Route::get('/birthdays-this-month', [AdminController::class, 'getBirthdaysThisMonth']);
+Route::get('/active-clients-count', [AdminController::class, 'getActiveClientsCount']);
 
 
 
@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/usertypes', [AdminController::class, 'userTypes'])->name('admin.usertypes');
     Route::get('/admin/clients', [AdminController::class, 'getClients'])->name('admin.clients');
+    Route::get('/admin/clients', [AdminController::class, 'showClientList'])->name('admin.clients.list');
 
     // Tipos de Usuários
     Route::post('/admin/user-types', [AdminController::class, 'store']);
@@ -79,11 +80,7 @@ Route::middleware('auth')->group(function () {
     // Guest
     Route::get('/guest/dashboard', [GuestController::class, 'index'])->name('guest.dashboard');
 
-    // Listagem de Clientes
-    Route::get('/clients', [ClientController::class, 'listClients'])->name('clients.list');
-    Route::middleware('can:editar_cliente')->group(function () {
-        Route::put('/clients/{id}/edit', [ClientController::class, 'editClient'])->name('clients.edit');
-    });
+    Route::get('/clients', [AdminController::class, 'showClientList'])->name('clients.list');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

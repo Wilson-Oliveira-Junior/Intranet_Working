@@ -6,7 +6,6 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import axios from 'axios';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-
 interface User {
     name: string;
     profilepicture: string;
@@ -17,6 +16,7 @@ const HomeAdm: React.FC = () => {
   const { user, activeUsersCount: activeUsersCountFromProps } = usePage().props as { user: User, activeUsersCount: number };
 
   const [activeUsersCount, setActiveUsersCount] = useState<number>(activeUsersCountFromProps || 0);
+  const [activeClientsCount, setActiveClientsCount] = useState<number>(0);
   const [birthdays, setBirthdays] = useState<User[]>([]);
 
   if (!user) {
@@ -30,6 +30,16 @@ const HomeAdm: React.FC = () => {
       })
       .catch(error => {
         console.error('Erro ao carregar dados de usuários ativos', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios.get('/active-clients-count')
+      .then(response => {
+        setActiveClientsCount(response.data.count);
+      })
+      .catch(error => {
+        console.error('Erro ao carregar dados de clientes ativos', error);
       });
   }, []);
 
@@ -64,7 +74,7 @@ const HomeAdm: React.FC = () => {
           <div className="col-md-3 mb-4">
             <div className="card">
               <h2>CLIENTES</h2>
-              <p>{/* valor para clientes */}</p>
+              <p>{activeClientsCount}</p>
             </div>
           </div>
         </div>
@@ -85,7 +95,7 @@ const HomeAdm: React.FC = () => {
           <div className="col-md-4 mb-4">
             <div className="card">
               <h2>Aniversariantes do Mês</h2>
-              {birthdays.length > 0 ? (
+              {Array.isArray(birthdays) && birthdays.length > 0 ? (
                 <div className="birthday-list">
                   {birthdays.map((person, index) => (
                     <div key={index} className="birthday-item">
