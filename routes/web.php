@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\GuestController;
+use App\Http\Controllers\ClientController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -24,8 +25,7 @@ Route::get('/dashboard', function () {
 Route::get('/active-users-count', [AdminController::class, 'getActiveUsersCount']);
 Route::get('/birthdays-this-month', [AdminController::class, 'getBirthdaysThisMonth']);
 Route::get('/active-clients-count', [AdminController::class, 'getActiveClientsCount']);
-
-
+Route::get('/segments', [AdminController::class, 'getSegments'])->name('segments.list');
 
 // Rotas específicas para diferentes níveis de acesso
 Route::middleware('auth')->group(function () {
@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/usertypes', [AdminController::class, 'userTypes'])->name('admin.usertypes');
     Route::get('/admin/clients', [AdminController::class, 'getClients'])->name('admin.clients');
     Route::get('/admin/clients', [AdminController::class, 'showClientList'])->name('admin.clients.list');
+    Route::post('/admin/clients', [AdminController::class, 'storeClient'])->name('admin.clients.store');
 
     // Tipos de Usuários
     Route::post('/admin/user-types', [AdminController::class, 'store']);
@@ -81,6 +82,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/guest/dashboard', [GuestController::class, 'index'])->name('guest.dashboard');
 
     Route::get('/clients', [AdminController::class, 'showClientList'])->name('clients.list');
+    Route::get('/clients/{id}/details', [AdminController::class, 'getClientDetails'])->name('clients.details');
+    Route::get('/clients/{id}', [ClientController::class, 'show'])->name('clients.show');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

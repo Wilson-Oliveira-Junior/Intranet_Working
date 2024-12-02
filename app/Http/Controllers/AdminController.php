@@ -14,6 +14,7 @@ use App\Models\Client;
 use App\Models\GatilhoTemplate;
 use Illuminate\Support\Facades\DB;
 use App\Models\TipoProjeto;
+use App\Models\Segmento;
 
 class AdminController extends Controller
 {
@@ -429,16 +430,56 @@ class AdminController extends Controller
         ]);
     }
 
-    public function showClientList()
+    public function showClientList(Request $request)
     {
-        $clients = Client::all();
+        if ($request->ajax()) {
+            $clients = Client::paginate(10);
+            return response()->json([
+                'clients' => $clients->items(),
+                'links' => $clients->linkCollection()->toArray(),
+            ]);
+        }
+
+        $clients = Client::paginate(10);
+        $projectTypes = TipoProjeto::all();
         $user = Auth::user();
 
         return Inertia::render('Clients/List', [
-            'clients' => $clients,
-            'canEdit' => $user->can('edit clients'), // Adjust permission check as needed
+            'clients' => $clients->items(),
+            'links' => $clients->linkCollection()->toArray(),
+            'projectTypes' => $projectTypes,
+            'canEdit' => $user->can('edit clients'),
             'auth' => ['user' => $user],
         ]);
+    }
+
+    public function storeClient(Request $request)
+    {
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'razao_social' => 'required|string|max:255',
+            'nome_fantasia' => 'required|string|max:255',
+            'CNPJ' => 'required|string|max:20',
+            'inscricao_estadual' => 'required|string|max:20',
+            'segmento' => 'required|string|max:255',
+            'melhor_dia_boleto' => 'required|integer|in:10,15,20,25,30',
+            'perfil_cliente' => 'required|string|max:255',
+        ]);
+
+        $client = Client::create($request->all());
+
+        return response()->json($client);
+    }
+
+    public function getClientDetails($id)
+    {
+        try {
+            $client = Client::with(['contacts', 'services'])->findOrFail($id);
+            return response()->json($client);
+        } catch (\Exception $e) {
+            Log::error('Error fetching client details: ' . $e->getMessage());
+            return response()->json(['error' => 'Error fetching client details'], 500);
+        }
     }
 
     //Gatilhos
@@ -588,5 +629,16 @@ class AdminController extends Controller
     {
         $projectTypes = TipoProjeto::all();
         return response()->json($projectTypes);
+    }
+
+    public function getSegments()
+    {
+        try {
+            $segments = Segmento::all(['id', 'nome']);
+            return response()->json($segments);
+        } catch (\Exception $e) {
+            Log::error('Error fetching segments: ' . $e->getMessage());
+            return response()->json(['error' => 'Error fetching segments'], 500);
+        }
     }
 }

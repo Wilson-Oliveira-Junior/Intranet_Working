@@ -1,0 +1,107 @@
+.container {
+    max-width: 1400px; /* Aumente a largura máxima do container */
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: fit-content;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.barralateral {
+    width: 40%; /* Aumente a largura da barralateral */
+    padding: 5px; /* Ajuste o padding da barra lateral */
+}
+
+.barralateral .card {
+    background-color: #1a2a6c;
+    color: white;
+    padding: 15px; /* Diminua o padding dos cards */
+    margin-bottom: 10px;
+    border-radius: 8px;
+    position: relative;
+}
+.barralateral .card:nth-child(2) {
+    background-color: #00c6ff;
+}
+.barralateral .card:nth-child(3) {
+    background-color: #0072ff;
+}
+.barralateral .card:nth-child(4) {
+    background-color: #28a745;
+}
+.barralateral .card:nth-child(5) {
+    background-color: #ffc107;
+}
+.barralateral .card:nth-child(6) {
+    background-color: #dc3545;
+}
+.barralateral .card i {
+    position: absolute;
+    top: 15px; /* Ajuste a posição do ícone */
+    right: 15px; /* Ajuste a posição do ícone */
+    font-size: 20px; /* Diminua o tamanho do ícone */
+}
+.barralateral .card p {
+    margin: 0;
+}
+.barralateral .card p:first-child {
+    font-size: 20px; /* Diminua o tamanho da fonte */
+    font-weight: bold;
+}
+.barralateral .card p:last-child {
+    margin-top: 10px;
+    font-size: 12px; /* Diminua o tamanho da fonte */
+}
+.content {
+    width: 70%; /* Ajuste a largura do conteúdo */
+    padding: 15px; /* Ajuste o padding do conteúdo */
+}
+.content h2 {
+    background-color: #6a11cb;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+}
+.task-list {
+    background-color: white;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+}
+.task {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+.task:last-child {
+    border-bottom: none;
+}
+.task .details {
+    flex-grow: 1;
+}
+.task .details p {
+    margin: 0;
+}
+.task .details p:first-child {
+    font-weight: bold;
+    color: #1a2a6c;
+}
+.task .details p:last-child {
+    font-size: 12px;
+    color: #555;
+}
+.task .status {
+    color: #1a2a6c;
+}
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    .barralateral, .content {
+        width: 100%;
+    }
+}
