@@ -74,7 +74,7 @@ const HomeAdm: React.FC = () => {
           <div className="col-md-3 mb-4">
             <div className="card">
               <h2>CLIENTES</h2>
-              <p>{activeClientsCount}</p>
+              <p className="active-clients">{activeClientsCount}</p>
             </div>
           </div>
         </div>

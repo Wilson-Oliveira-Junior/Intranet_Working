@@ -40,7 +40,7 @@ class AdminController extends Controller
 
     public function getActiveClientsCount()
     {
-        $activeClientsCount = Client::where('status', 'Ativo')->count();
+        $activeClientsCount = Client::where('status', 0)->count(); // Assuming 0 is for active clients
 
         return response()->json([
             'count' => $activeClientsCount
@@ -432,14 +432,6 @@ class AdminController extends Controller
 
     public function showClientList(Request $request)
     {
-        if ($request->ajax()) {
-            $clients = Client::paginate(10);
-            return response()->json([
-                'clients' => $clients->items(),
-                'links' => $clients->linkCollection()->toArray(),
-            ]);
-        }
-
         $clients = Client::paginate(10);
         $projectTypes = TipoProjeto::all();
         $user = Auth::user();
@@ -480,6 +472,11 @@ class AdminController extends Controller
             Log::error('Error fetching client details: ' . $e->getMessage());
             return response()->json(['error' => 'Error fetching client details'], 500);
         }
+    }
+
+    public function getClientPasswords($id) {
+        $client = Client::with('passwords')->findOrFail($id);
+        return response()->json($client->passwords);
     }
 
     //Gatilhos
@@ -640,5 +637,27 @@ class AdminController extends Controller
             Log::error('Error fetching segments: ' . $e->getMessage());
             return response()->json(['error' => 'Error fetching segments'], 500);
         }
+    }
+
+
+    //Senhas
+    public function showPasswordRegistration()
+    {
+        $clients = Client::paginate(10);
+        return Inertia::render('Admin/PasswordRegistration', ['clients' => $clients]);
+    }
+
+    public function deleteClientPasswords($id)
+    {
+        $client = Client::findOrFail($id);
+        $client->passwords()->delete();
+        return response()->json(['message' => 'Senhas excluídas com sucesso.']);
+    }
+
+    public function updateClientPassword(Request $request, $id)
+    {
+        $password = Password::findOrFail($id);
+        $password->update($request->all());
+        return response()->json(['message' => 'Senha atualizada com sucesso.']);
     }
 }

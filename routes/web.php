@@ -32,8 +32,7 @@ Route::middleware('auth')->group(function () {
     // Admin
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/usertypes', [AdminController::class, 'userTypes'])->name('admin.usertypes');
-    Route::get('/admin/clients', [AdminController::class, 'getClients'])->name('admin.clients');
-    Route::get('/admin/clients', [AdminController::class, 'showClientList'])->name('admin.clients.list');
+    Route::get('/admin/clients', [AdminController::class, 'showClientList'])->name('admin.clients');
     Route::post('/admin/clients', [AdminController::class, 'storeClient'])->name('admin.clients.store');
 
     // Tipos de Usuários
@@ -75,6 +74,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/admin/gatilhos/atualizar/{id}', [AdminController::class, 'atualizarGatilho'])->name('admin.gatilhos.atualizar');
     Route::delete('/admin/gatilhos/deletar/{id}', [AdminController::class, 'deletarGatilho'])->name('admin.gatilhos.deletar');
 
+    //Senhas
+    Route::get('/registro-senha', [AdminController::class, 'showPasswordRegistration'])->name('password.registration');
+
+
     // Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');
 
@@ -90,6 +93,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+
+
 
 require __DIR__ . '/auth.php';
+});
