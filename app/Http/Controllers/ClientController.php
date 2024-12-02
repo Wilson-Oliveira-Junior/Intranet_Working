@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Models\User;
 use App\Models\Client;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ClientController extends Controller
 {
@@ -63,5 +64,34 @@ class ClientController extends Controller
                 'user' => Auth::user(),
             ],
         ]);
+    }
+
+    public function getClientContacts($id)
+    {
+        $client = Client::findOrFail($id);
+        $contacts = $client->contacts()->get(['nome_contato', 'telefone', 'celular', 'email']);
+        return response()->json($contacts);
+    }
+
+    public function getClientDetails($id)
+    {
+        try {
+            $client = Client::with(['contacts'])->findOrFail($id);
+            return response()->json($client);
+        } catch (\Exception $e) {
+            Log::error('Error fetching client details: ' . $e->getMessage());
+            return response()->json(['error' => 'Error fetching client details'], 500);
+        }
+    }
+
+    public function getClientPasswords($id)
+    {
+        try {
+            $client = Client::with('passwords')->findOrFail($id);
+            return response()->json($client->passwords);
+        } catch (\Exception $e) {
+            Log::error('Error fetching client passwords: ' . $e->getMessage());
+            return response()->json(['error' => 'Error fetching client passwords'], 500);
+        }
     }
 }

@@ -82,8 +82,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/guest/dashboard', [GuestController::class, 'index'])->name('guest.dashboard');
 
     Route::get('/clients', [AdminController::class, 'showClientList'])->name('clients.list');
-    Route::get('/clients/{id}/details', [AdminController::class, 'getClientDetails'])->name('clients.details');
+    Route::get('/clients/{id}/details', [ClientController::class, 'getClientDetails'])->name('clients.details');
     Route::get('/clients/{id}', [ClientController::class, 'show'])->name('clients.show');
+    Route::get('/clients/{id}/contacts', [ClientController::class, 'getClientContacts'])->name('clients.contacts');
+    Route::get('/clients/{id}/passwords', [ClientController::class, 'getClientPasswords'])->name('clients.passwords');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

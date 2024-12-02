@@ -25,11 +25,11 @@ class Client extends Model
 
     public function contacts()
     {
-        return $this->hasMany(Contact::class);
+        return $this->hasMany(ClienteContato::class, 'id_cliente');
     }
 
-    public function services()
+    public function passwords()
     {
-        return $this->hasMany(Service::class);
+        return $this->hasMany(Client_Senhas::class, 'idCliente');
     }
 }

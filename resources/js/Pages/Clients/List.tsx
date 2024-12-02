@@ -13,7 +13,6 @@ interface Client {
 
 interface ClientDetails {
     contacts: string[];
-    services: string[];
 }
 
 interface ProjectType {
@@ -64,6 +63,7 @@ const ClientList: React.FC = () => {
         melhor_dia_boleto: '',
         perfil_cliente: ''
     });
+    const [contacts, setContacts] = useState<string[]>([]);
 
     useEffect(() => {
         let filtered = clients;
@@ -92,6 +92,15 @@ const ClientList: React.FC = () => {
             .catch(error => {
                 console.error('There was an error fetching the segments!', error);
                 setSegments([]); // Set segments to an empty array to avoid undefined error
+            });
+
+        axios.get('/clients/contacts')
+            .then(response => {
+                setContacts(response.data);
+            })
+            .catch(error => {
+                console.error('There was an error fetching the contacts!', error);
+                setContacts([]); // Set contacts to an empty array to avoid undefined error
             });
     }, []);
 

@@ -45,6 +45,7 @@
 }
 .barralateral .card p {
     margin: 0;
+    font-size: 14px; /* Ensure consistent font size */
 }
 .barralateral .card p:first-child {
     font-size: 20px; /* Diminua o tamanho da fonte */
@@ -97,6 +98,36 @@
 .task .status {
     color: #1a2a6c;
 }
+
+.carousel-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.carousel-controls button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px; /* Ensure consistent font size */
+}
+
+.carousel-controls button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.carousel-controls button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.password-field {
+    font-size: 14px; /* Ensure consistent font size */
+}
+
 @media (max-width: 768px) {
     .container {
         flex-direction: column;

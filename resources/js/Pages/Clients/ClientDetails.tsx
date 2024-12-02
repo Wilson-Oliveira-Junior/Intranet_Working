@@ -23,6 +23,20 @@ interface Client {
     redes_sociais?: string[];
 }
 
+interface Contact {
+    nome_contato: string;
+    telefone: string;
+    celular: string;
+    email: string;
+}
+
+interface Password {
+    strURL: string;
+    strLogin: string;
+    strSenha: string;
+    observacao: string;
+}
+
 interface ClientDetailsProps {
     client: Client;
     auth: {
@@ -35,16 +49,53 @@ interface ClientDetailsProps {
 const ClientDetails: React.FC = () => {
     const { client: initialClient, auth } = usePage<ClientDetailsProps>().props;
     const [client, setClient] = useState<Client>(initialClient);
+    const [contact, setContact] = useState<Contact | null>(null);
+    const [passwords, setPasswords] = useState<Password[]>([]);
+    const [showPassword, setShowPassword] = useState(false);
+    const [currentPasswordIndex, setCurrentPasswordIndex] = useState(0);
 
     useEffect(() => {
-        axios.get(`/clients/${client.id}`)
+        console.log('Fetching client details for ID:', initialClient.id);
+        axios.get(`/clients/${initialClient.id}/details`)
             .then(response => {
+                console.log('Client details fetched:', response.data);
                 setClient(response.data);
             })
             .catch(error => {
                 console.error('There was an error fetching the client details!', error);
             });
-    }, [client.id]);
+
+        axios.get(`/clients/${initialClient.id}/contacts`)
+            .then(response => {
+                console.log('Client contacts fetched:', response.data);
+                if (response.data.length > 0) {
+                    setContact(response.data[0]); // Assuming the first contact is the responsible person
+                }
+            })
+            .catch(error => {
+                console.error('There was an error fetching the client contacts!', error);
+            });
+
+        axios.get(`/clients/${initialClient.id}/passwords`)
+            .then(response => {
+                setPasswords(response.data);
+            })
+            .catch(error => {
+                console.error('There was an error fetching the client passwords!', error);
+            });
+    }, [initialClient.id]);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleNextPassword = () => {
+        setCurrentPasswordIndex((prevIndex) => (prevIndex + 1) % passwords.length);
+    };
+
+    const handlePrevPassword = () => {
+        setCurrentPasswordIndex((prevIndex) => (prevIndex - 1 + passwords.length) % passwords.length);
+    };
 
     return (
         <AuthenticatedLayout user={auth.user}>
@@ -53,13 +104,29 @@ const ClientDetails: React.FC = () => {
                     <div className="card">
                         <p>Identificação</p>
                         <p>{client.nome_fantasia}</p>
-                        <p>{client.nome}</p>
-                        <p>{client.dominio}</p>
+                        <p>{contact ? contact.nome_contato : 'Responsável não definido'}</p>
+                        <p><a href={`http://${client.dominio}`} target="_blank" rel="noopener noreferrer">{client.dominio}</a></p>
                         <p><i className="fas fa-thumbs-up"></i></p>
                     </div>
                     <div className="card">
                         <p>Senhas</p>
-                        <p>{client.senhas}</p>
+                        <p>
+                            <button onClick={togglePasswordVisibility}>
+                                {showPassword ? 'Ocultar Senha' : 'Mostrar Senha'}
+                            </button>
+                        </p>
+                        {passwords.length > 0 && (
+                            <div>
+                                <p className="password-field">URL: {passwords[currentPasswordIndex].strURL}</p>
+                                <p className="password-field">Login: {passwords[currentPasswordIndex].strLogin}</p>
+                                <p className="password-field">Senha: {showPassword ? passwords[currentPasswordIndex].strSenha : '********'}</p>
+                                <p className="password-field">Observação: {passwords[currentPasswordIndex].observacao}</p>
+                                <div className="carousel-controls">
+                                    <button onClick={handlePrevPassword} disabled={passwords.length <= 1}>Anterior</button>
+                                    <button onClick={handleNextPassword} disabled={passwords.length <= 1}>Próximo</button>
+                                </div>
+                            </div>
+                        )}
                         <p><i className="fas fa-cogs"></i></p>
                     </div>
                     <div className="card">
@@ -93,7 +160,7 @@ const ClientDetails: React.FC = () => {
                     </div>
                 </div>
                 <div className="content">
-                    <h2>Gatilhos para o cliente "{client.nome}"</h2>
+                    <h2>Gatilhos para o cliente {client.nome_fantasia}</h2>
                     <div className="task-list">
                         <div className="task">
                             <div className="details">
@@ -132,7 +199,7 @@ const ClientDetails: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                    <h2>Tarefas para o cliente "{client.nome}"</h2>
+                    <h2>Tarefas para o cliente {client.nome_fantasia}</h2>
                     <div className="task-list">
                         <div className="task">
                             <div className="details">
