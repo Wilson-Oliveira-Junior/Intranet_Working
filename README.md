@@ -14,4 +14,14 @@ A Intranet Working é um sistema interno desenvolvido para facilitar a comunica�
 Para instalar o projeto, siga os passos abaixo:
 
 1. Clone o repositório:
+ Baixar o zip 
+2. Configurar estrutura de pastas 
+ na pasta config vai ter mais detalhes do que tem que ser mudado 
+3. Iniciar o servidor 
+ use os comandos phpartisan serve 
+abra outro terminal 
+ npm run dev 
+
+## Planos futuros 
+Pretendo colocar ele no docker para não ter que fazer mais essa configuração 
     
