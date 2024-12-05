@@ -32,6 +32,10 @@ const PasswordRegistration = () => {
             .then(data => {
                 setPasswords(data);
                 setShowModal(true);
+            })
+            .catch(error => {
+                console.error('Error fetching passwords:', error);
+                alert('Failed to fetch passwords. Please try again.');
             });
     };
 
@@ -41,6 +45,10 @@ const PasswordRegistration = () => {
             .then(data => {
                 alert(data.message);
                 // Refresh the client list or handle UI updates
+            })
+            .catch(error => {
+                console.error('Error deleting passwords:', error);
+                alert('Failed to delete passwords. Please try again.');
             });
     };
 
@@ -61,6 +69,10 @@ const PasswordRegistration = () => {
                 alert(data.message);
                 setShowEditModal(false);
                 // Refresh the password list or handle UI updates
+            })
+            .catch(error => {
+                console.error('Error updating password:', error);
+                alert('Failed to update password. Please try again.');
             });
     };
 
@@ -99,33 +111,39 @@ const PasswordRegistration = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {clients.data.map((client) => (
-                            <tr key={client.id}>
-                                <td className="border px-4 py-2">{client.nome_fantasia}</td>
-                                <td className="border px-4 py-2">
-                                    <button
-                                        className="bg-green-500 text-white px-4 py-2"
-                                        onClick={() => handleViewPasswords(client)}
-                                    >
-                                        Visualizar
-                                    </button>
-                                </td>
-                                <td className="border px-4 py-2">
-                                    <button
-                                        className="bg-yellow-500 text-white px-4 py-2 mr-2"
-                                        onClick={() => handleEditPassword(client)}
-                                    >
-                                        Editar
-                                    </button>
-                                    <button
-                                        className="bg-red-500 text-white px-4 py-2"
-                                        onClick={() => handleDeletePasswords(client)}
-                                    >
-                                        Excluir
-                                    </button>
-                                </td>
+                        {clients.data.length === 0 ? (
+                            <tr>
+                                <td colSpan="3" className="text-center py-4">No clients found.</td>
                             </tr>
-                        ))}
+                        ) : (
+                            clients.data.map((client) => (
+                                <tr key={client.id}>
+                                    <td className="border px-4 py-2">{client.nome_fantasia}</td>
+                                    <td className="border px-4 py-2">
+                                        <button
+                                            className="bg-green-500 text-white px-4 py-2"
+                                            onClick={() => handleViewPasswords(client)}
+                                        >
+                                            Visualizar
+                                        </button>
+                                    </td>
+                                    <td className="border px-4 py-2">
+                                        <button
+                                            className="bg-yellow-500 text-white px-4 py-2 mr-2"
+                                            onClick={() => handleEditPassword(client)}
+                                        >
+                                            Editar
+                                        </button>
+                                        <button
+                                            className="bg-red-500 text-white px-4 py-2"
+                                            onClick={() => handleDeletePasswords(client)}
+                                        >
+                                            Excluir
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
 
@@ -147,13 +165,17 @@ const PasswordRegistration = () => {
                         <div className="modal-content">
                             <span className="close" onClick={() => setShowModal(false)}>&times;</span>
                             <h2>Senhas de {selectedClient.nome_fantasia}</h2>
-                            <ul>
-                                {passwords.map((password) => (
-                                    <li key={password.id}>
-                                        {password.type} - {password.domain} - {password.url} - {password.login} - {password.password} - {password.adminOnly ? 'Sim' : 'Não'} - {password.notes}
-                                    </li>
-                                ))}
-                            </ul>
+                            {passwords.length === 0 ? (
+                                <p>No passwords found for this client.</p>
+                            ) : (
+                                <ul>
+                                    {passwords.map((password) => (
+                                        <li key={password.id}>
+                                            {password.type} - {password.domain} - {password.url} - {password.login} - {password.password} - {password.adminOnly ? 'Sim' : 'Não'} - {password.notes}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
                     </div>
                 )}
