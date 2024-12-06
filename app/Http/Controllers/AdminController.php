@@ -479,6 +479,15 @@ class AdminController extends Controller
         return response()->json($client->passwords);
     }
 
+    public function updateClientStatus(Request $request, $id)
+    {
+        $client = Client::findOrFail($id);
+        $client->status = $request->status;
+        $client->save();
+
+        return response()->json(['message' => 'Status do cliente atualizado com sucesso!']);
+    }
+
     //Gatilhos
     public function getGatilhosData()
     {

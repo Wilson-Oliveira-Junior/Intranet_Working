@@ -9,6 +9,7 @@ interface Client {
     id: number;
     nome: string;
     email: string;
+    status: number;
 }
 
 interface ClientDetails {
@@ -64,9 +65,10 @@ const ClientList: React.FC = () => {
         perfil_cliente: ''
     });
     const [contacts, setContacts] = useState<string[]>([]);
+    const [statusFilter, setStatusFilter] = useState('');
 
     useEffect(() => {
-        let filtered = clients;
+        let filtered = initialClients;
 
         if (searchTerm) {
             filtered = filtered.filter(client => client.nome && client.nome.includes(searchTerm));
@@ -81,8 +83,13 @@ const ClientList: React.FC = () => {
             // Filter clients by contact
         }
 
+        if (statusFilter) {
+            const status = statusFilter === 'Ativo' ? 0 : 1;
+            filtered = filtered.filter(client => client.status === status);
+        }
+
         setClients(filtered);
-    }, [searchTerm, projectType, contact]);
+    }, [searchTerm, projectType, contact, statusFilter, initialClients]);
 
     useEffect(() => {
         axios.get('/segments')
@@ -137,6 +144,23 @@ const ClientList: React.FC = () => {
         }
     };
 
+    const toggleClientStatus = (id: number, currentStatus: number) => {
+        const newStatus = currentStatus === 0 ? 1 : 0;
+        setClients((prevState) =>
+            prevState.map((client) =>
+                client.id === id ? { ...client, status: newStatus } : client
+            )
+        );
+
+        axios.put(`/clients/${id}/status`, { status: newStatus })
+            .then(() => {
+                console.log(`Status do cliente atualizado para ${newStatus === 0 ? 'Ativo' : 'Inativo'}!`);
+            })
+            .catch(error => {
+                console.error('There was an error updating the client status!', error);
+            });
+    };
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setNewClient({ ...newClient, [name]: value });
@@ -186,6 +210,14 @@ const ClientList: React.FC = () => {
                             ))}
                         </select>
                     </label>
+                    <label>
+                        Status:
+                        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                            <option value="">Todos</option>
+                            <option value="Ativo">Ativo</option>
+                            <option value="Inativo">Inativo</option>
+                        </select>
+                    </label>
                     <button onClick={() => setIsModalOpen(true)} className="btn novo">Adicionar Novo Cliente</button>
                 </div>
                 <table>
@@ -193,7 +225,9 @@ const ClientList: React.FC = () => {
                         <tr>
                             <th>Nome do Cliente (Domínio)</th>
                             <th>Visualizar mais detalhes</th>
+                            <th>Status</th>
                             <th>Ações</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -205,6 +239,16 @@ const ClientList: React.FC = () => {
                                         <button onClick={() => toggleClientDetails(client.id)}>
                                             {expandedClientId === client.id ? '-' : '+'}
                                         </button>
+                                    </td>
+                                    <td>
+                                        <label className="switch">
+                                            <input
+                                                type="checkbox"
+                                                checked={client.status === 0}
+                                                onChange={() => toggleClientStatus(client.id, client.status)}
+                                            />
+                                            <span className="slider"></span>
+                                        </label>
                                     </td>
                                     <td>
                                         <button className="btn detalhes" onClick={() => handleViewDetails(client.id)}>
