@@ -36,7 +36,10 @@ class AuthenticatedSessionController extends Controller
         // Redirecionar com base no nível de acesso
         $user = Auth::user();
 
-        // dd($user->access_level);
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['error' => 'User not authenticated']);
+        }
+
         if ($user->access_level === 'admin') {
             return redirect()->route('admin.dashboard');
         } elseif ($user->access_level === 'employee') {

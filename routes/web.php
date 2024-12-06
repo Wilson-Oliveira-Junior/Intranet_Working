@@ -27,6 +27,11 @@ Route::get('/birthdays-this-month', [AdminController::class, 'getBirthdaysThisMo
 Route::get('/active-clients-count', [AdminController::class, 'getActiveClientsCount']);
 Route::get('/segments', [AdminController::class, 'getSegments'])->name('segments.list');
 
+// Error boundary route
+Route::get('/error-boundary', function () {
+    return Inertia::render('ErrorBoundary');
+})->name('error.boundary');
+
 // Rotas específicas para diferentes níveis de acesso
 Route::middleware('auth')->group(function () {
     // Admin

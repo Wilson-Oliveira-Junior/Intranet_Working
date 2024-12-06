@@ -1,16 +1,27 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
-import { Link } from '@inertiajs/react';
-import { PropsWithChildren, ReactNode, useState } from 'react';
+import { Link, usePage } from '@inertiajs/react';
+import { PropsWithChildren, ReactNode, useState, useEffect } from 'react';
 import SidebarADM from '@/Pages/Admin/AdminSidebar';
 
 export default function Authenticated({
     header,
     children,
-    user,
-}: PropsWithChildren<{ header?: ReactNode, user: any }>) {
+}: PropsWithChildren<{ header?: ReactNode }>) {
+    const { auth } = usePage().props;
+    const user = auth?.user; // Ensure user is defined
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+
+    useEffect(() => {
+        if (!user) {
+            window.location.href = route('login');
+        }
+    }, [user]);
+
+    if (!user) {
+        return <div>Redirecting...</div>; // Show a message while redirecting
+    }
 
     return (
         <div className="min-h-screen bg-gray-100">

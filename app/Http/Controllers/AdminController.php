@@ -51,9 +51,11 @@ class AdminController extends Controller
     {
         $currentMonth = date('m');
         $birthdays = User::whereMonth('birth_date', $currentMonth)->get(['name', 'profilepicture', 'birth_date']);
+        $user = Auth::user();
 
         return Inertia::render('Admin/BirthdaysThisMonth', [
-            'birthdays' => $birthdays
+            'birthdays' => $birthdays,
+            'user' => $user,
         ]);
     }
 
@@ -178,7 +180,6 @@ class AdminController extends Controller
     public function userControl()
     {
         $users = User::paginate(10);
-        $users = User::all();
         $user = Auth::user();
         $userTypes = UserType::all();
         $sectors = Sector::all();
