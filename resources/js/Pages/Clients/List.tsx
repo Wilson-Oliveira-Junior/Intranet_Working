@@ -258,23 +258,27 @@ const ClientList: React.FC = () => {
                                 </tr>
                                 {expandedClientId === client.id && clientDetails[client.id] && (
                                     <tr>
-                                        <td colSpan={3}>
+                                        <td colSpan={4}>
                                             <table>
                                                 <thead>
                                                     <tr>
-                                                        <th>Contatos</th>
+                                                        <th>Nome do Contato</th>
+                                                        <th>Telefone</th>
+                                                        <th>Celular</th>
+                                                        <th>Email</th>
+                                                        <th>Tipo de Contato</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <ul>
-                                                                {clientDetails[client.id].contacts.map((contact, index) => (
-                                                                    <li key={index}>{contact}</li>
-                                                                ))}
-                                                            </ul>
-                                                        </td>
-                                                    </tr>
+                                                    {clientDetails[client.id].contacts.map((contact, index) => (
+                                                        <tr key={index}>
+                                                            <td>{contact.nome_contato}</td>
+                                                            <td>{contact.telefone}</td>
+                                                            <td>{contact.celular}</td>
+                                                            <td>{contact.email}</td>
+                                                            <td>{contact.tipo_contato}</td>
+                                                        </tr>
+                                                    ))}
                                                 </tbody>
                                             </table>
                                         </td>
@@ -292,7 +296,7 @@ const ClientList: React.FC = () => {
                             disabled={!link.url}
                             className={link.active ? 'active' : ''}
                         >
-                            {link.label}
+                            {link.label === 'Next' ? 'Próximo' : link.label === 'Previous' ? 'Anterior' : link.label}
                         </button>
                     ))}
                 </div>

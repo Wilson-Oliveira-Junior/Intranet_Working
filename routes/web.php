@@ -8,6 +8,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\TeamScheduleController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -82,6 +83,9 @@ Route::middleware('auth')->group(function () {
     //Senhas
     Route::get('/registro-senha', [AdminController::class, 'showPasswordRegistration'])->name('password.registration');
 
+    // Cronograma de Equipes
+    Route::get('/cronograma', [TeamScheduleController::class, 'index'])->name('teamSchedule.index');
+    Route::get('/admin/cronograma', [TeamScheduleController::class, 'adminView'])->name('teamSchedule.adminView');
 
     // Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');
@@ -96,7 +100,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/clients/{id}/contacts', [ClientController::class, 'getClientContacts'])->name('clients.contacts');
     Route::get('/clients/{id}/passwords', [ClientController::class, 'getClientPasswords'])->name('clients.passwords');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });

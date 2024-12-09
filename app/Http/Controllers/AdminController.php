@@ -224,8 +224,6 @@ class AdminController extends Controller
 
     public function updateUserProfile(Request $request, $id)
     {
-
-
         $request->validate([
             'name' => 'required|string|max:255',
             'middlename' => 'nullable|string|max:255',
@@ -282,12 +280,12 @@ class AdminController extends Controller
 
         if ($request->hasFile('profilepicture')) {
             $imagePath = $request->file('profilepicture')->store('img/usuario', 'public');
-            $user->profilepicture = $imagePath; // Ensure the correct field is updated
+            $user->profilepicture = $imagePath;
         }
 
         $user->save();
 
-        return redirect()->route('admin.users')->with('successMessage', 'Detalhes do usuário atualizados com sucesso!');
+        return redirect()->route('profile.show')->with('successMessage', 'Detalhes do usuário atualizados com sucesso!');
     }
 
 

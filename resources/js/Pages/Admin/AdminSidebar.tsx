@@ -51,7 +51,7 @@ const AdminSidebar = ({ setActivePage }) => {
                     </button>
                     {openMenus.meuEspaco && (
                         <div className="pl-6">
-                            <Link href="/meu-perfil" className="py-2">Meu Perfil</Link>
+                            <Link href="/profile" className="py-2">Meu Perfil</Link>
                             <Link href="/meu-cronograma" className="py-2">Meu Cronograma</Link>
                             <Link href="/meu-calendario" className="py-2">Meu Calendário</Link>
                         </div>
