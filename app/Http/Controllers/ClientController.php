@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 class ClientController extends Controller
 {
-
     public function index()
     {
         $user = Auth::user();
@@ -20,6 +19,7 @@ class ClientController extends Controller
             'user' => $user,
         ]);
     }
+
     public function listClients()
     {
         $clients = User::all();

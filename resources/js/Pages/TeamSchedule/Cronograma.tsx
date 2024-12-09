@@ -29,7 +29,7 @@ const Cronograma = ({ user, teamSchedules }) => {
     useEffect(() => {
         const fetchCronogramas = async () => {
             try {
-                const response = await fetch(`/api/cronograma?equipe=${selectedEquipe}`);
+                const response = await fetch(`/api/tasks?equipe=${selectedEquipe}`);
                 const text = await response.text();
                 console.log('Cronogramas response text:', text);
                 if (!response.ok) throw new Error('Erro ao buscar cronogramas');
@@ -101,6 +101,8 @@ const Cronograma = ({ user, teamSchedules }) => {
         setTaskTitle(task ? task.title : '');
         setTaskDescription(task ? task.description : '');
         setReminderDate(task ? task.date : '');
+        setPriority(task ? task.priority : 'normal'); // Set default priority
+        setSelectedSector(task ? task.sector_id : ''); // Set default sector
         setModalIsOpen(true);
     };
 
@@ -148,13 +150,15 @@ const Cronograma = ({ user, teamSchedules }) => {
             user_id: taskType === 'individual' ? followerId : null,
             client_id: clientId,
             hours_worked: 0,
+            priority: priority, // Ensure priority is included
         };
 
         try {
-            const response = await fetch('/cronograma', {
+            const response = await fetch(route('teamSchedule.store'), { // Use route helper
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'), // Add CSRF token
                 },
                 body: JSON.stringify(newTask),
             });
@@ -178,6 +182,7 @@ const Cronograma = ({ user, teamSchedules }) => {
             user_id: taskType === 'individual' ? followerId : null,
             client_id: clientId,
             hours_worked: 0,
+            priority: priority, // Ensure priority is included
         };
 
         try {
@@ -185,6 +190,7 @@ const Cronograma = ({ user, teamSchedules }) => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'), // Add CSRF token
                 },
                 body: JSON.stringify(updatedTask),
             });
@@ -317,6 +323,8 @@ const Cronograma = ({ user, teamSchedules }) => {
                         selectedTask={selectedTask}
                         closeModal={closeModal}
                         equipes={equipes} // Passar equipes para o TaskModal
+                        priority={priority} // Add priority prop
+                        setPriority={setPriority} // Add setPriority prop
                     />
                 )}
 
@@ -390,6 +398,8 @@ const TaskModal = ({
     selectedTask,
     closeModal,
     equipes, // Receber equipes como prop
+    priority, // Add priority prop
+    setPriority, // Add setPriority prop
 }) => (
     <div className="modal">
         <div className="modal-content">
@@ -446,6 +456,15 @@ const TaskModal = ({
                 value={reminderDate}
                 onChange={(e) => setReminderDate(e.target.value)}
             />
+            <select
+                className="modal-input"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+            >
+                <option value="normal">Normal</option>
+                <option value="atencao">Atenção</option>
+                <option value="urgente">Urgente</option>
+            </select>
             <select
                 className="modal-input"
                 value={clientId || ''}

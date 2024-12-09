@@ -50,13 +50,14 @@ class TeamScheduleController extends Controller
             'date' => 'required|date',
             'sector_id' => 'nullable|exists:sectors,id',
             'user_id' => 'nullable|exists:users,id',
-            'client_id' => 'required|exists:clients,id',
+            'client_id' => 'required|exists:clientes,id', // Update table name to 'clientes'
             'hours_worked' => 'required|numeric',
+            'priority' => 'required|string', // Ensure priority is validated
         ]);
 
         $schedule = Schedule::create($request->all());
 
-        return redirect()->route('teamSchedule.index')->with('successMessage', 'Tarefa criada com sucesso!');
+        return response()->json($schedule); // Return the created schedule
     }
 
     public function update(Request $request, $id)
@@ -67,8 +68,9 @@ class TeamScheduleController extends Controller
             'date' => 'required|date',
             'sector_id' => 'nullable|exists:sectors,id',
             'user_id' => 'nullable|exists:users,id',
-            'client_id' => 'required|exists:clients,id',
+            'client_id' => 'required|exists:clientes,id', // Update table name to 'clientes'
             'hours_worked' => 'required|numeric',
+            'priority' => 'required|string', // Ensure priority is validated
         ]);
 
         $schedule = Schedule::findOrFail($id);
@@ -134,6 +136,16 @@ class TeamScheduleController extends Controller
             ->get();
 
         return response()->json($tasks);
+    }
+
+    public function getTasksWithPriority(Request $request)
+    {
+        $equipe = $request->query('equipe');
+        $schedules = Schedule::whereHas('sector', function ($query) use ($equipe) {
+            $query->where('name', $equipe);
+        })->get();
+
+        return response()->json($schedules);
     }
 
     public function getCronogramas(Request $request)

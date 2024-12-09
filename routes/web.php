@@ -13,7 +13,7 @@ use App\Http\Controllers\TeamScheduleController;
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'), // Corrected typo
+        'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
@@ -111,5 +111,6 @@ Route::middleware('auth')->group(function () {
 Route::get('/api/cronograma', [TeamScheduleController::class, 'getCronogramas']);
 Route::get('/api/users', [AdminController::class, 'getUsers']);
 Route::get('/api/clients', [ClientController::class, 'getClients']);
+Route::get('/api/tasks', [TeamScheduleController::class, 'getTasksWithPriority']);
 
 require __DIR__ . '/auth.php';

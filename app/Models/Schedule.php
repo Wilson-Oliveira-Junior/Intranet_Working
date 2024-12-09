@@ -17,6 +17,7 @@ class Schedule extends Model
         'user_id',
         'client_id',
         'hours_worked',
+        'priority', // Add this line
         // Adicione outros campos conforme necessário
     ];
 
