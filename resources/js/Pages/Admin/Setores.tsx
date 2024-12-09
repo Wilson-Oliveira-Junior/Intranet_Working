@@ -52,7 +52,6 @@ const sectors: React.FC = () => {
         }
     };
 
-
     return (
         <AuthenticatedLayout user={user}>
             <div className="container">

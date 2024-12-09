@@ -422,9 +422,13 @@ class AdminController extends Controller
     //Clientes
     public function getClients()
     {
-        $clients = Client::all(); // Retorna todos os clientes
-
-        return response()->json($clients);
+        try {
+            $clients = Client::all(); // Retorna todos os clientes
+            return response()->json($clients);
+        } catch (\Exception $e) {
+            Log::error('Error fetching clients: ' . $e->getMessage());
+            return response()->json(['error' => 'Error fetching clients'], 500);
+        }
     }
 
     public function showClientList(Request $request)
@@ -678,5 +682,19 @@ class AdminController extends Controller
         $client->passwords()->create($request->all());
 
         return response()->json(['message' => 'Senha adicionada com sucesso.']);
+    }
+
+    public function getUsers(Request $request)
+    {
+        $sectorId = $request->query('sector_id');
+        $query = User::query();
+
+        if ($sectorId) {
+            $query->where('sector', $sectorId);
+        }
+
+        $users = $query->get();
+
+        return response()->json($users);
     }
 }

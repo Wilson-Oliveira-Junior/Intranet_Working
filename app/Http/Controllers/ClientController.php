@@ -94,4 +94,15 @@ class ClientController extends Controller
             return response()->json(['error' => 'Error fetching client passwords'], 500);
         }
     }
+
+    public function getClients()
+    {
+        try {
+            $clients = Client::all(); // Retorna todos os clientes
+            return response()->json($clients);
+        } catch (\Exception $e) {
+            Log::error('Error fetching clients: ' . $e->getMessage());
+            return response()->json(['error' => 'Error fetching clients'], 500);
+        }
+    }
 }

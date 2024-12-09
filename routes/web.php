@@ -86,6 +86,9 @@ Route::middleware('auth')->group(function () {
     // Cronograma de Equipes
     Route::get('/cronograma', [TeamScheduleController::class, 'index'])->name('teamSchedule.index');
     Route::get('/admin/cronograma', [TeamScheduleController::class, 'adminView'])->name('teamSchedule.adminView');
+    Route::post('/cronograma', [TeamScheduleController::class, 'store'])->name('teamSchedule.store');
+    Route::put('/cronograma/{id}', [TeamScheduleController::class, 'update'])->name('teamSchedule.update');
+    Route::delete('/cronograma/{id}', [TeamScheduleController::class, 'destroy'])->name('teamSchedule.destroy');
 
     // Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');
@@ -93,8 +96,7 @@ Route::middleware('auth')->group(function () {
     // Guest
     Route::get('/guest/dashboard', [GuestController::class, 'index'])->name('guest.dashboard');
 
-    Route::get('/clients', [AdminController::class, 'getClients']);
-    Route::get('/clients', [AdminController::class, 'showClientList'])->name('clients.list');
+    Route::get('/clients', [ClientController::class, 'getClients'])->name('clients.list');
     Route::get('/clients/{id}/details', [ClientController::class, 'getClientDetails'])->name('clients.details');
     Route::get('/clients/{id}', [ClientController::class, 'show'])->name('clients.show');
     Route::get('/clients/{id}/contacts', [ClientController::class, 'getClientContacts'])->name('clients.contacts');
@@ -104,7 +106,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+}); // Ensure this closing bracket is properly placed
 
-// Ensure the closing bracket for the middleware group is properly placed
+Route::get('/api/cronograma', [TeamScheduleController::class, 'getCronogramas']);
+Route::get('/api/users', [AdminController::class, 'getUsers']);
+Route::get('/api/clients', [ClientController::class, 'getClients']);
+
 require __DIR__ . '/auth.php';

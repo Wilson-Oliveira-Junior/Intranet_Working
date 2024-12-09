@@ -22,7 +22,7 @@ class User extends Authenticatable
         'image',          // Foto de perfil
         'status',
         'user_type_id',
-        'sector',
+        'sector',         // Use sector as the foreign key
         'birth_date',
         'cellphone',      // Novo campo para celular
         'ramal',          // Novo campo para ramal
@@ -57,5 +57,10 @@ class User extends Authenticatable
     public function permissions()
     {
         return $this->belongsToMany(Permission::class, 'permission_user');
+    }
+
+    public function sector()
+    {
+        return $this->belongsTo(Sector::class, 'sector');
     }
 }
