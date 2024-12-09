@@ -179,7 +179,7 @@ class AdminController extends Controller
 
     public function userControl()
     {
-        $users = User::paginate(10);
+        $users = User::all(); // Fetch all users
         $user = Auth::user();
         $userTypes = UserType::all();
         $sectors = Sector::all();
@@ -424,11 +424,9 @@ class AdminController extends Controller
     //Clientes
     public function getClients()
     {
-        $clients = Client::where('status', 'Ativo')->get();
+        $clients = Client::all(); // Retorna todos os clientes
 
-        return Inertia::render('Admin/Clients', [
-            'clients' => $clients
-        ]);
+        return response()->json($clients);
     }
 
     public function showClientList(Request $request)
@@ -653,7 +651,7 @@ class AdminController extends Controller
     //Senhas
     public function showPasswordRegistration()
     {
-        $clients = Client::paginate(10);
+        $clients = Client::where('status', 0)->paginate(10); // Filtra apenas clientes ativos
         return Inertia::render('Admin/PasswordRegistration', ['clients' => $clients]);
     }
 
@@ -669,5 +667,18 @@ class AdminController extends Controller
         $password = Password::findOrFail($id);
         $password->update($request->all());
         return response()->json(['message' => 'Senha atualizada com sucesso.']);
+    }
+
+    public function storeClientPassword(Request $request, $clientId)
+    {
+        $request->validate([
+            'login' => 'required|string|max:255',
+            'password' => 'required|string|max:255',
+        ]);
+
+        $client = Client::findOrFail($clientId);
+        $client->passwords()->create($request->all());
+
+        return response()->json(['message' => 'Senha adicionada com sucesso.']);
     }
 }

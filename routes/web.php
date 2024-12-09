@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
     // Guest
     Route::get('/guest/dashboard', [GuestController::class, 'index'])->name('guest.dashboard');
 
+    Route::get('/clients', [AdminController::class, 'getClients']);
     Route::get('/clients', [AdminController::class, 'showClientList'])->name('clients.list');
     Route::get('/clients/{id}/details', [ClientController::class, 'getClientDetails'])->name('clients.details');
     Route::get('/clients/{id}', [ClientController::class, 'show'])->name('clients.show');

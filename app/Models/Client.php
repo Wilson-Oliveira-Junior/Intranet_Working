@@ -30,6 +30,6 @@ class Client extends Model
 
     public function passwords()
     {
-        return $this->hasMany(Client_Senhas::class, 'idCliente');
+        return $this->hasMany(Client_Senhas::class, 'idCliente'); // Chave estrangeira correta
     }
 }

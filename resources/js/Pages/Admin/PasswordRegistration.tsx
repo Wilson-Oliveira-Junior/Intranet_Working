@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, usePage } from '@inertiajs/react';
 import { Inertia } from '@inertiajs/inertia';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -15,6 +15,15 @@ const PasswordRegistration = () => {
     const [showModal, setShowModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [editPassword, setEditPassword] = useState(null);
+    const [clientOptions, setClientOptions] = useState([]);
+
+    useEffect(() => {
+        // Fetch clients for autocomplete
+        fetch('/clients')
+            .then(response => response.json())
+            .then(data => setClientOptions(data))
+            .catch(error => console.error('Error fetching clients:', error));
+    }, []);
 
     const handleFilterChange = (e) => {
         setData('filter', e.target.value);
@@ -22,7 +31,30 @@ const PasswordRegistration = () => {
     };
 
     const handleAddPassword = () => {
-        // Implement add password logic here
+        setEditPassword({ strURL: '', strLogin: '', strSenha: '', observacao: '', idCliente: '' });
+        setShowEditModal(true);
+    };
+
+    const handleSavePassword = (e) => {
+        e.preventDefault();
+        const method = editPassword.id ? 'PUT' : 'POST';
+        const url = editPassword.id ? `/passwords/${editPassword.id}` : `/clients/${editPassword.idCliente}/passwords`;
+
+        fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(editPassword),
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                setShowEditModal(false);
+                handleViewPasswords(selectedClient); // Refresh the password list
+            })
+            .catch(error => {
+                console.error('Error saving password:', error);
+                alert('Failed to save password. Please try again.');
+            });
     };
 
     const handleViewPasswords = (client) => {
@@ -30,7 +62,11 @@ const PasswordRegistration = () => {
         fetch(`/clients/${client.id}/passwords`)
             .then(response => response.json())
             .then(data => {
-                setPasswords(data);
+                if (Array.isArray(data)) {
+                    setPasswords(data);
+                } else {
+                    setPasswords([]);
+                }
                 setShowModal(true);
             })
             .catch(error => {
@@ -132,7 +168,7 @@ const PasswordRegistration = () => {
                                             className="bg-yellow-500 text-white px-4 py-2 mr-2"
                                             onClick={() => handleEditPassword(client)}
                                         >
-                                            Editar
+                                            Adicionar
                                         </button>
                                         <button
                                             className="bg-red-500 text-white px-4 py-2"
@@ -155,7 +191,7 @@ const PasswordRegistration = () => {
                             disabled={!link.url}
                             className={`px-4 py-2 border ${link.active ? 'bg-blue-500 text-white' : ''}`}
                         >
-                            {link.label}
+                            {link.label === 'Next &raquo;' ? 'Próximo' : link.label === '&laquo; Previous' ? 'Anterior' : link.label}
                         </button>
                     ))}
                 </div>
@@ -166,16 +202,46 @@ const PasswordRegistration = () => {
                             <span className="close" onClick={() => setShowModal(false)}>&times;</span>
                             <h2>Senhas de {selectedClient.nome_fantasia}</h2>
                             {passwords.length === 0 ? (
-                                <p>No passwords found for this client.</p>
+                                <p>Sem senhas registradas no banco.</p>
                             ) : (
-                                <ul>
-                                    {passwords.map((password) => (
-                                        <li key={password.id}>
-                                            {password.type} - {password.domain} - {password.url} - {password.login} - {password.password} - {password.adminOnly ? 'Sim' : 'Não'} - {password.notes}
-                                        </li>
-                                    ))}
-                                </ul>
+                                <table className="min-w-full bg-white">
+                                    <thead>
+                                        <tr>
+                                            <th className="py-2">Login</th>
+                                            <th className="py-2">Senha</th>
+                                            <th className="py-2">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {passwords.map((password) => (
+                                            <tr key={password.idRegistroSenha}>
+                                                <td className="border px-4 py-2">{password.strLogin}</td>
+                                                <td className="border px-4 py-2">{password.strSenha}</td>
+                                                <td className="border px-4 py-2">
+                                                    <button
+                                                        className="btn editar"
+                                                        onClick={() => handleEditPassword(password)}
+                                                    >
+                                                        Editar
+                                                    </button>
+                                                    <button
+                                                        className="btn deletar"
+                                                        onClick={() => handleDeletePasswords(password)}
+                                                    >
+                                                        Excluir
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             )}
+                            <button
+                                className="btn adicionar mt-4"
+                                onClick={handleAddPassword}
+                            >
+                                Adicionar Nova Senha
+                            </button>
                         </div>
                     </div>
                 )}
@@ -184,66 +250,58 @@ const PasswordRegistration = () => {
                     <div className="modal">
                         <div className="modal-content">
                             <span className="close" onClick={() => setShowEditModal(false)}>&times;</span>
-                            <h2>Editar Senha</h2>
-                            <form onSubmit={handleUpdatePassword}>
+                            <h2>{editPassword.id ? 'Editar Senha' : 'Adicionar Nova Senha'}</h2>
+                            <form onSubmit={handleSavePassword}>
                                 <label>
-                                    Tipo de Registro
+                                    Cliente
                                     <input
                                         type="text"
-                                        value={editPassword.type}
-                                        onChange={(e) => setEditPassword({ ...editPassword, type: e.target.value })}
+                                        list="client-options"
+                                        value={editPassword.idCliente}
+                                        onChange={(e) => setEditPassword({ ...editPassword, idCliente: e.target.value })}
                                     />
+                                    <datalist id="client-options">
+                                        {clientOptions.map((client) => (
+                                            <option key={client.id} value={client.id}>
+                                                {client.nome_fantasia}
+                                            </option>
+                                        ))}
+                                    </datalist>
                                 </label>
                                 <label>
-                                    Dominio
+                                    URL
                                     <input
                                         type="text"
-                                        value={editPassword.domain}
-                                        onChange={(e) => setEditPassword({ ...editPassword, domain: e.target.value })}
-                                    />
-                                </label>
-                                <label>
-                                    Url
-                                    <input
-                                        type="text"
-                                        value={editPassword.url}
-                                        onChange={(e) => setEditPassword({ ...editPassword, url: e.target.value })}
+                                        value={editPassword.strURL}
+                                        onChange={(e) => setEditPassword({ ...editPassword, strURL: e.target.value })}
                                     />
                                 </label>
                                 <label>
                                     Login
                                     <input
                                         type="text"
-                                        value={editPassword.login}
-                                        onChange={(e) => setEditPassword({ ...editPassword, login: e.target.value })}
+                                        value={editPassword.strLogin}
+                                        onChange={(e) => setEditPassword({ ...editPassword, strLogin: e.target.value })}
                                     />
                                 </label>
                                 <label>
                                     Senha
                                     <input
                                         type="text"
-                                        value={editPassword.password}
-                                        onChange={(e) => setEditPassword({ ...editPassword, password: e.target.value })}
-                                    />
-                                </label>
-                                <label>
-                                    Somente Admin?
-                                    <input
-                                        type="checkbox"
-                                        checked={editPassword.adminOnly}
-                                        onChange={(e) => setEditPassword({ ...editPassword, adminOnly: e.target.checked })}
+                                        value={editPassword.strSenha}
+                                        onChange={(e) => setEditPassword({ ...editPassword, strSenha: e.target.value })}
                                     />
                                 </label>
                                 <label>
                                     Observação
                                     <input
                                         type="text"
-                                        value={editPassword.notes}
-                                        onChange={(e) => setEditPassword({ ...editPassword, notes: e.target.value })}
+                                        value={editPassword.observacao}
+                                        onChange={(e) => setEditPassword({ ...editPassword, observacao: e.target.value })}
                                     />
                                 </label>
                                 <button type="submit" className="bg-blue-500 text-white px-4 py-2">
-                                    Atualizar
+                                    {editPassword.id ? 'Atualizar' : 'Adicionar'}
                                 </button>
                             </form>
                         </div>
