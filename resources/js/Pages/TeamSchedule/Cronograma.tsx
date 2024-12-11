@@ -25,18 +25,17 @@ const Cronograma = ({ user, teamSchedules }) => {
     const [clients, setClients] = useState([]);
     const [selectedSector, setSelectedSector] = useState('');
     const [sectorUsers, setSectorUsers] = useState([]);
+    const [taskStatus, setTaskStatus] = useState('aberto'); // Add this line
 
     useEffect(() => {
         const fetchCronogramas = async () => {
             try {
                 const response = await fetch(`/api/tasks?equipe=${selectedEquipe}`);
                 const text = await response.text();
-                console.log('Cronogramas response text:', text);
                 if (!response.ok) throw new Error('Erro ao buscar cronogramas');
                 const data = JSON.parse(text);
                 setCronogramas(data || []);
             } catch (error) {
-                console.error('Erro ao buscar cronogramas:', error);
                 setCronogramas([]);
             }
         };
@@ -45,12 +44,10 @@ const Cronograma = ({ user, teamSchedules }) => {
             try {
                 const response = await fetch('/api/users');
                 const text = await response.text();
-                console.log('Users response text:', text);
                 if (!response.ok) throw new Error('Erro ao buscar usuários');
                 const data = JSON.parse(text);
                 setUsers(data || []);
             } catch (error) {
-                console.error('Erro ao buscar usuários:', error);
             }
         };
 
@@ -58,12 +55,10 @@ const Cronograma = ({ user, teamSchedules }) => {
             try {
                 const response = await fetch('/api/clients');
                 const text = await response.text();
-                console.log('Clients response text:', text);
                 if (!response.ok) throw new Error('Erro ao buscar clientes');
                 const data = JSON.parse(text);
                 setClients(data || []);
             } catch (error) {
-                console.error('Erro ao buscar clientes:', error);
             }
         };
 
@@ -103,6 +98,7 @@ const Cronograma = ({ user, teamSchedules }) => {
         setReminderDate(task ? task.date : '');
         setPriority(task ? task.priority : 'normal'); // Set default priority
         setSelectedSector(task ? task.sector_id : ''); // Set default sector
+        setTaskStatus(task ? task.status : 'aberto'); // Add this line
         setModalIsOpen(true);
     };
 
@@ -115,6 +111,7 @@ const Cronograma = ({ user, teamSchedules }) => {
         setFollowerId(null);
         setTaskTitle('');
         setTaskDescription('');
+        setTaskStatus('aberto'); // Add this line
     };
 
     const openSecondModal = (type) => {
@@ -142,47 +139,68 @@ const Cronograma = ({ user, teamSchedules }) => {
     };
 
     const saveTaskDetails = async () => {
+        let sectorId = selectedSector;
+        if (taskType === 'sector' && !selectedSector) {
+            const sectorResponse = await fetch(`/api/sectors?description=${usuario.sector}`);
+            const sectorData = await sectorResponse.json();
+            sectorId = sectorData.id;
+        }
+
         const newTask = {
             title: taskTitle,
             description: taskDescription,
             date: reminderDate || new Date().toISOString().slice(0, 10),
-            sector_id: taskType === 'sector' ? usuario.sector_id : selectedSector,
+            sector_id: taskType === 'sector' ? sectorId : selectedSector,
             user_id: taskType === 'individual' ? followerId : null,
             client_id: clientId,
             hours_worked: 0,
-            priority: priority, // Ensure priority is included
+            priority: priority,
+            status: 'aberto', // Set status to 'aberto' when creating a new task
         };
 
         try {
-            const response = await fetch(route('teamSchedule.store'), { // Use route helper
+            const response = await fetch('/api/teamSchedule/store', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'), // Add CSRF token
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 },
                 body: JSON.stringify(newTask),
             });
-            if (!response.ok) throw new Error('Erro ao salvar a tarefa');
-            const data = await response.json();
+            const text = await response.text();
+            console.log('Response text:', text); // Log the response text
+            if (!response.ok) {
+                throw new Error(`Erro ao salvar a tarefa: ${text}`);
+            }
+            const data = JSON.parse(text);
             setCronogramas((prevCronogramas) => [...prevCronogramas, data]);
             console.log('Tarefa salva com os seguintes detalhes:', newTask);
         } catch (error) {
             console.error('Erro ao salvar a tarefa:', error);
+            alert('Erro ao salvar a tarefa: ' + error.message);
         }
 
         closeModal();
     };
 
     const updateTaskDetails = async () => {
+        let sectorId = selectedSector;
+        if (taskType === 'sector' && !selectedSector) {
+            const sectorResponse = await fetch(`/api/sectors?description=${usuario.sector}`);
+            const sectorData = await sectorResponse.json();
+            sectorId = sectorData.id;
+        }
+
         const updatedTask = {
             title: taskTitle,
             description: taskDescription,
             date: reminderDate,
-            sector_id: taskType === 'sector' ? usuario.sector_id : selectedSector,
+            sector_id: taskType === 'sector' ? sectorId : selectedSector,
             user_id: taskType === 'individual' ? followerId : null,
             client_id: clientId,
             hours_worked: 0,
             priority: priority, // Ensure priority is included
+            status: taskStatus, // Keep the existing status when updating a task
         };
 
         try {
@@ -194,8 +212,10 @@ const Cronograma = ({ user, teamSchedules }) => {
                 },
                 body: JSON.stringify(updatedTask),
             });
+            const text = await response.text();
+            console.log('Response text:', text); // Log the response text
             if (!response.ok) throw new Error('Erro ao atualizar a tarefa');
-            const data = await response.json();
+            const data = JSON.parse(text);
             setCronogramas((prevCronogramas) =>
                 prevCronogramas.map((task) => (task.id === selectedTask.id ? data : task))
             );

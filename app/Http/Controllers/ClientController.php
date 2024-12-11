@@ -98,11 +98,22 @@ class ClientController extends Controller
     public function getClients()
     {
         try {
-            $clients = Client::all(); // Retorna todos os clientes
+            $clients = Client::all(); // Retorna todos os clientes da tabela 'clientes'
             return response()->json($clients);
         } catch (\Exception $e) {
             Log::error('Error fetching clients: ' . $e->getMessage());
             return response()->json(['error' => 'Error fetching clients'], 500);
+        }
+    }
+
+    public function getClientById($id)
+    {
+        try {
+            $client = Client::findOrFail($id);
+            return response()->json($client);
+        } catch (\Exception $e) {
+            Log::error('Error fetching client by ID: ' . $e->getMessage());
+            return response()->json(['error' => 'Error fetching client by ID'], 500);
         }
     }
 }

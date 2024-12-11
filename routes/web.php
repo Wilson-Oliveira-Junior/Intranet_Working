@@ -9,6 +9,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\TeamScheduleController;
+use App\Http\Controllers\SectorController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -108,9 +109,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 }); // Ensure this closing bracket is properly placed
 
+
+//API's
 Route::get('/api/cronograma', [TeamScheduleController::class, 'getCronogramas']);
 Route::get('/api/users', [AdminController::class, 'getUsers']);
 Route::get('/api/clients', [ClientController::class, 'getClients']);
 Route::get('/api/tasks', [TeamScheduleController::class, 'getTasksWithPriority']);
+Route::post('/api/teamSchedule/store', [TeamScheduleController::class, 'store'])->name('api.teamSchedule.store');
+Route::get('/api/sectors', [SectorController::class, 'getSectorByDescription']);
+
+Route::post('/teamSchedule/store', [TeamScheduleController::class, 'store'])->middleware('auth');
 
 require __DIR__ . '/auth.php';

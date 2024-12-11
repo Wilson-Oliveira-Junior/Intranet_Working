@@ -9,7 +9,7 @@ class Client extends Model
 {
     use HasFactory;
 
-    protected $table = 'clientes'; // Tabela correta
+    protected $table = 'clientes'; // Ensure the correct table name
 
     protected $fillable = [
         'nome',
@@ -21,6 +21,18 @@ class Client extends Model
         'melhor_dia_boleto',
         'perfil_cliente',
         'dominio',
+        'cep',
+        'endereco',
+        'bairro',
+        'cidade',
+        'estado',
+        'numero',
+        'id_segmento',
+        'idCustomerAsaas',
+        'status_financeiro',
+        'status',
+        'complemento',
+        'idContaAzul',
     ];
 
     public function contacts()
@@ -30,6 +42,6 @@ class Client extends Model
 
     public function passwords()
     {
-        return $this->hasMany(Client_Senhas::class, 'idCliente'); // Chave estrangeira correta
+        return $this->hasMany(Client_Senhas::class, 'idCliente');
     }
 }

@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Schedule;
 use App\Models\Sector;
 use App\Models\User;
+use App\Models\Client;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TeamScheduleController extends Controller
 {
@@ -33,7 +35,6 @@ class TeamScheduleController extends Controller
     public function adminView()
     {
         $user = Auth::user();
-        // Fetch all schedules for admin view
         $teamSchedules = Schedule::all();
 
         return Inertia::render('TeamSchedule/AdminView', [
@@ -44,20 +45,44 @@ class TeamScheduleController extends Controller
 
     public function store(Request $request)
     {
+        Log::info('Store method called'); // Log the method call
+        Log::info('Request data:', $request->all()); // Log the request data
+
+        // Fetch the sector ID based on the sector description
+        if ($request->has('sector_id') && !is_numeric($request->sector_id)) {
+            Log::info('Fetching sector ID for description:', ['description' => $request->sector_id]); // Log the sector description
+            $sector = Sector::where('description', $request->sector_id)->first();
+            if ($sector) {
+                Log::info('Sector found:', ['sector' => $sector]); // Log the found sector
+                $request->merge(['sector_id' => $sector->id]);
+            } else {
+                Log::error('Setor não encontrado:', ['description' => $request->sector_id]); // Log the error
+                return response()->json(['error' => 'Setor não encontrado'], 400);
+            }
+        }
+
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'date' => 'required|date',
             'sector_id' => 'nullable|exists:sectors,id',
             'user_id' => 'nullable|exists:users,id',
-            'client_id' => 'required|exists:clientes,id', // Update table name to 'clientes'
+            'client_id' => 'required|exists:clientes,id',
             'hours_worked' => 'required|numeric',
-            'priority' => 'required|string', // Ensure priority is validated
+            'priority' => 'required|string',
+            'status' => 'required|string',
         ]);
 
-        $schedule = Schedule::create($request->all());
-
-        return response()->json($schedule); // Return the created schedule
+        try {
+            $schedule = Schedule::create($request->all());
+            Log::info('Schedule created successfully', ['schedule' => $schedule]); // Log the created schedule
+            Log::info('Response data:', $schedule->toJson()); // Log the response data
+            return response()->json($schedule);
+        } catch (\Exception $e) {
+            Log::error('Error creating schedule: ' . $e->getMessage());
+            Log::error('Error response: ' . $e->getMessage()); // Log the error response
+            return response()->json(['error' => 'Error creating schedule: ' . $e->getMessage()], 500);
+        }
     }
 
     public function update(Request $request, $id)
@@ -68,9 +93,10 @@ class TeamScheduleController extends Controller
             'date' => 'required|date',
             'sector_id' => 'nullable|exists:sectors,id',
             'user_id' => 'nullable|exists:users,id',
-            'client_id' => 'required|exists:clientes,id', // Update table name to 'clientes'
+            'client_id' => 'required|exists:clientes,id', // Ensure the correct table name
             'hours_worked' => 'required|numeric',
-            'priority' => 'required|string', // Ensure priority is validated
+            'priority' => 'required|string',
+            'status' => 'required|string', // Add this line
         ]);
 
         $schedule = Schedule::findOrFail($id);
