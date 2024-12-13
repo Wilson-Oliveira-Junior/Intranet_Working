@@ -26,9 +26,7 @@ const Cronograma = ({ user, teamSchedules }) => {
         const fetchCronogramas = async () => {
             try {
                 const response = await fetch(`/api/tasks?equipe=${selectedEquipe}`);
-                const text = await response.text();
-                if (!response.ok) throw new Error('Erro ao buscar cronogramas');
-                const data = JSON.parse(text);
+                const data = await response.json();
                 setCronogramas(data || []);
             } catch (error) {
                 setCronogramas([]);
@@ -38,9 +36,7 @@ const Cronograma = ({ user, teamSchedules }) => {
         const fetchUsers = async () => {
             try {
                 const response = await fetch('/api/users');
-                const text = await response.text();
-                if (!response.ok) throw new Error('Erro ao buscar usuários');
-                const data = JSON.parse(text);
+                const data = await response.json();
                 setUsers(data || []);
             } catch (error) {
                 console.error('Erro ao buscar usuários:', error);
@@ -50,9 +46,7 @@ const Cronograma = ({ user, teamSchedules }) => {
         const fetchClients = async () => {
             try {
                 const response = await fetch('/api/clients');
-                const text = await response.text();
-                if (!response.ok) throw new Error('Erro ao buscar clientes');
-                const data = JSON.parse(text);
+                const data = await response.json();
                 setClients(data || []);
             } catch (error) {
                 console.error('Erro ao buscar clientes:', error);
@@ -67,9 +61,7 @@ const Cronograma = ({ user, teamSchedules }) => {
     const fetchSectorUsers = async () => {
         try {
             const response = await fetch(`/api/users?sector_id=${selectedSector}`);
-            const text = await response.text();
-            if (!response.ok) throw new Error('Erro ao buscar usuários do setor');
-            const data = JSON.parse(text);
+            const data = await response.json();
             setSectorUsers(data || []);
         } catch (error) {
             console.error('Erro ao buscar usuários do setor:', error);
@@ -142,11 +134,24 @@ const Cronograma = ({ user, teamSchedules }) => {
                 },
                 body: JSON.stringify(newTask),
             });
-            const text = await response.text();
+
+            const responseText = await response.text();
+            console.log('Response Text:', responseText);
+
             if (!response.ok) {
-                throw new Error(`Erro ao salvar a tarefa: ${text}`);
+                throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
             }
-            const data = JSON.parse(text);
+
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                if (responseText.startsWith('<!DOCTYPE html>')) {
+                    throw new Error('Received HTML response instead of JSON. Possible server error.');
+                }
+                throw new Error('Failed to parse JSON: ' + responseText);
+            }
+
             setCronogramas((prevCronogramas) => [...prevCronogramas, data]);
         } catch (error) {
             console.error('Erro ao salvar a tarefa:', error);
@@ -189,14 +194,30 @@ const Cronograma = ({ user, teamSchedules }) => {
                 },
                 body: JSON.stringify(updatedTask),
             });
-            const text = await response.text();
-            if (!response.ok) throw new Error('Erro ao atualizar a tarefa');
-            const data = JSON.parse(text);
+
+            const responseText = await response.text();
+            console.log('Response Text:', responseText);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
+            }
+
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                if (responseText.startsWith('<!DOCTYPE html>')) {
+                    throw new Error('Received HTML response instead of JSON. Possible server error.');
+                }
+                throw new Error('Failed to parse JSON: ' + responseText);
+            }
+
             setCronogramas((prevCronogramas) =>
                 prevCronogramas.map((task) => (task.id === selectedTask.id ? data : task))
             );
         } catch (error) {
             console.error('Erro ao atualizar a tarefa:', error);
+            alert('Erro ao atualizar a tarefa: ' + error.message);
         }
 
         closeModal();
@@ -207,8 +228,7 @@ const Cronograma = ({ user, teamSchedules }) => {
             const response = await fetch(`/cronograma/${taskId}`, {
                 method: 'DELETE',
             });
-            const text = await response.text();
-            if (!response.ok) throw new Error('Erro ao deletar a tarefa');
+            await response.json();
             setCronogramas((prevCronogramas) => prevCronogramas.filter(task => task.id !== taskId));
         } catch (error) {
             console.error('Erro ao deletar a tarefa:', error);
@@ -318,7 +338,7 @@ const Cronograma = ({ user, teamSchedules }) => {
                         deleteTask={deleteTask}
                         selectedTask={selectedTask}
                         closeModal={closeModal}
-                        equipes={equipes} // Passar equipes para o TaskModal
+                        equipes={equipes}
                         priority={priority}
                         setPriority={setPriority}
                         taskStatus={taskStatus}
@@ -356,7 +376,7 @@ const TaskModal = ({
     setPriority,
     taskStatus,
     setTaskStatus,
-    equipes, // Receber equipes como prop
+    equipes,
 }) => (
     <div className="modal">
         <div className="modal-content">

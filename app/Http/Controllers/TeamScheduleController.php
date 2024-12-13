@@ -26,6 +26,8 @@ class TeamScheduleController extends Controller
 
     public function store(Request $request)
     {
+        Log::info('Store request data: ', $request->all());
+
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -39,14 +41,19 @@ class TeamScheduleController extends Controller
 
         $validatedData['status'] = 'aberto'; // Ensure status is 'aberto' when creating a new task
 
-        $schedule = Schedule::create($validatedData);
-        Log::info('Task created successfully', ['schedule' => $schedule]); // Adicione este log
-        Log::info('Server response', ['response' => $schedule->toArray()]); // Adicione este log
-        return response()->json($schedule);
+        try {
+            $schedule = Schedule::create($validatedData);
+            return response()->json($schedule);
+        } catch (\Exception $e) {
+            Log::error('Error storing schedule: ', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Failed to store schedule'], 500);
+        }
     }
 
     public function update(Request $request, $id)
     {
+        Log::info('Update request data: ', $request->all());
+
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -59,19 +66,20 @@ class TeamScheduleController extends Controller
             'status' => 'required|string',
         ]);
 
-        $schedule = Schedule::findOrFail($id);
-        $schedule->update($validatedData);
-        Log::info('Task updated successfully', ['schedule' => $schedule]); // Adicione este log
-        Log::info('Server response', ['response' => $schedule->toArray()]); // Adicione este log
-        return response()->json($schedule);
+        try {
+            $schedule = Schedule::findOrFail($id);
+            $schedule->update($validatedData);
+            return response()->json($schedule);
+        } catch (\Exception $e) {
+            Log::error('Error updating schedule: ', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Failed to update schedule'], 500);
+        }
     }
 
     public function destroy($id)
     {
         $schedule = Schedule::findOrFail($id);
         $schedule->delete();
-        Log::info('Task deleted successfully', ['schedule_id' => $id]); // Adicione este log
-        Log::info('Server response', ['response' => ['message' => 'Task deleted successfully']]); // Adicione este log
         return response()->json(['message' => 'Task deleted successfully']);
     }
 
@@ -79,7 +87,6 @@ class TeamScheduleController extends Controller
     {
         $priority = $request->input('priority');
         $tasks = Schedule::where('priority', $priority)->get();
-        Log::info('Server response', ['response' => $tasks->toArray()]); // Adicione este log
         return response()->json($tasks);
     }
 }
