@@ -115,9 +115,10 @@ Route::get('/api/cronograma', [TeamScheduleController::class, 'getCronogramas'])
 Route::get('/api/users', [AdminController::class, 'getUsers']);
 Route::get('/api/clients', [ClientController::class, 'getClients']);
 Route::get('/api/tasks', [TeamScheduleController::class, 'getTasksWithPriority']);
-Route::post('/api/teamSchedule/store', [TeamScheduleController::class, 'store'])->name('api.teamSchedule.store');
+Route::post('/api/teamSchedule/store', [TeamScheduleController::class, 'store'])->name('teamSchedule.store');
 Route::get('/api/sectors', [SectorController::class, 'getSectorByDescription']);
 
 Route::post('/teamSchedule/store', [TeamScheduleController::class, 'store'])->middleware('auth');
+Route::put('/teamSchedule/{id}', [TeamScheduleController::class, 'update'])->name('teamSchedule.update');
 
 require __DIR__ . '/auth.php';

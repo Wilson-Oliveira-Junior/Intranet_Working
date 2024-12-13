@@ -1,16 +1,13 @@
-import { Link } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import '../../../css/components/cronograma.css';
 
 const Cronograma = ({ user, teamSchedules }) => {
-    const [usuario, setUsuario] = useState(user || {});
     const [cronogramas, setCronogramas] = useState(teamSchedules || []);
-    const [equipes, setEquipes] = useState(['Atendimento', 'Criação', 'Desenvolvimento', 'Marketing', 'Comercial', 'Administrativo']);
+    const [equipes] = useState(['Atendimento', 'Criação', 'Desenvolvimento', 'Marketing', 'Comercial', 'Administrativo']);
     const [selectedEquipe, setSelectedEquipe] = useState(user?.sector?.name || '');
     const [indicatorPosition, setIndicatorPosition] = useState(0);
     const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [secondModalIsOpen, setSecondModalIsOpen] = useState(false);
     const [taskTitle, setTaskTitle] = useState('');
     const [taskDescription, setTaskDescription] = useState('');
     const [selectedTask, setSelectedTask] = useState(null);
@@ -18,14 +15,12 @@ const Cronograma = ({ user, teamSchedules }) => {
     const [priority, setPriority] = useState('');
     const [followerId, setFollowerId] = useState(null);
     const [users, setUsers] = useState([]);
-    const [files, setFiles] = useState([]);
     const [taskType, setTaskType] = useState('sector');
     const [clientId, setClientId] = useState('');
-    const [hoursWorked, setHoursWorked] = useState('');
     const [clients, setClients] = useState([]);
     const [selectedSector, setSelectedSector] = useState('');
     const [sectorUsers, setSectorUsers] = useState([]);
-    const [taskStatus, setTaskStatus] = useState('aberto'); // Add this line
+    const [taskStatus, setTaskStatus] = useState('aberto');
 
     useEffect(() => {
         const fetchCronogramas = async () => {
@@ -48,6 +43,7 @@ const Cronograma = ({ user, teamSchedules }) => {
                 const data = JSON.parse(text);
                 setUsers(data || []);
             } catch (error) {
+                console.error('Erro ao buscar usuários:', error);
             }
         };
 
@@ -59,6 +55,7 @@ const Cronograma = ({ user, teamSchedules }) => {
                 const data = JSON.parse(text);
                 setClients(data || []);
             } catch (error) {
+                console.error('Erro ao buscar clientes:', error);
             }
         };
 
@@ -71,7 +68,6 @@ const Cronograma = ({ user, teamSchedules }) => {
         try {
             const response = await fetch(`/api/users?sector_id=${selectedSector}`);
             const text = await response.text();
-            console.log('Sector Users response text:', text);
             if (!response.ok) throw new Error('Erro ao buscar usuários do setor');
             const data = JSON.parse(text);
             setSectorUsers(data || []);
@@ -96,53 +92,32 @@ const Cronograma = ({ user, teamSchedules }) => {
         setTaskTitle(task ? task.title : '');
         setTaskDescription(task ? task.description : '');
         setReminderDate(task ? task.date : '');
-        setPriority(task ? task.priority : 'normal'); // Set default priority
-        setSelectedSector(task ? task.sector_id : ''); // Set default sector
-        setTaskStatus(task ? task.status : 'aberto'); // Add this line
+        setPriority(task ? task.priority : 'normal');
+        setSelectedSector(task ? task.sector_id : '');
+        setTaskStatus('aberto');
         setModalIsOpen(true);
     };
 
     const closeModal = () => {
         setModalIsOpen(false);
         setSelectedTask(null);
-        setFiles([]);
         setReminderDate('');
         setPriority('');
         setFollowerId(null);
         setTaskTitle('');
         setTaskDescription('');
-        setTaskStatus('aberto'); // Add this line
-    };
-
-    const openSecondModal = (type) => {
-        setSecondModalIsOpen(type);
-    };
-
-    const closeSecondModal = () => {
-        setSecondModalIsOpen(false);
-    };
-
-    const handleFileChange = (e) => {
-        setFiles(Array.from(e.target.files));
-    };
-
-    const handleReminderDateChange = (e) => {
-        setReminderDate(e.target.value);
-    };
-
-    const handlePriorityChange = (e) => {
-        setPriority(e.target.value);
-    };
-
-    const handleFollowerChange = (e) => {
-        setFollowerId(e.target.value);
+        setTaskStatus('aberto');
     };
 
     const saveTaskDetails = async () => {
         let sectorId = selectedSector;
         if (taskType === 'sector' && !selectedSector) {
-            const sectorResponse = await fetch(`/api/sectors?description=${usuario.sector}`);
+            const sectorResponse = await fetch(`/api/sectors?description=${user.sector}`);
             const sectorData = await sectorResponse.json();
+            if (sectorData.error) {
+                alert('Erro ao buscar setor: ' + sectorData.error);
+                return;
+            }
             sectorId = sectorData.id;
         }
 
@@ -155,7 +130,7 @@ const Cronograma = ({ user, teamSchedules }) => {
             client_id: clientId,
             hours_worked: 0,
             priority: priority,
-            status: 'aberto', // Set status to 'aberto' when creating a new task
+            status: 'aberto',
         };
 
         try {
@@ -168,13 +143,11 @@ const Cronograma = ({ user, teamSchedules }) => {
                 body: JSON.stringify(newTask),
             });
             const text = await response.text();
-            console.log('Response text:', text); // Log the response text
             if (!response.ok) {
                 throw new Error(`Erro ao salvar a tarefa: ${text}`);
             }
             const data = JSON.parse(text);
             setCronogramas((prevCronogramas) => [...prevCronogramas, data]);
-            console.log('Tarefa salva com os seguintes detalhes:', newTask);
         } catch (error) {
             console.error('Erro ao salvar a tarefa:', error);
             alert('Erro ao salvar a tarefa: ' + error.message);
@@ -186,8 +159,12 @@ const Cronograma = ({ user, teamSchedules }) => {
     const updateTaskDetails = async () => {
         let sectorId = selectedSector;
         if (taskType === 'sector' && !selectedSector) {
-            const sectorResponse = await fetch(`/api/sectors?description=${usuario.sector}`);
+            const sectorResponse = await fetch(`/api/sectors?description=${user.sector}`);
             const sectorData = await sectorResponse.json();
+            if (sectorData.error) {
+                alert('Erro ao buscar setor: ' + sectorData.error);
+                return;
+            }
             sectorId = sectorData.id;
         }
 
@@ -199,8 +176,8 @@ const Cronograma = ({ user, teamSchedules }) => {
             user_id: taskType === 'individual' ? followerId : null,
             client_id: clientId,
             hours_worked: 0,
-            priority: priority, // Ensure priority is included
-            status: taskStatus, // Keep the existing status when updating a task
+            priority: priority,
+            status: taskStatus,
         };
 
         try {
@@ -208,18 +185,16 @@ const Cronograma = ({ user, teamSchedules }) => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'), // Add CSRF token
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 },
                 body: JSON.stringify(updatedTask),
             });
             const text = await response.text();
-            console.log('Response text:', text); // Log the response text
             if (!response.ok) throw new Error('Erro ao atualizar a tarefa');
             const data = JSON.parse(text);
             setCronogramas((prevCronogramas) =>
                 prevCronogramas.map((task) => (task.id === selectedTask.id ? data : task))
             );
-            console.log('Tarefa atualizada com os seguintes detalhes:', updatedTask);
         } catch (error) {
             console.error('Erro ao atualizar a tarefa:', error);
         }
@@ -232,6 +207,7 @@ const Cronograma = ({ user, teamSchedules }) => {
             const response = await fetch(`/cronograma/${taskId}`, {
                 method: 'DELETE',
             });
+            const text = await response.text();
             if (!response.ok) throw new Error('Erro ao deletar a tarefa');
             setCronogramas((prevCronogramas) => prevCronogramas.filter(task => task.id !== taskId));
         } catch (error) {
@@ -343,52 +319,11 @@ const Cronograma = ({ user, teamSchedules }) => {
                         selectedTask={selectedTask}
                         closeModal={closeModal}
                         equipes={equipes} // Passar equipes para o TaskModal
-                        priority={priority} // Add priority prop
-                        setPriority={setPriority} // Add setPriority prop
+                        priority={priority}
+                        setPriority={setPriority}
+                        taskStatus={taskStatus}
+                        setTaskStatus={setTaskStatus}
                     />
-                )}
-
-                {secondModalIsOpen && (
-                    <div className="modal">
-                        <div className="modal-content">
-                            {secondModalIsOpen === 'file' && (
-                                <>
-                                    <h2>Selecionar o Arquivo para anexar</h2>
-                                    <input type="file" onChange={handleFileChange} multiple />
-                                    <button onClick={closeSecondModal} className="modal-button">
-                                        Fechar
-                                    </button>
-                                </>
-                            )}
-
-                            {secondModalIsOpen === 'data' && (
-                                <>
-                                    <h2>Selecionar Data de Lembrete</h2>
-                                    <input type="date" value={reminderDate} onChange={handleReminderDateChange} />
-                                    <button onClick={closeSecondModal} className="modal-button">
-                                        Fechar
-                                    </button>
-                                </>
-                            )}
-
-                            {secondModalIsOpen === 'seguidor' && (
-                                <>
-                                    <h2>Adicionar Seguidor</h2>
-                                    <select onChange={handleFollowerChange}>
-                                        <option value="">Selecione um seguidor</option>
-                                        {users.map((user) => (
-                                            <option key={user.id} value={user.id}>
-                                                {user.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <button onClick={closeSecondModal} className="modal-button">
-                                        Fechar
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                    </div>
                 )}
             </div>
         </AuthenticatedLayout>
@@ -417,9 +352,11 @@ const TaskModal = ({
     deleteTask,
     selectedTask,
     closeModal,
+    priority,
+    setPriority,
+    taskStatus,
+    setTaskStatus,
     equipes, // Receber equipes como prop
-    priority, // Add priority prop
-    setPriority, // Add setPriority prop
 }) => (
     <div className="modal">
         <div className="modal-content">

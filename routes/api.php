@@ -15,8 +15,3 @@ use App\Http\Controllers\TeamScheduleController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::post('/teamSchedule/store', [TeamScheduleController::class, 'store']);

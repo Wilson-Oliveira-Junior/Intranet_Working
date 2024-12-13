@@ -9,8 +9,7 @@ class Client extends Model
 {
     use HasFactory;
 
-    protected $table = 'clientes'; // Ensure the correct table name
-
+    protected $table = 'clientes'; // Certifique-se de que o nome da tabela está correto
     protected $fillable = [
         'nome',
         'razao_social',
