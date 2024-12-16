@@ -14,32 +14,39 @@ use Illuminate\Support\Facades\Log;
 
 class TeamScheduleController extends Controller
 {
+    // Método para listar os cronogramas do setor do usuário autenticado
     public function index(Request $request)
     {
         $user = Auth::user();
+        $sectors = Sector::all();
+        $users = User::all(); // Buscar todos os usuários
         $teamSchedules = Schedule::where('sector_id', $user->sector_id)->get();
         return Inertia::render('TeamSchedule/Cronograma', [
             'user' => $user,
             'teamSchedules' => $teamSchedules,
+            'sectors' => $sectors,
+            'users' => $users, // Passar a lista de usuários para o frontend
         ]);
     }
 
+    // Método para criar um novo cronograma
     public function store(Request $request)
     {
         Log::info('Store request data: ', $request->all());
 
+        // Valida os dados da requisição
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'date' => 'required|date',
-            'sector_id' => 'required|integer|exists:sectors,id',
+            'sector_id' => 'required|integer|exists:sectors,name',
             'user_id' => 'nullable|integer|exists:users,id',
-            'client_id' => 'nullable|integer|exists:clientes,id', // Atualize para usar a tabela 'clientes'
+            'client_id' => 'nullable|integer|exists:clientes,id',
             'hours_worked' => 'nullable|integer',
             'priority' => 'required|string',
         ]);
 
-        $validatedData['status'] = 'aberto'; // Ensure status is 'aberto' when creating a new task
+        $validatedData['status'] = 'aberto'; // Define o status como 'aberto' ao criar uma nova tarefa
 
         try {
             $schedule = Schedule::create($validatedData);
@@ -50,17 +57,19 @@ class TeamScheduleController extends Controller
         }
     }
 
+    // Método para atualizar um cronograma existente
     public function update(Request $request, $id)
     {
         Log::info('Update request data: ', $request->all());
 
+        // Valida os dados da requisição
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'date' => 'required|date',
-            'sector_id' => 'required|integer|exists:sectors,id',
+            'sector_id' => 'required|integer|exists:sectors,name',
             'user_id' => 'nullable|integer|exists:users,id',
-            'client_id' => 'nullable|integer|exists:clientes,id', // Atualize para usar a tabela 'clientes'
+            'client_id' => 'nullable|integer|exists:clientes,id',
             'hours_worked' => 'nullable|integer',
             'priority' => 'required|string',
             'status' => 'required|string',
@@ -76,6 +85,7 @@ class TeamScheduleController extends Controller
         }
     }
 
+    // Método para deletar um cronograma
     public function destroy($id)
     {
         $schedule = Schedule::findOrFail($id);
@@ -83,6 +93,7 @@ class TeamScheduleController extends Controller
         return response()->json(['message' => 'Task deleted successfully']);
     }
 
+    // Método para obter tarefas com uma prioridade específica
     public function getTasksWithPriority(Request $request)
     {
         $priority = $request->input('priority');

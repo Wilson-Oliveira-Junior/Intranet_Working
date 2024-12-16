@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import '../../../css/components/cronograma.css';
 
-const Cronograma = ({ user, teamSchedules }) => {
+const Cronograma = ({ user, teamSchedules, sectors, users }) => {
     const [cronogramas, setCronogramas] = useState(teamSchedules || []);
-    const [equipes] = useState(['Atendimento', 'Criação', 'Desenvolvimento', 'Marketing', 'Comercial', 'Administrativo']);
+    const [equipes, setEquipes] = useState(sectors || []);
     const [selectedEquipe, setSelectedEquipe] = useState(user?.sector?.name || '');
     const [indicatorPosition, setIndicatorPosition] = useState(0);
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -14,13 +14,17 @@ const Cronograma = ({ user, teamSchedules }) => {
     const [reminderDate, setReminderDate] = useState('');
     const [priority, setPriority] = useState('');
     const [followerId, setFollowerId] = useState(null);
-    const [users, setUsers] = useState([]);
     const [taskType, setTaskType] = useState('sector');
     const [clientId, setClientId] = useState('');
     const [clients, setClients] = useState([]);
     const [selectedSector, setSelectedSector] = useState('');
     const [sectorUsers, setSectorUsers] = useState([]);
     const [taskStatus, setTaskStatus] = useState('aberto');
+
+    const getCsrfToken = () => {
+        const token = document.querySelector('meta[name="csrf-token"]');
+        return token ? token.getAttribute('content') : '';
+    };
 
     useEffect(() => {
         const fetchCronogramas = async () => {
@@ -30,16 +34,6 @@ const Cronograma = ({ user, teamSchedules }) => {
                 setCronogramas(data || []);
             } catch (error) {
                 setCronogramas([]);
-            }
-        };
-
-        const fetchUsers = async () => {
-            try {
-                const response = await fetch('/api/users');
-                const data = await response.json();
-                setUsers(data || []);
-            } catch (error) {
-                console.error('Erro ao buscar usuários:', error);
             }
         };
 
@@ -54,23 +48,17 @@ const Cronograma = ({ user, teamSchedules }) => {
         };
 
         fetchCronogramas();
-        fetchUsers();
         fetchClients();
     }, [selectedEquipe]);
 
-    const fetchSectorUsers = async () => {
-        try {
-            const response = await fetch(`/api/users?sector_id=${selectedSector}`);
-            const data = await response.json();
-            setSectorUsers(data || []);
-        } catch (error) {
-            console.error('Erro ao buscar usuários do setor:', error);
-        }
+    const fetchSectorUsers = (sectorId) => {
+        const filteredUsers = users.filter(user => user.sector_id === parseInt(sectorId));
+        setSectorUsers(filteredUsers);
     };
 
     useEffect(() => {
         if (selectedSector) {
-            fetchSectorUsers();
+            fetchSectorUsers(selectedSector);
         }
     }, [selectedSector]);
 
@@ -86,7 +74,7 @@ const Cronograma = ({ user, teamSchedules }) => {
         setReminderDate(task ? task.date : '');
         setPriority(task ? task.priority : 'normal');
         setSelectedSector(task ? task.sector_id : '');
-        setTaskStatus('aberto');
+        setTaskStatus(task ? task.status : 'aberto');
         setModalIsOpen(true);
     };
 
@@ -104,7 +92,7 @@ const Cronograma = ({ user, teamSchedules }) => {
     const saveTaskDetails = async () => {
         let sectorId = selectedSector;
         if (taskType === 'sector' && !selectedSector) {
-            const sectorResponse = await fetch(`/api/sectors?description=${user.sector}`);
+            const sectorResponse = await fetch(`/api/sectors?name=${user.sector}`);
             const sectorData = await sectorResponse.json();
             if (sectorData.error) {
                 alert('Erro ao buscar setor: ' + sectorData.error);
@@ -120,7 +108,6 @@ const Cronograma = ({ user, teamSchedules }) => {
             sector_id: taskType === 'sector' ? sectorId : selectedSector,
             user_id: taskType === 'individual' ? followerId : null,
             client_id: clientId,
-            hours_worked: 0,
             priority: priority,
             status: 'aberto',
         };
@@ -130,28 +117,17 @@ const Cronograma = ({ user, teamSchedules }) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-CSRF-TOKEN': getCsrfToken(),
                 },
                 body: JSON.stringify(newTask),
             });
 
             const responseText = await response.text();
-            console.log('Response Text:', responseText);
-
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
             }
 
-            let data;
-            try {
-                data = JSON.parse(responseText);
-            } catch (e) {
-                if (responseText.startsWith('<!DOCTYPE html>')) {
-                    throw new Error('Received HTML response instead of JSON. Possible server error.');
-                }
-                throw new Error('Failed to parse JSON: ' + responseText);
-            }
-
+            const data = JSON.parse(responseText);
             setCronogramas((prevCronogramas) => [...prevCronogramas, data]);
         } catch (error) {
             console.error('Erro ao salvar a tarefa:', error);
@@ -164,7 +140,7 @@ const Cronograma = ({ user, teamSchedules }) => {
     const updateTaskDetails = async () => {
         let sectorId = selectedSector;
         if (taskType === 'sector' && !selectedSector) {
-            const sectorResponse = await fetch(`/api/sectors?description=${user.sector}`);
+            const sectorResponse = await fetch(`/api/sectors?name=${user.sector}`);
             const sectorData = await sectorResponse.json();
             if (sectorData.error) {
                 alert('Erro ao buscar setor: ' + sectorData.error);
@@ -180,7 +156,6 @@ const Cronograma = ({ user, teamSchedules }) => {
             sector_id: taskType === 'sector' ? sectorId : selectedSector,
             user_id: taskType === 'individual' ? followerId : null,
             client_id: clientId,
-            hours_worked: 0,
             priority: priority,
             status: taskStatus,
         };
@@ -190,28 +165,17 @@ const Cronograma = ({ user, teamSchedules }) => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-CSRF-TOKEN': getCsrfToken(),
                 },
                 body: JSON.stringify(updatedTask),
             });
 
             const responseText = await response.text();
-            console.log('Response Text:', responseText);
-
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
             }
 
-            let data;
-            try {
-                data = JSON.parse(responseText);
-            } catch (e) {
-                if (responseText.startsWith('<!DOCTYPE html>')) {
-                    throw new Error('Received HTML response instead of JSON. Possible server error.');
-                }
-                throw new Error('Failed to parse JSON: ' + responseText);
-            }
-
+            const data = JSON.parse(responseText);
             setCronogramas((prevCronogramas) =>
                 prevCronogramas.map((task) => (task.id === selectedTask.id ? data : task))
             );
@@ -227,6 +191,9 @@ const Cronograma = ({ user, teamSchedules }) => {
         try {
             const response = await fetch(`/cronograma/${taskId}`, {
                 method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                },
             });
             await response.json();
             setCronogramas((prevCronogramas) => prevCronogramas.filter(task => task.id !== taskId));
@@ -287,11 +254,11 @@ const Cronograma = ({ user, teamSchedules }) => {
                                 name="tab"
                                 id={`tab${index}`}
                                 className="tab_input"
-                                checked={selectedEquipe === equipe}
-                                onChange={() => handleTabChange(equipe, index)}
+                                checked={selectedEquipe === equipe.name}
+                                onChange={() => handleTabChange(equipe.name, index)}
                             />
                             <label className="tab_label" htmlFor={`tab${index}`}>
-                                {equipe}
+                                {equipe.name}
                             </label>
                         </div>
                     ))}
@@ -343,6 +310,7 @@ const Cronograma = ({ user, teamSchedules }) => {
                         setPriority={setPriority}
                         taskStatus={taskStatus}
                         setTaskStatus={setTaskStatus}
+                        fetchSectorUsers={fetchSectorUsers}
                     />
                 )}
             </div>
@@ -377,6 +345,7 @@ const TaskModal = ({
     taskStatus,
     setTaskStatus,
     equipes,
+    fetchSectorUsers,
 }) => (
     <div className="modal">
         <div className="modal-content">
@@ -459,12 +428,15 @@ const TaskModal = ({
                     <select
                         className="modal-input"
                         value={selectedSector || ''}
-                        onChange={(e) => setSelectedSector(e.target.value)}
+                        onChange={(e) => {
+                            setSelectedSector(e.target.value);
+                            fetchSectorUsers(e.target.value);
+                        }}
                     >
                         <option value="">Selecione um Setor</option>
                         {equipes.map((equipe, index) => (
-                            <option key={index} value={equipe}>
-                                {equipe}
+                            <option key={index} value={equipe.id}>
+                                {equipe.name}
                             </option>
                         ))}
                     </select>
