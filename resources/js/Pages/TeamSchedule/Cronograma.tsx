@@ -73,7 +73,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
         setTaskDescription(task ? task.description : '');
         setReminderDate(task ? task.date : '');
         setPriority(task ? task.priority : 'normal');
-        setSelectedSector(task ? task.sector_id : '');
+        setSelectedSector(task ? task.sector_id.toString() : '');
         setTaskStatus(task ? task.status : 'aberto');
         setModalIsOpen(true);
     };
@@ -98,14 +98,14 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
                 alert('Erro ao buscar setor: ' + sectorData.error);
                 return;
             }
-            sectorId = sectorData.id;
+            sectorId = sectorData.id.toString();
         }
 
         const newTask = {
             title: taskTitle,
             description: taskDescription,
             date: reminderDate || new Date().toISOString().slice(0, 10),
-            sector_id: taskType === 'sector' ? sectorId : selectedSector,
+            sector_id: parseInt(sectorId),
             user_id: taskType === 'individual' ? followerId : null,
             client_id: clientId,
             priority: priority,
@@ -127,7 +127,14 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
                 throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
             }
 
-            const data = JSON.parse(responseText);
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                console.error('Erro ao analisar JSON:', e);
+                throw new Error('Erro ao analisar JSON: ' + responseText);
+            }
+
             setCronogramas((prevCronogramas) => [...prevCronogramas, data]);
         } catch (error) {
             console.error('Erro ao salvar a tarefa:', error);
@@ -146,14 +153,14 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
                 alert('Erro ao buscar setor: ' + sectorData.error);
                 return;
             }
-            sectorId = sectorData.id;
+            sectorId = sectorData.id.toString();
         }
 
         const updatedTask = {
             title: taskTitle,
             description: taskDescription,
             date: reminderDate,
-            sector_id: taskType === 'sector' ? sectorId : selectedSector,
+            sector_id: parseInt(sectorId),
             user_id: taskType === 'individual' ? followerId : null,
             client_id: clientId,
             priority: priority,
@@ -175,7 +182,14 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
                 throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
             }
 
-            const data = JSON.parse(responseText);
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                console.error('Erro ao analisar JSON:', e);
+                throw new Error('Erro ao analisar JSON: ' + responseText);
+            }
+
             setCronogramas((prevCronogramas) =>
                 prevCronogramas.map((task) => (task.id === selectedTask.id ? data : task))
             );

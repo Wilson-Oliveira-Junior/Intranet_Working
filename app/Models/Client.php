@@ -9,17 +9,22 @@ class Client extends Model
 {
     use HasFactory;
 
-    protected $table = 'clientes';
+    // Especificar o nome da tabela
+    protected $table = 'clients';
+
+    // Definir os campos que podem ser preenchidos
     protected $fillable = [
         'nome',
+        'cliente_id',
+        'created_at',
+        'updated_at',
+        'dominio',
         'razao_social',
         'nome_fantasia',
         'CNPJ',
-        'inscricao_estadual',
-        'segmento',
-        'melhor_dia_boleto',
+        'dia_boleto',
         'perfil_cliente',
-        'dominio',
+        'inscricao_estadual',
         'cep',
         'endereco',
         'bairro',

@@ -9,6 +9,7 @@ class Schedule extends Model
 {
     use HasFactory;
 
+    // Definir os campos que podem ser preenchidos
     protected $fillable = [
         'title',
         'description',
@@ -19,7 +20,6 @@ class Schedule extends Model
         'hours_worked',
         'priority',
         'status',
-        // Adicione outros campos conforme necessário
     ];
 
     public function sector()
@@ -34,6 +34,6 @@ class Schedule extends Model
 
     public function client()
     {
-        return $this->belongsTo(Client::class, 'client_id', 'id', 'clientes'); // Atualize para usar a tabela 'clientes'
+        return $this->belongsTo(Client::class, 'client_id', 'id'); // Atualize para usar a tabela 'clientes'
     }
 }
