@@ -231,7 +231,11 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
         }
 
         for (let day = 1; day <= daysInMonth; day++) {
-            const tasksForDay = cronogramas.filter((task) => new Date(task.date).getDate() === day);
+            const tasksForDay = cronogramas.filter((task) => {
+                const taskDate = new Date(task.date);
+                return taskDate.getDate() === day && taskDate.getMonth() === currentMonth && taskDate.getFullYear() === currentYear && (task.sector_id === user.sector_id || task.user_id === user.id);
+            });
+            console.log(`Tasks for day ${day}:`, tasksForDay); // Adicione esta linha para depuração
             days.push(
                 <div key={day} className="calendar-day">
                     <div className="day-number">{day}</div>
@@ -437,6 +441,20 @@ const TaskModal = ({
                     </option>
                 ))}
             </select>
+            {taskType === 'sector' && (
+                <select
+                    className="modal-input"
+                    value={selectedSector || ''}
+                    onChange={(e) => setSelectedSector(e.target.value)}
+                >
+                    <option value="">Selecione um Setor</option>
+                    {equipes.map((equipe, index) => (
+                        <option key={index} value={equipe.id}>
+                            {equipe.name}
+                        </option>
+                    ))}
+                </select>
+            )}
             {taskType === 'individual' && (
                 <>
                     <select

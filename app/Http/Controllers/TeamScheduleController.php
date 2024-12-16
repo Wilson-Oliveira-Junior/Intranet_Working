@@ -22,8 +22,9 @@ class TeamScheduleController extends Controller
         $sectors = Sector::all();
         $users = User::all();
         $clientes = Client::all();
-        Log::info('Clientes: ', $clientes->toArray());
-        $teamSchedules = Schedule::where('sector_id', $user->sector_id)->get();
+        $teamSchedules = Schedule::where('sector_id', $user->sector_id)
+            ->orWhere('user_id', $user->id)
+            ->get();
         return Inertia::render('TeamSchedule/Cronograma', [
             'user' => $user,
             'teamSchedules' => $teamSchedules,
@@ -36,21 +37,16 @@ class TeamScheduleController extends Controller
     // Método para criar um novo cronograma
     public function store(Request $request)
     {
-        Log::info('Store request data: ', $request->all());
+
 
         // Listar todas as tabelas no banco de dados
         $tables = DB::select('SELECT name FROM sqlite_master WHERE type="table"');
-        Log::info('Tabelas no banco de dados: ', $tables);
+
 
         // Verificar se a tabela clientes existe
         if (!Schema::hasTable('clients')) {
-            Log::error('Tabela clients não existe no banco de dados.');
             return response()->json(['error' => 'Tabela clients não existe no banco de dados.'], 500);
         }
-
-        // Logar o nome da tabela e a conexão do banco de dados
-        Log::info('Nome da tabela: clients');
-        Log::info('Conexão do banco de dados: ' . config('database.default'));
 
         // Valida os dados da requisição
         $validatedData = $request->validate([
@@ -70,11 +66,8 @@ class TeamScheduleController extends Controller
             DB::enableQueryLog(); // Habilitar o log de consultas
             $schedule = Schedule::create($validatedData);
             $queries = DB::getQueryLog(); // Obter o log de consultas
-            Log::info('Consultas SQL: ', $queries); // Logar as consultas SQL
             return response()->json($schedule);
         } catch (\Exception $e) {
-            Log::error('Error storing schedule: ', ['error' => $e->getMessage()]);
-            Log::error('Consultas SQL: ', DB::getQueryLog()); // Logar as consultas SQL em caso de erro
             return response()->json(['error' => 'Failed to store schedule'], 500);
         }
     }
@@ -82,7 +75,6 @@ class TeamScheduleController extends Controller
     // Método para atualizar um cronograma existente
     public function update(Request $request, $id)
     {
-        Log::info('Update request data: ', $request->all());
 
         // Valida os dados da requisição
         $validatedData = $request->validate([
@@ -102,11 +94,8 @@ class TeamScheduleController extends Controller
             $schedule = Schedule::findOrFail($id);
             $schedule->update($validatedData);
             $queries = DB::getQueryLog(); // Obter o log de consultas
-            Log::info('Consultas SQL: ', $queries); // Logar as consultas SQL
             return response()->json($schedule);
         } catch (\Exception $e) {
-            Log::error('Error updating schedule: ', ['error' => $e->getMessage()]);
-            Log::error('Consultas SQL: ', DB::getQueryLog()); // Logar as consultas SQL em caso de erro
             return response()->json(['error' => 'Failed to update schedule'], 500);
         }
     }
