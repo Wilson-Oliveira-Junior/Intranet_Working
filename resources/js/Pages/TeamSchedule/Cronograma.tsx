@@ -31,8 +31,10 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
             try {
                 const response = await fetch(`/api/tasks?equipe=${selectedEquipe}`);
                 const data = await response.json();
+                console.log('Fetched tasks:', data);
                 setCronogramas(data || []);
             } catch (error) {
+                console.error('Erro ao buscar cronogramas:', error);
                 setCronogramas([]);
             }
         };
@@ -50,6 +52,10 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
         fetchCronogramas();
         fetchClients();
     }, [selectedEquipe]);
+
+    useEffect(() => {
+        console.log('Cronogramas updated:', cronogramas);
+    }, [cronogramas]);
 
     const fetchSectorUsers = (sectorId) => {
         const filteredUsers = users.filter(user => user.sector_id === parseInt(sectorId));
@@ -135,6 +141,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
                 throw new Error('Erro ao analisar JSON: ' + responseText);
             }
 
+            console.log('Saved task:', data);
             setCronogramas((prevCronogramas) => [...prevCronogramas, data]);
         } catch (error) {
             console.error('Erro ao salvar a tarefa:', error);
@@ -190,6 +197,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
                 throw new Error('Erro ao analisar JSON: ' + responseText);
             }
 
+            console.log('Updated task:', data);
             setCronogramas((prevCronogramas) =>
                 prevCronogramas.map((task) => (task.id === selectedTask.id ? data : task))
             );
@@ -210,6 +218,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
                 },
             });
             await response.json();
+            console.log('Deleted task:', taskId);
             setCronogramas((prevCronogramas) => prevCronogramas.filter(task => task.id !== taskId));
         } catch (error) {
             console.error('Erro ao deletar a tarefa:', error);
@@ -235,7 +244,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
                 const taskDate = new Date(task.date);
                 return taskDate.getDate() === day && taskDate.getMonth() === currentMonth && taskDate.getFullYear() === currentYear && (task.sector_id === user.sector_id || task.user_id === user.id);
             });
-            console.log(`Tasks for day ${day}:`, tasksForDay); // Adicione esta linha para depuração
+            console.log(`Tasks for day ${day}:`, tasksForDay);
             days.push(
                 <div key={day} className="calendar-day">
                     <div className="day-number">{day}</div>
