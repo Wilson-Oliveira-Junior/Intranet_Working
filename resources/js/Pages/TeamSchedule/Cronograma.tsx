@@ -66,7 +66,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
     }, [fetchCronogramas, fetchClients]);
 
     const fetchSectorUsers = useCallback((sectorId) => {
-        const filteredUsers = users.filter(user => user.sector_id === parseInt(sectorId));
+        const filteredUsers = users.filter(user => user.sector_id === parseInt(sectorId) && user.status === 'active');
         setSectorUsers(filteredUsers);
     }, [users]);
 

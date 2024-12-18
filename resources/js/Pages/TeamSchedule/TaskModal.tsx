@@ -78,6 +78,7 @@ const TaskModal = ({
                                 id="alocados"
                                 value={followerId}
                                 onChange={(e) => setFollowerId(e.target.value)}
+                                style={{ flex: 1 }}
                             >
                                 <option value="">Selecione um Usuário</option>
                                 {users.filter(user => user.status === 'active').map((user) => (
@@ -91,6 +92,7 @@ const TaskModal = ({
                                 id="alocados"
                                 value={selectedSector}
                                 onChange={(e) => setSelectedSector(e.target.value)}
+                                style={{ flex: 1 }}
                             >
                                 <option value="">Selecione um Setor</option>
                                 {equipes.map((equipe) => (
@@ -130,24 +132,6 @@ const TaskModal = ({
                 </div>
                 <div className="form-group">
                     <label htmlFor="descricao">Descrição</label>
-                    <div className="editor-toolbar">
-                        <select>
-                            <option>Normal</option>
-                        </select>
-                        <div>
-                            <button><i className="fas fa-bold"></i></button>
-                            <button><i className="fas fa-italic"></i></button>
-                            <button><i className="fas fa-underline"></i></button>
-                            <button><i className="fas fa-link"></i></button>
-                            <button><i className="fas fa-image"></i></button>
-                            <button><i className="fas fa-list-ul"></i></button>
-                            <button><i className="fas fa-list-ol"></i></button>
-                            <button><i className="fas fa-align-left"></i></button>
-                            <button><i className="fas fa-align-center"></i></button>
-                            <button><i className="fas fa-align-right"></i></button>
-                            <button><i className="fas fa-align-justify"></i></button>
-                        </div>
-                    </div>
                     <textarea
                         id="descricao"
                         placeholder="Escreva a descrição da tarefa..."
