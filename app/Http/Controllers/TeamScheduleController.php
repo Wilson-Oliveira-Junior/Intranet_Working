@@ -10,7 +10,6 @@ use App\Models\Sector;
 use App\Models\User;
 use App\Models\Client;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
 class TeamScheduleController extends Controller
@@ -20,7 +19,7 @@ class TeamScheduleController extends Controller
     {
         $user = Auth::user();
         $sectors = Sector::all();
-        $users = User::all();
+        $users = User::where('status', 'active')->get(); // Apenas usuários com status 'active'
         $clientes = Client::all();
         $teamSchedules = Schedule::where('sector_id', $user->sector_id)
             ->orWhere('user_id', $user->id)
@@ -37,11 +36,8 @@ class TeamScheduleController extends Controller
     // Método para criar um novo cronograma
     public function store(Request $request)
     {
-
-
         // Listar todas as tabelas no banco de dados
         $tables = DB::select('SELECT name FROM sqlite_master WHERE type="table"');
-
 
         // Verificar se a tabela clientes existe
         if (!Schema::hasTable('clients')) {
@@ -63,9 +59,7 @@ class TeamScheduleController extends Controller
         $validatedData['status'] = 'aberto';
 
         try {
-            DB::enableQueryLog(); // Habilitar o log de consultas
             $schedule = Schedule::create($validatedData);
-            $queries = DB::getQueryLog(); // Obter o log de consultas
             return response()->json($schedule);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to store schedule'], 500);
@@ -75,7 +69,6 @@ class TeamScheduleController extends Controller
     // Método para atualizar um cronograma existente
     public function update(Request $request, $id)
     {
-
         // Valida os dados da requisição
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
@@ -90,10 +83,8 @@ class TeamScheduleController extends Controller
         ]);
 
         try {
-            DB::enableQueryLog(); // Habilitar o log de consultas
             $schedule = Schedule::findOrFail($id);
             $schedule->update($validatedData);
-            $queries = DB::getQueryLog(); // Obter o log de consultas
             return response()->json($schedule);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update schedule'], 500);
@@ -103,15 +94,19 @@ class TeamScheduleController extends Controller
     // Método para deletar um cronograma
     public function destroy($id)
     {
-        $schedule = Schedule::findOrFail($id);
-        $schedule->delete();
-        return response()->json(['message' => 'Task deleted successfully']);
+        try {
+            $schedule = Schedule::findOrFail($id);
+            $schedule->delete();
+            return response()->json(['message' => 'Task deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete schedule'], 500);
+        }
     }
 
     // Método para obter tarefas com uma prioridade específica
     public function getTasksWithPriority(Request $request)
     {
-        $priority = $request->input('priority');
+        $priority = $request->input('priority', 'normal'); // Definir prioridade padrão como 'normal'
         $tasks = Schedule::where('priority', $priority)->get();
         return response()->json($tasks);
     }

@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import TaskModal from './TaskModal';
+import TaskResponseModal from './TaskResponseModal';
 import '../../../css/components/cronograma.css';
 
 const Cronograma = ({ user, teamSchedules, sectors, users }) => {
@@ -8,11 +10,12 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
     const [selectedEquipe, setSelectedEquipe] = useState(user?.sector?.name || '');
     const [indicatorPosition, setIndicatorPosition] = useState(0);
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [responseModalIsOpen, setResponseModalIsOpen] = useState(false);
     const [taskTitle, setTaskTitle] = useState('');
     const [taskDescription, setTaskDescription] = useState('');
     const [selectedTask, setSelectedTask] = useState(null);
     const [reminderDate, setReminderDate] = useState('');
-    const [priority, setPriority] = useState('');
+    const [priority, setPriority] = useState('normal'); // Definir prioridade padrão como 'normal'
     const [followerId, setFollowerId] = useState(null);
     const [taskType, setTaskType] = useState('sector');
     const [clientId, setClientId] = useState('');
@@ -20,53 +23,58 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
     const [selectedSector, setSelectedSector] = useState('');
     const [sectorUsers, setSectorUsers] = useState([]);
     const [taskStatus, setTaskStatus] = useState('aberto');
+    const [comments, setComments] = useState([]);
+    const [newComment, setNewComment] = useState('');
+
+    const debounceTimeout = useRef(null);
 
     const getCsrfToken = () => {
         const token = document.querySelector('meta[name="csrf-token"]');
         return token ? token.getAttribute('content') : '';
     };
 
-    useEffect(() => {
-        const fetchCronogramas = async () => {
+    const fetchCronogramas = useCallback(async () => {
+        clearTimeout(debounceTimeout.current);
+        debounceTimeout.current = setTimeout(async () => {
+            setLoading(true);
             try {
                 const response = await fetch(`/api/tasks?equipe=${selectedEquipe}`);
                 const data = await response.json();
-                console.log('Fetched tasks:', data);
                 setCronogramas(data || []);
             } catch (error) {
                 console.error('Erro ao buscar cronogramas:', error);
                 setCronogramas([]);
+            } finally {
+                setLoading(false);
             }
-        };
-
-        const fetchClients = async () => {
-            try {
-                const response = await fetch('/api/clients');
-                const data = await response.json();
-                setClients(data || []);
-            } catch (error) {
-                console.error('Erro ao buscar clientes:', error);
-            }
-        };
-
-        fetchCronogramas();
-        fetchClients();
+        }, 1000);
     }, [selectedEquipe]);
 
-    useEffect(() => {
-        console.log('Cronogramas updated:', cronogramas);
-    }, [cronogramas]);
+    const fetchClients = useCallback(async () => {
+        try {
+            const response = await fetch('/api/clients');
+            const data = await response.json();
+            setClients(data || []);
+        } catch (error) {
+            console.error('Erro ao buscar clientes:', error);
+        }
+    }, []);
 
-    const fetchSectorUsers = (sectorId) => {
+    useEffect(() => {
+        fetchCronogramas();
+        fetchClients();
+    }, [fetchCronogramas, fetchClients]);
+
+    const fetchSectorUsers = useCallback((sectorId) => {
         const filteredUsers = users.filter(user => user.sector_id === parseInt(sectorId));
         setSectorUsers(filteredUsers);
-    };
+    }, [users]);
 
     useEffect(() => {
         if (selectedSector) {
             fetchSectorUsers(selectedSector);
         }
-    }, [selectedSector]);
+    }, [selectedSector, fetchSectorUsers]);
 
     const handleTabChange = (equipe, index) => {
         setSelectedEquipe(equipe);
@@ -77,22 +85,30 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
         setSelectedTask(task);
         setTaskTitle(task ? task.title : '');
         setTaskDescription(task ? task.description : '');
-        setReminderDate(task ? task.date : '');
+        setReminderDate(task ? task.date.split('T')[0] : ''); // Ensure date is in YYYY-MM-DD format
         setPriority(task ? task.priority : 'normal');
         setSelectedSector(task ? task.sector_id.toString() : '');
         setTaskStatus(task ? task.status : 'aberto');
         setModalIsOpen(true);
     };
 
+    const openResponseModal = (task) => {
+        setSelectedTask(task);
+        setComments(task.comments || []);
+        setResponseModalIsOpen(true);
+    };
+
     const closeModal = () => {
         setModalIsOpen(false);
+        setResponseModalIsOpen(false);
         setSelectedTask(null);
         setReminderDate('');
-        setPriority('');
+        setPriority('normal');
         setFollowerId(null);
         setTaskTitle('');
         setTaskDescription('');
         setTaskStatus('aberto');
+        setNewComment('');
     };
 
     const saveTaskDetails = async () => {
@@ -137,14 +153,11 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
             try {
                 data = JSON.parse(responseText);
             } catch (e) {
-                console.error('Erro ao analisar JSON:', e);
                 throw new Error('Erro ao analisar JSON: ' + responseText);
             }
 
-            console.log('Saved task:', data);
             setCronogramas((prevCronogramas) => [...prevCronogramas, data]);
         } catch (error) {
-            console.error('Erro ao salvar a tarefa:', error);
             alert('Erro ao salvar a tarefa: ' + error.message);
         }
 
@@ -193,16 +206,13 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
             try {
                 data = JSON.parse(responseText);
             } catch (e) {
-                console.error('Erro ao analisar JSON:', e);
                 throw new Error('Erro ao analisar JSON: ' + responseText);
             }
 
-            console.log('Updated task:', data);
             setCronogramas((prevCronogramas) =>
                 prevCronogramas.map((task) => (task.id === selectedTask.id ? data : task))
             );
         } catch (error) {
-            console.error('Erro ao atualizar a tarefa:', error);
             alert('Erro ao atualizar a tarefa: ' + error.message);
         }
 
@@ -218,14 +228,81 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
                 },
             });
             await response.json();
-            console.log('Deleted task:', taskId);
             setCronogramas((prevCronogramas) => prevCronogramas.filter(task => task.id !== taskId));
         } catch (error) {
             console.error('Erro ao deletar a tarefa:', error);
         }
     };
 
-    const renderCalendar = () => {
+    const updateTaskStatus = async (status) => {
+        try {
+            const response = await fetch(`/cronograma/${selectedTask.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                },
+                body: JSON.stringify({ status }),
+            });
+
+            const responseText = await response.text();
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
+            }
+
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                throw new Error('Erro ao analisar JSON: ' + responseText);
+            }
+
+            setCronogramas((prevCronogramas) =>
+                prevCronogramas.map((task) => (task.id === selectedTask.id ? data : task))
+            );
+        } catch (error) {
+            alert('Erro ao atualizar o status da tarefa: ' + error.message);
+        }
+
+        closeModal();
+    };
+
+    const addComment = async () => {
+        const newCommentData = {
+            text: newComment,
+            date: new Date().toISOString(),
+        };
+
+        try {
+            const response = await fetch(`/cronograma/${selectedTask.id}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                },
+                body: JSON.stringify(newCommentData),
+            });
+
+            const responseText = await response.text();
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
+            }
+
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                throw new Error('Erro ao analisar JSON: ' + responseText);
+            }
+
+            setComments((prevComments) => [...prevComments, data]);
+            setNewComment('');
+        } catch (error) {
+            alert('Erro ao adicionar comentário: ' + error.message);
+        }
+    };
+
+    const renderCalendar = useCallback(() => {
         const today = new Date();
         const currentYear = today.getFullYear();
         const currentMonth = today.getMonth();
@@ -242,9 +319,10 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
         for (let day = 1; day <= daysInMonth; day++) {
             const tasksForDay = cronogramas.filter((task) => {
                 const taskDate = new Date(task.date);
-                return taskDate.getDate() === day && taskDate.getMonth() === currentMonth && taskDate.getFullYear() === currentYear && (task.sector_id === user.sector_id || task.user_id === user.id);
+                const isTaskForDay = taskDate.getUTCDate() === day && taskDate.getUTCMonth() === currentMonth && taskDate.getUTCFullYear() === currentYear;
+                const isTaskForUser = task.sector_id === user.sector_id || task.user_id === user.id;
+                return isTaskForDay && isTaskForUser;
             });
-            console.log(`Tasks for day ${day}:`, tasksForDay);
             days.push(
                 <div key={day} className="calendar-day">
                     <div className="day-number">{day}</div>
@@ -267,7 +345,9 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
         }
 
         return weeks;
-    };
+    }, [cronogramas, user.sector_id, user.id, openModal]);
+
+    const memoizedCalendar = useMemo(() => renderCalendar(), [renderCalendar]);
 
     return (
         <AuthenticatedLayout user={user}>
@@ -307,7 +387,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
                     </div>
                 </div>
 
-                <div>{renderCalendar()}</div>
+                <div>{memoizedCalendar}</div>
 
                 {modalIsOpen && (
                     <TaskModal
@@ -338,176 +418,24 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
                         taskStatus={taskStatus}
                         setTaskStatus={setTaskStatus}
                         fetchSectorUsers={fetchSectorUsers}
+                        users={users} // Pass the list of active users to TaskModal
+                    />
+                )}
+
+                {responseModalIsOpen && (
+                    <TaskResponseModal
+                        selectedTask={selectedTask}
+                        comments={comments}
+                        newComment={newComment}
+                        setNewComment={setNewComment}
+                        addComment={addComment}
+                        closeModal={closeModal}
+                        updateTaskStatus={updateTaskStatus}
                     />
                 )}
             </div>
         </AuthenticatedLayout>
     );
 };
-
-const TaskModal = ({
-    taskType,
-    setTaskType,
-    taskTitle,
-    setTaskTitle,
-    taskDescription,
-    setTaskDescription,
-    reminderDate,
-    setReminderDate,
-    clientId,
-    setClientId,
-    clients,
-    selectedSector,
-    setSelectedSector,
-    followerId,
-    setFollowerId,
-    sectorUsers,
-    saveTaskDetails,
-    updateTaskDetails,
-    deleteTask,
-    selectedTask,
-    closeModal,
-    priority,
-    setPriority,
-    taskStatus,
-    setTaskStatus,
-    equipes,
-    fetchSectorUsers,
-}) => (
-    <div className="modal">
-        <div className="modal-content">
-            {selectedTask ? (
-                <h2>{selectedTask.title}</h2>
-            ) : (
-                <h2>Adicionar Tarefa</h2>
-            )}
-            <div className="tab-container">
-                <div className="tab">
-                    <input
-                        type="radio"
-                        name="taskType"
-                        id="sectorTab"
-                        className="tab_input"
-                        checked={taskType === 'sector'}
-                        onChange={() => setTaskType('sector')}
-                    />
-                    <label className="tab_label" htmlFor="sectorTab">
-                        Setor
-                    </label>
-                </div>
-                <div className="tab">
-                    <input
-                        type="radio"
-                        name="taskType"
-                        id="individualTab"
-                        className="tab_input"
-                        checked={taskType === 'individual'}
-                        onChange={() => setTaskType('individual')}
-                    />
-                    <label className="tab_label" htmlFor="individualTab">
-                        Individual
-                    </label>
-                </div>
-            </div>
-            <input
-                type="text"
-                placeholder="Título da Tarefa (obrigatório)"
-                className="modal-input"
-                value={taskTitle}
-                onChange={(e) => setTaskTitle(e.target.value)}
-                required
-            />
-            <textarea
-                placeholder="Descrição da Tarefa"
-                className="modal-input"
-                value={taskDescription}
-                onChange={(e) => setTaskDescription(e.target.value)}
-            />
-            <input
-                type="date"
-                className="modal-input"
-                value={reminderDate}
-                onChange={(e) => setReminderDate(e.target.value)}
-            />
-            <select
-                className="modal-input"
-                value={priority}
-                onChange={(e) => setPriority(e.target.value)}
-            >
-                <option value="normal">Normal</option>
-                <option value="atencao">Atenção</option>
-                <option value="urgente">Urgente</option>
-            </select>
-            <select
-                className="modal-input"
-                value={clientId || ''}
-                onChange={(e) => setClientId(e.target.value)}
-            >
-                <option value="">Selecione um Cliente</option>
-                {clients.map((client) => (
-                    <option key={client.id} value={client.id}>
-                        {client.nome}
-                    </option>
-                ))}
-            </select>
-            {taskType === 'sector' && (
-                <select
-                    className="modal-input"
-                    value={selectedSector || ''}
-                    onChange={(e) => setSelectedSector(e.target.value)}
-                >
-                    <option value="">Selecione um Setor</option>
-                    {equipes.map((equipe, index) => (
-                        <option key={index} value={equipe.id}>
-                            {equipe.name}
-                        </option>
-                    ))}
-                </select>
-            )}
-            {taskType === 'individual' && (
-                <>
-                    <select
-                        className="modal-input"
-                        value={selectedSector || ''}
-                        onChange={(e) => {
-                            setSelectedSector(e.target.value);
-                            fetchSectorUsers(e.target.value);
-                        }}
-                    >
-                        <option value="">Selecione um Setor</option>
-                        {equipes.map((equipe, index) => (
-                            <option key={index} value={equipe.id}>
-                                {equipe.name}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        className="modal-input"
-                        value={followerId || ''}
-                        onChange={(e) => setFollowerId(e.target.value)}
-                    >
-                        <option value="">Selecione um Usuário</option>
-                        {sectorUsers.map((user) => (
-                            <option key={user.id} value={user.id}>
-                                {user.name}
-                            </option>
-                        ))}
-                    </select>
-                </>
-            )}
-            <button onClick={selectedTask ? updateTaskDetails : saveTaskDetails} className="modal-button">
-                {selectedTask ? 'Atualizar' : 'Salvar'}
-            </button>
-            {selectedTask && (
-                <button onClick={() => deleteTask(selectedTask.id)} className="modal-button">
-                    Deletar
-                </button>
-            )}
-            <button onClick={closeModal} className="modal-button">
-                Fechar
-            </button>
-        </div>
-    </div>
-);
 
 export default Cronograma;
