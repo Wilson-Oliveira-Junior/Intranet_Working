@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import TaskModal from './TaskModal';
 import TaskResponseModal from './TaskResponseModal';
-import '../../../css/components/cronograma.css';
+import '../../../css/components/cronograma.css'; // Import CSS do cronograma
 
-const Cronograma = ({ user, teamSchedules, sectors, users }) => {
+const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => { // Adicione tiposTarefa aqui
     const [cronogramas, setCronogramas] = useState(teamSchedules || []);
     const [equipes, setEquipes] = useState(sectors || []);
     const [selectedEquipe, setSelectedEquipe] = useState(user?.sector?.name || '');
@@ -324,10 +324,10 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
                 return isTaskForDay && isTaskForUser;
             });
             days.push(
-                <div key={day} className="calendar-day">
+                <div key={day} className="calendar-day" onClick={() => openResponseModal(tasksForDay[0])}>
                     <div className="day-number">{day}</div>
                     {tasksForDay.map((task, index) => (
-                        <div key={index} className={`task ${task.priority}`} onClick={() => openModal(task)}>
+                        <div key={index} className={`task ${task.priority}`}>
                             {task.title}
                         </div>
                     ))}
@@ -345,7 +345,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
         }
 
         return weeks;
-    }, [cronogramas, user.sector_id, user.id, openModal]);
+    }, [cronogramas, user.sector_id, user.id, openResponseModal]);
 
     const memoizedCalendar = useMemo(() => renderCalendar(), [renderCalendar]);
 
@@ -419,12 +419,13 @@ const Cronograma = ({ user, teamSchedules, sectors, users }) => {
                         setTaskStatus={setTaskStatus}
                         fetchSectorUsers={fetchSectorUsers}
                         users={users} // Pass the list of active users to TaskModal
+                        tiposTarefa={tiposTarefa} // Adicione esta linha
                     />
                 )}
 
                 {responseModalIsOpen && (
                     <TaskResponseModal
-                        selectedTask={selectedTask}
+                        task={selectedTask}
                         comments={comments}
                         newComment={newComment}
                         setNewComment={setNewComment}

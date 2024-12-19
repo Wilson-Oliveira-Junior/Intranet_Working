@@ -17,9 +17,11 @@ class Schedule extends Model
         'sector_id',
         'user_id',
         'client_id',
+        'tipo_tarefa_id', // Adicione esta linha
         'hours_worked',
         'priority',
         'status',
+        'file_path', // Adicione esta linha
     ];
 
     public function sector()
@@ -35,5 +37,15 @@ class Schedule extends Model
     public function client()
     {
         return $this->belongsTo(Client::class, 'client_id', 'id'); // Atualize para usar a tabela 'clientes'
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function tipoTarefa()
+    {
+        return $this->belongsTo(TipoTarefa::class, 'tipo_tarefa_id');
     }
 }

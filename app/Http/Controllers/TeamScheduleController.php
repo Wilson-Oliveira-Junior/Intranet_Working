@@ -9,8 +9,10 @@ use App\Models\Schedule;
 use App\Models\Sector;
 use App\Models\User;
 use App\Models\Client;
+use App\Models\TipoTarefa; // Adicione esta linha
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 
 class TeamScheduleController extends Controller
 {
@@ -19,9 +21,11 @@ class TeamScheduleController extends Controller
     {
         $user = Auth::user();
         $sectors = Sector::all();
-        $users = User::where('status', 'active')->get(); // Apenas usuários com status 'active'
-        $clientes = Client::all();
-        $teamSchedules = Schedule::where('sector_id', $user->sector_id)
+        $users = User::where('status', 'Ativo')->get();
+        $clients = Client::all();
+        $tiposTarefa = TipoTarefa::all(); // Adicione esta linha
+        $teamSchedules = Schedule::with(['creator', 'client', 'tipoTarefa']) // Atualize esta linha
+            ->where('sector_id', $user->sector_id)
             ->orWhere('user_id', $user->id)
             ->get();
         return Inertia::render('TeamSchedule/Cronograma', [
@@ -29,7 +33,8 @@ class TeamScheduleController extends Controller
             'teamSchedules' => $teamSchedules,
             'sectors' => $sectors,
             'users' => $users,
-            'clientes' => $clientes,
+            'clients' => $clients,
+            'tiposTarefa' => $tiposTarefa, // Adicione esta linha
         ]);
     }
 
@@ -52,11 +57,18 @@ class TeamScheduleController extends Controller
             'sector_id' => 'required|integer|exists:sectors,id',
             'user_id' => 'nullable|integer|exists:users,id',
             'client_id' => 'nullable|integer|exists:clients,id', // Garantir que o nome da tabela está correto
+            'tipo_tarefa_id' => 'nullable|integer|exists:tb_tipostarefas,id', // Adicione esta linha
             'hours_worked' => 'nullable|integer',
             'priority' => 'required|string',
+            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:2048', // Validação do arquivo
         ]);
 
         $validatedData['status'] = 'aberto';
+
+        if ($request->hasFile('file')) {
+            $filePath = $request->file('file')->store('img/tarefas', 'public');
+            $validatedData['file_path'] = $filePath;
+        }
 
         try {
             $schedule = Schedule::create($validatedData);
@@ -77,10 +89,17 @@ class TeamScheduleController extends Controller
             'sector_id' => 'required|integer|exists:sectors,id',
             'user_id' => 'nullable|integer|exists:users,id',
             'client_id' => 'nullable|integer|exists:clients,id', // Garantir que o nome da tabela está correto
+            'tipo_tarefa_id' => 'nullable|integer|exists:tb_tipostarefas,id', // Adicione esta linha
             'hours_worked' => 'nullable|integer',
             'priority' => 'required|string',
             'status' => 'required|string',
+            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:2048', // Validação do arquivo
         ]);
+
+        if ($request->hasFile('file')) {
+            $filePath = $request->file('file')->store('img/tarefas', 'public');
+            $validatedData['file_path'] = $filePath;
+        }
 
         try {
             $schedule = Schedule::findOrFail($id);
