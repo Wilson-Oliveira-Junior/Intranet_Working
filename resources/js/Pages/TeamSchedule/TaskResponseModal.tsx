@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import '../../../css/components/modal.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
 const TaskResponseModal = ({
     task,
@@ -9,6 +11,7 @@ const TaskResponseModal = ({
     comments,
     newComment,
     setNewComment,
+    user, // Adicione o usuário autenticado como prop
 }) => {
     const [status, setStatus] = useState(task.status);
     const [activeTab, setActiveTab] = useState('comments');
@@ -20,6 +23,22 @@ const TaskResponseModal = ({
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
+    };
+
+    const handleAddComment = () => {
+        if (newComment.trim() === '') return;
+
+        const commentData = {
+            text: newComment,
+            date: new Date().toISOString(),
+            user: {
+                name: user.name,
+                id: user.id,
+            },
+        };
+
+        addComment(commentData);
+        setNewComment('');
     };
 
     return (
@@ -40,7 +59,7 @@ const TaskResponseModal = ({
                                 <div className="details">
                                     <span>ID: {task.id} - Criado por: {task.creator ? task.creator.name : 'Desconhecido'} em {new Date(task.created_at).toLocaleDateString()}</span>
                                     <span>Status: {status}</span>
-                                    <span>Projeto: {task.client ? task.client.name : 'Desconhecido'}</span>
+                                    <span>Projeto: {task.client ? task.client.nome_fantasia : 'Desconhecido'}</span> {/* Ajuste aqui */}
                                 </div>
                             </div>
                         </div>
@@ -66,8 +85,8 @@ const TaskResponseModal = ({
                                         value={newComment}
                                         onChange={(e) => setNewComment(e.target.value)}
                                     />
-                                    <button onClick={addComment}>
-                                        <i className="fas fa-paper-plane"></i>
+                                    <button onClick={handleAddComment}>
+                                        <FontAwesomeIcon icon={faPaperPlane} />
                                     </button>
                                 </div>
                                 {comments.length === 0 ? (
@@ -81,8 +100,8 @@ const TaskResponseModal = ({
                                 ) : (
                                     comments.map((comment, index) => (
                                         <div key={index} className="comment">
+                                            <small>{new Date(comment.date).toLocaleString()} - {comment.user.name}</small>
                                             <p>{comment.text}</p>
-                                            <small>{comment.date}</small>
                                         </div>
                                     ))
                                 )}

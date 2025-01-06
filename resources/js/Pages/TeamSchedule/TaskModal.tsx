@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../../css/components/modal.css';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faUsers, faCalendarAlt, faPaperclip } from '@fortawesome/free-solid-svg-icons';
 
 const TaskModal = ({
     taskType,
@@ -30,9 +31,9 @@ const TaskModal = ({
     setTaskStatus,
     equipes,
     users,
-    tiposTarefa, // Adicione esta linha
-    tipoTarefaId, // Adicione esta linha
-    setTipoTarefaId, // Adicione esta linha
+    tiposTarefa,
+    tipoTarefaId,
+    setTipoTarefaId,
 }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [selectedFollower, setSelectedFollower] = useState(null);
@@ -40,7 +41,6 @@ const TaskModal = ({
     const [showDateModal, setShowDateModal] = useState(false);
     const fileInputRef = useRef(null);
     const dateInputRef = useRef(null);
-
 
     const handleFileChange = (e) => {
         setSelectedFile(e.target.files[0]);
@@ -84,7 +84,7 @@ const TaskModal = ({
         formData.append('sector_id', selectedSector);
         formData.append('user_id', taskType === 'individual' ? followerId : '');
         formData.append('client_id', clientId);
-        formData.append('tipo_tarefa_id', tipoTarefaId); // Adicione esta linha
+        formData.append('tipo_tarefa_id', tipoTarefaId);
         formData.append('priority', priority);
         formData.append('status', taskStatus);
 
@@ -124,16 +124,18 @@ const TaskModal = ({
                             <label htmlFor="alocados">Alocados</label>
                             <div className="input-group">
                                 <button
+                                    type="button"
                                     className={`btn ${taskType === 'individual' ? 'btn-primary' : 'btn-secondary'}`}
                                     onClick={() => setTaskType('individual')}
                                 >
-                                    <i className="fas fa-user"></i>
+                                    <FontAwesomeIcon icon={faUser} />
                                 </button>
                                 <button
+                                    type="button"
                                     className={`btn ${taskType === 'sector' ? 'btn-primary' : 'btn-secondary'}`}
                                     onClick={() => setTaskType('sector')}
                                 >
-                                    <i className="fas fa-users"></i>
+                                    <FontAwesomeIcon icon={faUsers} />
                                 </button>
                                 {taskType === 'individual' ? (
                                     <select
@@ -223,10 +225,10 @@ const TaskModal = ({
                         <div className="form-footer">
                             <div className="icons">
                                 <button type="button" className="btn btn-secondary" onClick={() => setShowFollowerModal(true)}>
-                                    <i className="fas fa-users"></i>
+                                    <FontAwesomeIcon icon={faUsers} />
                                 </button>
                                 <button type="button" className="btn btn-secondary" onClick={handleDateClick}>
-                                    <i className="fas fa-calendar-alt"></i>
+                                    <FontAwesomeIcon icon={faCalendarAlt} />
                                 </button>
                                 <button type="button" className="btn btn-secondary" onClick={handleFileClick}>
                                     <input
@@ -235,7 +237,7 @@ const TaskModal = ({
                                         style={{ display: 'none' }}
                                         onChange={handleFileChange}
                                     />
-                                    <i className="fas fa-paperclip"></i>
+                                    <FontAwesomeIcon icon={faPaperclip} />
                                 </button>
                             </div>
                             <button type="submit" className="btn btn-primary">

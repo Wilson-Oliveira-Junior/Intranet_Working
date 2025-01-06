@@ -10,9 +10,11 @@ use App\Models\Sector;
 use App\Models\User;
 use App\Models\Client;
 use App\Models\TipoTarefa; // Adicione esta linha
+use App\Models\Comment; // Adicione esta linha
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log; // Adicione esta linha
 
 class TeamScheduleController extends Controller
 {
@@ -24,10 +26,11 @@ class TeamScheduleController extends Controller
         $users = User::where('status', 'Ativo')->get();
         $clients = Client::all();
         $tiposTarefa = TipoTarefa::all(); // Adicione esta linha
-        $teamSchedules = Schedule::with(['creator', 'client', 'tipoTarefa']) // Atualize esta linha
+        $teamSchedules = Schedule::with(['creator', 'client', 'tipoTarefa', 'comments.user']) // Atualize esta linha
             ->where('sector_id', $user->sector_id)
             ->orWhere('user_id', $user->id)
             ->get();
+
         return Inertia::render('TeamSchedule/Cronograma', [
             'user' => $user,
             'teamSchedules' => $teamSchedules,
@@ -129,4 +132,33 @@ class TeamScheduleController extends Controller
         $tasks = Schedule::where('priority', $priority)->get();
         return response()->json($tasks);
     }
+
+    // Método para adicionar um comentário a uma tarefa
+    public function addComment(Request $request, $taskId)
+    {
+        $user = Auth::user();
+        Log::info('addComment called', ['taskId' => $taskId, 'request' => $request->all(), 'user' => $user]); // Adicione esta linha
+
+        $validatedData = $request->validate([
+            'text' => 'required|string',
+        ]);
+
+        Log::info('Validation passed', ['validatedData' => $validatedData]); // Adicione esta linha
+
+        $comment = new Comment();
+        $comment->text = $validatedData['text'];
+        $comment->date = now();
+        $comment->user_id = $user->id;
+        $comment->task_id = $taskId;
+
+        try {
+            $comment->save();
+            Log::info('Comment saved successfully', ['comment' => $comment]); // Adicione esta linha
+            return response()->json($comment);
+        } catch (\Exception $e) {
+            Log::error('Failed to add comment', ['error' => $e->getMessage()]); // Adicione esta linha
+            return response()->json(['error' => 'Failed to add comment'], 500);
+        }
+    }
 }
+

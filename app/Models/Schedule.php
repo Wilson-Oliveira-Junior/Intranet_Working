@@ -48,4 +48,9 @@ class Schedule extends Model
     {
         return $this->belongsTo(TipoTarefa::class, 'tipo_tarefa_id');
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'task_id');
+    }
 }

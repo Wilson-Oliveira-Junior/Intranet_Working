@@ -25,13 +25,16 @@
         "vite": "^5.0"
     },
     "dependencies": {
+        "@fortawesome/fontawesome-svg-core": "^6.7.2",
+        "@fortawesome/free-solid-svg-icons": "^6.7.2",
+        "@fortawesome/react-fontawesome": "^0.2.2",
         "@inertiajs/inertia": "^0.11.1",
         "@inertiajs/inertia-react": "^0.8.1",
         "@inertiajs/progress": "^0.1.2",
         "bootstrap": "^5.3.3",
         "bootstrap-icons": "^1.11.3",
+        "laravel-vite-plugin": "^1.0",
         "typeface-montserrat": "^1.1.13",
-        "vite-plugin-laravel": "^0.3.1",
-        "laravel-vite-plugin": "^1.0"
+        "vite-plugin-laravel": "^0.3.1"
     }
 }

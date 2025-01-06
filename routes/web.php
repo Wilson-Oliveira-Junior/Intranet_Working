@@ -90,6 +90,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/cronograma', [TeamScheduleController::class, 'store'])->name('teamSchedule.store');
     Route::put('/cronograma/{id}', [TeamScheduleController::class, 'update'])->name('teamSchedule.update');
     Route::delete('/cronograma/{id}', [TeamScheduleController::class, 'destroy'])->name('teamSchedule.destroy');
+    Route::post('/tasks/{taskId}/comments', [TeamScheduleController::class, 'addComment']);
 
     // Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');
@@ -114,6 +115,7 @@ Route::get('/api/cronograma', [TeamScheduleController::class, 'getCronogramas'])
 Route::get('/api/users', [AdminController::class, 'getUsers']);
 Route::get('/api/clients', [ClientController::class, 'getClients']);
 Route::get('/api/tasks', [TeamScheduleController::class, 'getTasksWithPriority']);
+Route::post('/tasks/{taskId}/comments', [TeamScheduleController::class, 'addComment']);
 Route::post('/api/teamSchedule/store', [TeamScheduleController::class, 'store'])->name('teamSchedule.store');
 Route::get('/api/sectors', [SectorController::class, 'getSectorByDescription']);
 

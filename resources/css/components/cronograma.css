@@ -211,6 +211,31 @@ body {
     background-color: #0056b3;
 }
 
+.calendar-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-navigation button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.calendar-navigation button:hover {
+    background-color: #0056b3;
+}
+
+.calendar-navigation span {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
 
 @media (max-width: 768px) {
     .calendar-day {

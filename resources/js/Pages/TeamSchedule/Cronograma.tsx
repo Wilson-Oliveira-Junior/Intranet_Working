@@ -3,8 +3,12 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import TaskModal from './TaskModal';
 import TaskResponseModal from './TaskResponseModal';
 import '../../../css/components/cronograma.css'; // Import CSS do cronograma
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faUser, faUsers, faCalendarAlt, faPaperclip, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
-const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => { // Adicione tiposTarefa aqui
+library.add(faUser, faUsers, faCalendarAlt, faPaperclip, faPaperPlane);
+
+const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
     const [cronogramas, setCronogramas] = useState(teamSchedules || []);
     const [equipes, setEquipes] = useState(sectors || []);
     const [selectedEquipe, setSelectedEquipe] = useState(user?.sector?.name || '');
@@ -15,7 +19,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => { /
     const [taskDescription, setTaskDescription] = useState('');
     const [selectedTask, setSelectedTask] = useState(null);
     const [reminderDate, setReminderDate] = useState('');
-    const [priority, setPriority] = useState('normal'); // Definir prioridade padrão como 'normal'
+    const [priority, setPriority] = useState('normal');
     const [followerId, setFollowerId] = useState(null);
     const [taskType, setTaskType] = useState('sector');
     const [clientId, setClientId] = useState('');
@@ -25,6 +29,8 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => { /
     const [taskStatus, setTaskStatus] = useState('aberto');
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
+    const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
     const debounceTimeout = useRef(null);
 
@@ -267,20 +273,15 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => { /
         closeModal();
     };
 
-    const addComment = async () => {
-        const newCommentData = {
-            text: newComment,
-            date: new Date().toISOString(),
-        };
-
+    const addComment = async (commentData) => {
         try {
-            const response = await fetch(`/cronograma/${selectedTask.id}/comments`, {
+            const response = await fetch(`/tasks/${selectedTask.id}/comments`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': getCsrfToken(),
                 },
-                body: JSON.stringify(newCommentData),
+                body: JSON.stringify(commentData),
             });
 
             const responseText = await response.text();
@@ -296,16 +297,12 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => { /
             }
 
             setComments((prevComments) => [...prevComments, data]);
-            setNewComment('');
         } catch (error) {
             alert('Erro ao adicionar comentário: ' + error.message);
         }
     };
 
     const renderCalendar = useCallback(() => {
-        const today = new Date();
-        const currentYear = today.getFullYear();
-        const currentMonth = today.getMonth();
         const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
         const firstDay = new Date(currentYear, currentMonth, 1).getDay();
 
@@ -323,6 +320,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => { /
                 const isTaskForUser = task.sector_id === user.sector_id || task.user_id === user.id;
                 return isTaskForDay && isTaskForUser;
             });
+
             days.push(
                 <div key={day} className="calendar-day" onClick={() => openResponseModal(tasksForDay[0])}>
                     <div className="day-number">{day}</div>
@@ -345,9 +343,23 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => { /
         }
 
         return weeks;
-    }, [cronogramas, user.sector_id, user.id, openResponseModal]);
+    }, [cronogramas, user.sector_id, user.id, openResponseModal, currentMonth, currentYear]);
 
     const memoizedCalendar = useMemo(() => renderCalendar(), [renderCalendar]);
+
+    const handlePrevMonth = () => {
+        setCurrentMonth((prevMonth) => (prevMonth === 0 ? 11 : prevMonth - 1));
+        if (currentMonth === 0) {
+            setCurrentYear((prevYear) => prevYear - 1);
+        }
+    };
+
+    const handleNextMonth = () => {
+        setCurrentMonth((prevMonth) => (prevMonth === 11 ? 0 : prevMonth + 1));
+        if (currentMonth === 11) {
+            setCurrentYear((prevYear) => prevYear + 1);
+        }
+    };
 
     return (
         <AuthenticatedLayout user={user}>
@@ -385,6 +397,12 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => { /
                             <span className="legenda-task urgente" /> Urgente
                         </div>
                     </div>
+                </div>
+
+                <div className="calendar-navigation">
+                    <button onClick={handlePrevMonth}>Anterior</button>
+                    <span>{new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+                    <button onClick={handleNextMonth}>Próximo</button>
                 </div>
 
                 <div>{memoizedCalendar}</div>
@@ -432,6 +450,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => { /
                         addComment={addComment}
                         closeModal={closeModal}
                         updateTaskStatus={updateTaskStatus}
+                        user={user} // Passe o usuário autenticado para o modal
                     />
                 )}
             </div>
