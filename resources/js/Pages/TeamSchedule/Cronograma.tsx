@@ -31,6 +31,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
     const [newComment, setNewComment] = useState('');
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+    const [attachments, setAttachments] = useState([]); // Add state for attachments
 
     const debounceTimeout = useRef(null);
 
@@ -95,12 +96,14 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
         setPriority(task ? task.priority : 'normal');
         setSelectedSector(task ? task.sector_id.toString() : '');
         setTaskStatus(task ? task.status : 'aberto');
+        setAttachments(task ? task.attachments || [] : []); // Set attachments
         setModalIsOpen(true);
     };
 
     const openResponseModal = (task) => {
         setSelectedTask(task);
         setComments(task.comments || []);
+        setAttachments(task.attachments || []); // Set attachments
         setResponseModalIsOpen(true);
     };
 
@@ -115,6 +118,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
         setTaskDescription('');
         setTaskStatus('aberto');
         setNewComment('');
+        setAttachments([]); // Reset attachments
     };
 
     const saveTaskDetails = async () => {
@@ -138,6 +142,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
             client_id: clientId,
             priority: priority,
             status: 'aberto',
+            attachments: attachments, // Include attachments
         };
 
         try {
@@ -191,6 +196,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
             client_id: clientId,
             priority: priority,
             status: taskStatus,
+            attachments: attachments, // Include attachments
         };
 
         try {
@@ -438,6 +444,8 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
                         fetchSectorUsers={fetchSectorUsers}
                         users={users} // Pass the list of active users to TaskModal
                         tiposTarefa={tiposTarefa} // Adicione esta linha
+                        attachments={attachments} // Pass attachments to TaskModal
+                        setAttachments={setAttachments} // Pass setAttachments to TaskModal
                     />
                 )}
 
@@ -451,6 +459,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
                         closeModal={closeModal}
                         updateTaskStatus={updateTaskStatus}
                         user={user} // Passe o usuário autenticado para o modal
+                        attachments={attachments} // Pass attachments to TaskResponseModal
                     />
                 )}
             </div>

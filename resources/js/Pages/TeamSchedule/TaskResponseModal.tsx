@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import '../../../css/components/modal.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faPaperclip } from '@fortawesome/free-solid-svg-icons';
 
 const TaskResponseModal = ({
     task,
@@ -11,10 +11,13 @@ const TaskResponseModal = ({
     comments,
     newComment,
     setNewComment,
-    user, // Adicione o usuário autenticado como prop
+    user,
+    attachments,
+    setAttachments,
 }) => {
     const [status, setStatus] = useState(task.status);
     const [activeTab, setActiveTab] = useState('comments');
+    const fileInputRef = useRef(null);
 
     const handleStatusChange = (newStatus) => {
         setStatus(newStatus);
@@ -39,6 +42,21 @@ const TaskResponseModal = ({
 
         addComment(commentData);
         setNewComment('');
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const newAttachment = {
+                file_path: URL.createObjectURL(file),
+                file_name: file.name,
+            };
+            setAttachments((prevAttachments) => [...prevAttachments, newAttachment]);
+        }
+    };
+
+    const handleFileClick = () => {
+        fileInputRef.current.click();
     };
 
     return (
@@ -71,7 +89,7 @@ const TaskResponseModal = ({
                                 Comentário ({comments.length})
                             </button>
                             <button className={activeTab === 'attachments' ? 'active' : ''} onClick={() => handleTabChange('attachments')}>
-                                Anexo ({task.attachments ? task.attachments.length : 0})
+                                Anexo ({attachments.length})
                             </button>
                             <button className={activeTab === 'followers' ? 'active' : ''} onClick={() => handleTabChange('followers')}>
                                 Seguidores ({task.followers ? task.followers.length : 0})
@@ -109,16 +127,27 @@ const TaskResponseModal = ({
                         )}
                         {activeTab === 'attachments' && (
                             <div className="attachments-section">
-                                {task.attachments && task.attachments.length > 0 ? (
-                                    task.attachments.map((attachment, index) => (
+                                <div className="input-group">
+                                    <button type="button" className="btn btn-secondary" onClick={handleFileClick}>
+                                        <input
+                                            type="file"
+                                            ref={fileInputRef}
+                                            style={{ display: 'none' }}
+                                            onChange={handleFileChange}
+                                        />
+                                        <FontAwesomeIcon icon={faPaperclip} />
+                                    </button>
+                                </div>
+                                {attachments.length === 0 ? (
+                                    <p>Não há anexos para esta tarefa.</p>
+                                ) : (
+                                    attachments.map((attachment, index) => (
                                         <div key={index} className="attachment">
-                                            <a href={attachment.url} target="_blank" rel="noopener noreferrer">
-                                                {attachment.name}
+                                            <a href={attachment.file_path} target="_blank" rel="noopener noreferrer">
+                                                {attachment.file_name}
                                             </a>
                                         </div>
                                     ))
-                                ) : (
-                                    <p>Não há anexos para esta tarefa.</p>
                                 )}
                             </div>
                         )}

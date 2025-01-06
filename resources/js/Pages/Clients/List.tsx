@@ -3,12 +3,14 @@ import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import '../../../css/components/list.css';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is included
 import { Inertia } from '@inertiajs/inertia';
 
 interface Client {
     id: number;
     nome: string;
     email: string;
+    dominio: string; // Add dominio field
     status: number;
 }
 
@@ -43,8 +45,8 @@ interface PageProps {
 }
 
 const ClientList: React.FC = () => {
-    const { clients: initialClients, auth, links: initialLinks, projectTypes: initialProjectTypes, segments: initialSegments } = usePage<PageProps>().props;
-    const [clients, setClients] = useState<Client[]>(initialClients);
+    const { clients: initialClients = [], auth, links: initialLinks = [], projectTypes: initialProjectTypes = [], segments: initialSegments = [] } = usePage<PageProps>().props;
+    const [clients, setClients] = useState<Client[]>(Array.isArray(initialClients) ? initialClients : []);
     const [links, setLinks] = useState(initialLinks);
     const [projectTypes, setProjectTypes] = useState<ProjectType[]>(initialProjectTypes);
     const [segments, setSegments] = useState<Segment[]>(initialSegments);
@@ -68,28 +70,20 @@ const ClientList: React.FC = () => {
     const [statusFilter, setStatusFilter] = useState('');
 
     useEffect(() => {
-        let filtered = initialClients;
-
         if (searchTerm) {
-            filtered = filtered.filter(client => client.nome && client.nome.includes(searchTerm));
+            axios.get(`/clients/search`, { params: { searchTerm } })
+                .then(response => {
+                    setClients(response.data.clients);
+                    setLinks(response.data.links);
+                })
+                .catch(error => {
+                    console.error('There was an error searching the clients!', error);
+                });
+        } else {
+            setClients(initialClients);
+            setLinks(initialLinks);
         }
-
-        if (projectType) {
-            // Filter clients by project type
-            filtered = filtered.filter(client => client.projectType === projectType);
-        }
-
-        if (contact) {
-            // Filter clients by contact
-        }
-
-        if (statusFilter) {
-            const status = statusFilter === 'Ativo' ? 0 : 1;
-            filtered = filtered.filter(client => client.status === status);
-        }
-
-        setClients(filtered);
-    }, [searchTerm, projectType, contact, statusFilter, initialClients]);
+    }, [searchTerm, initialClients, initialLinks]);
 
     useEffect(() => {
         axios.get('/segments')
@@ -99,15 +93,6 @@ const ClientList: React.FC = () => {
             .catch(error => {
                 console.error('There was an error fetching the segments!', error);
                 setSegments([]); // Set segments to an empty array to avoid undefined error
-            });
-
-        axios.get('/clients/contacts')
-            .then(response => {
-                setContacts(response.data);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the contacts!', error);
-                setContacts([]); // Set contacts to an empty array to avoid undefined error
             });
     }, []);
 
@@ -137,10 +122,14 @@ const ClientList: React.FC = () => {
 
     const handlePageChange = (url: string | null) => {
         if (url) {
-            axios.get(url).then(response => {
-                setClients(response.data.clients);
-                setLinks(response.data.links);
-            });
+            axios.get(url)
+                .then(response => {
+                    setClients(Array.isArray(response.data.clients) ? response.data.clients : []);
+                    setLinks(response.data.links || '');
+                })
+                .catch(error => {
+                    console.error('There was an error fetching the paginated clients!', error);
+                });
         }
     };
 
@@ -189,7 +178,7 @@ const ClientList: React.FC = () => {
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Buscar por nome"
+                            placeholder="Buscar por nome ou domínio"
                         />
                     </label>
                     <label>
@@ -234,7 +223,7 @@ const ClientList: React.FC = () => {
                         {clients.map((client: Client) => (
                             <React.Fragment key={client.id}>
                                 <tr>
-                                    <td>{client.nome}</td>
+                                    <td>{client.nome}</td> {/* Keep this line as it is */}
                                     <td>
                                         <button onClick={() => toggleClientDetails(client.id)}>
                                             {expandedClientId === client.id ? '-' : '+'}
@@ -288,18 +277,7 @@ const ClientList: React.FC = () => {
                         ))}
                     </tbody>
                 </table>
-                <div className="pagination">
-                    {links.map((link, index) => (
-                        <button
-                            key={index}
-                            onClick={() => handlePageChange(link.url)}
-                            disabled={!link.url}
-                            className={link.active ? 'active' : ''}
-                        >
-                            {link.label === 'Next' ? 'Próximo' : link.label === 'Previous' ? 'Anterior' : link.label}
-                        </button>
-                    ))}
-                </div>
+                <div className="pagination" dangerouslySetInnerHTML={{ __html: links }} />
                 {isModalOpen && (
                     <div className="modal">
                         <div className="modal-content">

@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Client;
 use App\Models\TipoTarefa; // Adicione esta linha
 use App\Models\Comment; // Adicione esta linha
+use App\Models\Attachment; // Adicione esta linha
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -69,12 +70,21 @@ class TeamScheduleController extends Controller
         $validatedData['status'] = 'aberto';
 
         if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('img/tarefas', 'public');
+            $filePath = $request->file('file')->store('attachments', 'public');
             $validatedData['file_path'] = $filePath;
         }
 
         try {
             $schedule = Schedule::create($validatedData);
+
+            if ($request->hasFile('file')) {
+                Attachment::create([
+                    'task_id' => $schedule->id,
+                    'file_path' => $filePath,
+                    'file_name' => $request->file('file')->getClientOriginalName(),
+                ]);
+            }
+
             return response()->json($schedule);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to store schedule'], 500);
@@ -100,13 +110,22 @@ class TeamScheduleController extends Controller
         ]);
 
         if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('img/tarefas', 'public');
+            $filePath = $request->file('file')->store('attachments', 'public');
             $validatedData['file_path'] = $filePath;
         }
 
         try {
             $schedule = Schedule::findOrFail($id);
             $schedule->update($validatedData);
+
+            if ($request->hasFile('file')) {
+                Attachment::create([
+                    'task_id' => $schedule->id,
+                    'file_path' => $filePath,
+                    'file_name' => $request->file('file')->getClientOriginalName(),
+                ]);
+            }
+
             return response()->json($schedule);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update schedule'], 500);

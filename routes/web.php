@@ -103,6 +103,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/clients/{id}', [ClientController::class, 'show'])->name('clients.show');
     Route::get('/clients/{id}/contacts', [ClientController::class, 'getClientContacts'])->name('clients.contacts');
     Route::get('/clients/{id}/passwords', [ClientController::class, 'getClientPasswords'])->name('clients.passwords');
+    Route::get('/clients/paginated', [ClientController::class, 'getPaginatedClients'])->name('clients.paginated');
+    Route::get('/clients/search', [ClientController::class, 'searchClients'])->name('clients.search');
 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');

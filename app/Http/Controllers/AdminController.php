@@ -439,7 +439,7 @@ class AdminController extends Controller
 
         return Inertia::render('Clients/List', [
             'clients' => $clients->items(),
-            'links' => $clients->linkCollection()->toArray(),
+            'links' => $clients->links('pagination::bootstrap-4')->toHtml(),
             'projectTypes' => $projectTypes,
             'canEdit' => $user->can('edit clients'),
             'auth' => ['user' => $user],

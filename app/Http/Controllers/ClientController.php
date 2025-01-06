@@ -98,7 +98,7 @@ class ClientController extends Controller
     public function getClients()
     {
         try {
-            $clients = Client::all(); // Retorna todos os clientes da tabela 'clientes'
+            $clients = Client::all(['id', 'nome', 'email', 'dominio', 'status']); // Include dominio field
             return response()->json($clients);
         } catch (\Exception $e) {
             Log::error('Error fetching clients: ' . $e->getMessage());
@@ -115,5 +115,39 @@ class ClientController extends Controller
             Log::error('Error fetching client by ID: ' . $e->getMessage());
             return response()->json(['error' => 'Error fetching client by ID'], 500);
         }
+    }
+
+    public function getPaginatedClients(Request $request)
+    {
+        $clients = Client::paginate(10);
+        $links = $clients->links('pagination::bootstrap-4')->toHtml();
+
+        Log::info('Paginated clients data', [
+            'clients' => $clients->items(),
+            'links' => $links,
+        ]);
+
+        return response()->json([
+            'clients' => $clients->items(),
+            'links' => $links,
+        ]);
+    }
+
+    public function searchClients(Request $request)
+    {
+        $query = $request->input('query');
+        Log::info('Search query: ' . $query);
+
+        $clients = Client::where('nome', 'LIKE', "%{$query}%")
+            ->orWhere('email', 'LIKE', "%{$query}%")
+            ->paginate(10);
+
+        Log::info('Clients found: ' . $clients->count());
+
+        return Inertia::render('Clients/List', [
+            'clients' => $clients->items(),
+            'links' => $clients->links('pagination::bootstrap-4')->toHtml(),
+            'query' => $query,
+        ]);
     }
 }
