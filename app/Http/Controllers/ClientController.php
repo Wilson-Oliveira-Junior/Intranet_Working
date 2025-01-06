@@ -135,19 +135,18 @@ class ClientController extends Controller
 
     public function searchClients(Request $request)
     {
-        $query = $request->input('query');
-        Log::info('Search query: ' . $query);
+        $searchTerm = $request->input('searchTerm');
+        Log::info('Search term: ' . $searchTerm);
 
-        $clients = Client::where('nome', 'LIKE', "%{$query}%")
-            ->orWhere('email', 'LIKE', "%{$query}%")
+        $clients = Client::where('nome', 'LIKE', "%{$searchTerm}%")
+            ->orWhere('dominio', 'LIKE', "%{$searchTerm}%")
             ->paginate(10);
 
         Log::info('Clients found: ' . $clients->count());
 
-        return Inertia::render('Clients/List', [
+        return response()->json([
             'clients' => $clients->items(),
             'links' => $clients->links('pagination::bootstrap-4')->toHtml(),
-            'query' => $query,
         ]);
     }
 }

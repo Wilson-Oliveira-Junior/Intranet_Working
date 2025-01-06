@@ -42,6 +42,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/clients', [AdminController::class, 'showClientList'])->name('admin.clients');
     Route::post('/admin/clients', [AdminController::class, 'storeClient'])->name('admin.clients.store');
 
+    //Senhas
+    Route::get('/registro-senha', [AdminController::class, 'showPasswordRegistration'])->name('password.registration');
+
     // Tipos de Usuários
     Route::post('/admin/user-types', [AdminController::class, 'store']);
     Route::get('/admin/user-types/{id}/edit', [AdminController::class, 'edit'])->name('admin.userTypes.edit');
@@ -80,9 +83,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/gatilhos/editar/{id}', [AdminController::class, 'editarGatilho'])->name('admin.gatilhos.editar');
     Route::put('/admin/gatilhos/atualizar/{id}', [AdminController::class, 'atualizarGatilho'])->name('admin.gatilhos.atualizar');
     Route::delete('/admin/gatilhos/deletar/{id}', [AdminController::class, 'deletarGatilho'])->name('admin.gatilhos.deletar');
-
-    //Senhas
-    Route::get('/registro-senha', [AdminController::class, 'showPasswordRegistration'])->name('password.registration');
 
     // Cronograma de Equipes
     Route::get('/cronograma', [TeamScheduleController::class, 'index'])->name('teamSchedule.index');

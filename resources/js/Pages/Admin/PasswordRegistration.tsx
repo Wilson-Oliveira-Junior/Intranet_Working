@@ -5,7 +5,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import '../../../css/components/password.css';
 
 const PasswordRegistration = () => {
-    const { auth, clients } = usePage().props;
+    const { auth, clients } = usePage().props; // Certifique-se de que clients está sendo obtido aqui
     const { data, setData, post, processing, errors } = useForm({
         filter: '',
     });
@@ -16,18 +16,30 @@ const PasswordRegistration = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [editPassword, setEditPassword] = useState(null);
     const [clientOptions, setClientOptions] = useState([]);
+    const [allClients, setAllClients] = useState([]);
+    const [filteredClients, setFilteredClients] = useState([]);
 
     useEffect(() => {
-        // Fetch clients for autocomplete
-        fetch('/clients')
+        // Fetch all clients for filtering
+        fetch('/clients') // Corrija a URL para buscar todos os clientes
             .then(response => response.json())
-            .then(data => setClientOptions(data))
+            .then(data => {
+                setAllClients(data);
+                setFilteredClients(data);
+            })
             .catch(error => console.error('Error fetching clients:', error));
     }, []);
 
+    useEffect(() => {
+        // Filter clients based on the search input
+        const filtered = allClients.filter(client =>
+            getClientDisplayName(client).toLowerCase().includes(data.filter.toLowerCase())
+        );
+        setFilteredClients(filtered);
+    }, [data.filter, allClients]);
+
     const handleFilterChange = (e) => {
         setData('filter', e.target.value);
-        // Implement filter logic here
     };
 
     const handleAddPassword = () => {
@@ -119,6 +131,10 @@ const PasswordRegistration = () => {
         });
     };
 
+    const getClientDisplayName = (client) => {
+        return client.nome_fantasia || client.razao_social || client.nome;
+    };
+
     return (
         <AuthenticatedLayout user={auth.user}>
             <div className="container mx-auto p-4">
@@ -133,7 +149,7 @@ const PasswordRegistration = () => {
                     />
                     <button
                         onClick={handleAddPassword}
-                        className="bg-blue-500 text-white px-4 py-2 ml-4"
+                        className="bg-blue-500 text-white px-4 py-2 ml-4 rounded-button"
                     >
                         Adicionar Nova Senha
                     </button>
@@ -147,17 +163,17 @@ const PasswordRegistration = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {clients.data.length === 0 ? (
+                        {filteredClients.length === 0 ? (
                             <tr>
                                 <td colSpan="3" className="text-center py-4">No clients found.</td>
                             </tr>
                         ) : (
-                            clients.data.map((client) => (
+                            filteredClients.map((client) => (
                                 <tr key={client.id}>
-                                    <td className="border px-4 py-2">{client.nome_fantasia}</td>
+                                    <td className="border px-4 py-2">{getClientDisplayName(client)}</td>
                                     <td className="border px-4 py-2">
                                         <button
-                                            className="bg-green-500 text-white px-4 py-2"
+                                            className="bg-green-500 text-white px-4 py-2 rounded-button"
                                             onClick={() => handleViewPasswords(client)}
                                         >
                                             Visualizar
@@ -165,13 +181,13 @@ const PasswordRegistration = () => {
                                     </td>
                                     <td className="border px-4 py-2">
                                         <button
-                                            className="bg-yellow-500 text-white px-4 py-2 mr-2"
+                                            className="bg-yellow-500 text-white px-4 py-2 mr-2 rounded-button"
                                             onClick={() => handleEditPassword(client)}
                                         >
                                             Adicionar
                                         </button>
                                         <button
-                                            className="bg-red-500 text-white px-4 py-2"
+                                            className="bg-red-500 text-white px-4 py-2 rounded-button"
                                             onClick={() => handleDeletePasswords(client)}
                                         >
                                             Excluir
@@ -198,9 +214,9 @@ const PasswordRegistration = () => {
 
                 {showModal && (
                     <div className="modal">
-                        <div className="modal-content">
+                        <div className="modal-content" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
                             <span className="close" onClick={() => setShowModal(false)}>&times;</span>
-                            <h2>Senhas de {selectedClient.nome_fantasia}</h2>
+                            <h2>Senhas de {getClientDisplayName(selectedClient)}</h2>
                             {passwords.length === 0 ? (
                                 <p>Sem senhas registradas no banco.</p>
                             ) : (
@@ -219,13 +235,13 @@ const PasswordRegistration = () => {
                                                 <td className="border px-4 py-2">{password.strSenha}</td>
                                                 <td className="border px-4 py-2">
                                                     <button
-                                                        className="btn editar"
+                                                        className="btn editar rounded-button"
                                                         onClick={() => handleEditPassword(password)}
                                                     >
                                                         Editar
                                                     </button>
                                                     <button
-                                                        className="btn deletar"
+                                                        className="btn deletar rounded-button"
                                                         onClick={() => handleDeletePasswords(password)}
                                                     >
                                                         Excluir
@@ -237,7 +253,7 @@ const PasswordRegistration = () => {
                                 </table>
                             )}
                             <button
-                                className="btn adicionar mt-4"
+                                className="btn adicionar mt-4 rounded-button"
                                 onClick={handleAddPassword}
                             >
                                 Adicionar Nova Senha
@@ -263,7 +279,7 @@ const PasswordRegistration = () => {
                                     <datalist id="client-options">
                                         {clientOptions.map((client) => (
                                             <option key={client.id} value={client.id}>
-                                                {client.nome_fantasia}
+                                                {getClientDisplayName(client)}
                                             </option>
                                         ))}
                                     </datalist>
@@ -300,7 +316,7 @@ const PasswordRegistration = () => {
                                         onChange={(e) => setEditPassword({ ...editPassword, observacao: e.target.value })}
                                     />
                                 </label>
-                                <button type="submit" className="bg-blue-500 text-white px-4 py-2">
+                                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-button">
                                     {editPassword.id ? 'Atualizar' : 'Adicionar'}
                                 </button>
                             </form>
