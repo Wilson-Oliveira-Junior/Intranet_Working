@@ -91,6 +91,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/cronograma/{id}', [TeamScheduleController::class, 'update'])->name('teamSchedule.update');
     Route::delete('/cronograma/{id}', [TeamScheduleController::class, 'destroy'])->name('teamSchedule.destroy');
     Route::post('/tasks/{taskId}/comments', [TeamScheduleController::class, 'addComment']);
+    Route::post('/cronograma/{id}/add-follower', [TeamScheduleController::class, 'addFollower'])->name('teamSchedule.addFollower');
+    Route::post('/cronograma/{id}/remove-follower', [TeamScheduleController::class, 'removeFollower'])->name('teamSchedule.removeFollower');
 
     // Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');
@@ -120,5 +122,6 @@ Route::get('/api/tasks', [TeamScheduleController::class, 'getTasksWithPriority']
 Route::post('/tasks/{taskId}/comments', [TeamScheduleController::class, 'addComment']);
 Route::post('/api/teamSchedule/store', [TeamScheduleController::class, 'store'])->name('teamSchedule.store');
 Route::get('/api/sectors', [SectorController::class, 'getSectorByDescription']);
+Route::post('/api/uploadAttachment', [TeamScheduleController::class, 'uploadAttachment']);
 
 require __DIR__ . '/auth.php';

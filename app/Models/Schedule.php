@@ -58,4 +58,9 @@ class Schedule extends Model
     {
         return $this->hasMany(Attachment::class, 'task_id');
     }
+
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'schedule_followers', 'schedule_id', 'user_id');
+    }
 }

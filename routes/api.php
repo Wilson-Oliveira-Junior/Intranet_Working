@@ -15,4 +15,11 @@ use App\Http\Controllers\TeamScheduleController;
 |
 */
 
+Route::middleware('auth:api')->group(function () {
+    Route::post('/cronograma/{id}/add-follower', [TeamScheduleController::class, 'addFollower'])->name('api.teamSchedule.addFollower');
+    Route::post('/cronograma/{id}/remove-follower', [TeamScheduleController::class, 'removeFollower'])->name('api.teamSchedule.removeFollower');
+});
+
+
+
 

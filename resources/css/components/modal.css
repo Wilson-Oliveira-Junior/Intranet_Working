@@ -1,4 +1,3 @@
-
 .modal-container .modal {
     position: fixed;
     top: 0;
@@ -84,11 +83,6 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
-}
-
-.content .info .left .details span {
-    font-size: 14px;
-    color: #757575;
 }
 
 .content .info .right {
@@ -506,3 +500,93 @@
     color: white;
     border: none;
 }
+
+/* Attachments Section */
+.attachments-section .input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.attachments-section .input-group button {
+    margin-right: 10px;
+}
+
+.attachments-section .attachment {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.attachments-section .attachment input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.attachments-section .attachment a {
+    flex: 1;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.attachments-section .attachment a:hover {
+    text-decoration: underline;
+}
+
+/* Followers Section */
+.followers-section .input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.followers-section .input-group select {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.followers-section .input-group button {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.followers-section .input-group button:hover {
+    background: #0056b3;
+}
+
+.followers-section .follower {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.followers-section .follower p {
+    flex: 1;
+    margin: 0;
+}
+
+.followers-section .follower button {
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.followers-section .follower button:hover {
+    background: #c82333;
+}
+
+/* ...existing code... */
+.deadline {
+    color: red;
+    font-weight: bold;
+}
+/* ...existing code... */

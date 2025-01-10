@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import TaskModal from './TaskModal';
 import TaskResponseModal from './TaskResponseModal';
+import DayTasksModal from './DayTasksModal'; // Import the new modal
 import '../../../css/components/cronograma.css'; // Import CSS do cronograma
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faUser, faUsers, faCalendarAlt, faPaperclip, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
@@ -15,9 +16,11 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
     const [indicatorPosition, setIndicatorPosition] = useState(0);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [responseModalIsOpen, setResponseModalIsOpen] = useState(false);
+    const [dayTasksModalIsOpen, setDayTasksModalIsOpen] = useState(false); // Add state for day tasks modal
     const [taskTitle, setTaskTitle] = useState('');
     const [taskDescription, setTaskDescription] = useState('');
     const [selectedTask, setSelectedTask] = useState(null);
+    const [selectedDayTasks, setSelectedDayTasks] = useState([]); // Add state for tasks of the selected day
     const [reminderDate, setReminderDate] = useState('');
     const [priority, setPriority] = useState('normal');
     const [followerId, setFollowerId] = useState(null);
@@ -96,20 +99,26 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
         setPriority(task ? task.priority : 'normal');
         setSelectedSector(task ? task.sector_id.toString() : '');
         setTaskStatus(task ? task.status : 'aberto');
-        setAttachments(task ? task.attachments || [] : []); // Set attachments
+        setAttachments(task ? task.attachments || [] : []); // Ensure setAttachments is defined
         setModalIsOpen(true);
     };
 
     const openResponseModal = (task) => {
         setSelectedTask(task);
         setComments(task.comments || []);
-        setAttachments(task.attachments || []); // Set attachments
+        setAttachments(task ? task.attachments || [] : []); // Ensure setAttachments is defined
         setResponseModalIsOpen(true);
+    };
+
+    const openDayTasksModal = (tasks) => {
+        setSelectedDayTasks(tasks);
+        setDayTasksModalIsOpen(true);
     };
 
     const closeModal = () => {
         setModalIsOpen(false);
         setResponseModalIsOpen(false);
+        setDayTasksModalIsOpen(false); // Close day tasks modal
         setSelectedTask(null);
         setReminderDate('');
         setPriority('normal');
@@ -143,6 +152,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
             priority: priority,
             status: 'aberto',
             attachments: attachments, // Include attachments
+            follower_id: followerId, // Include follower_id
         };
 
         try {
@@ -197,6 +207,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
             priority: priority,
             status: taskStatus,
             attachments: attachments, // Include attachments
+            follower_id: followerId, // Include follower_id
         };
 
         try {
@@ -328,13 +339,19 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
             });
 
             days.push(
-                <div key={day} className="calendar-day" onClick={() => openResponseModal(tasksForDay[0])}>
+                <div key={day} className="calendar-day" onClick={() => tasksForDay.length > 1 ? openDayTasksModal(tasksForDay) : openResponseModal(tasksForDay[0])}>
                     <div className="day-number">{day}</div>
-                    {tasksForDay.map((task, index) => (
-                        <div key={index} className={`task ${task.priority}`}>
-                            {task.title}
+                    {tasksForDay.length > 1 ? (
+                        <div className="multiple-tasks-indicator">
+                            {tasksForDay.length} tarefas
                         </div>
-                    ))}
+                    ) : (
+                        tasksForDay.map((task, index) => (
+                            <div key={index} className={`task ${task.priority}`}>
+                                {task.title}
+                            </div>
+                        ))
+                    )}
                 </div>
             );
 
@@ -349,7 +366,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
         }
 
         return weeks;
-    }, [cronogramas, user.sector_id, user.id, openResponseModal, currentMonth, currentYear]);
+    }, [cronogramas, user.sector_id, user.id, openResponseModal, openDayTasksModal, currentMonth, currentYear]);
 
     const memoizedCalendar = useMemo(() => renderCalendar(), [renderCalendar]);
 
@@ -460,6 +477,16 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
                         updateTaskStatus={updateTaskStatus}
                         user={user} // Passe o usuário autenticado para o modal
                         attachments={attachments} // Pass attachments to TaskResponseModal
+                        setAttachments={setAttachments} // Ensure setAttachments is passed
+                        users={users} // Pass the list of active users to TaskResponseModal
+                    />
+                )}
+
+                {dayTasksModalIsOpen && (
+                    <DayTasksModal
+                        tasks={selectedDayTasks}
+                        openResponseModal={openResponseModal}
+                        closeModal={closeModal}
                     />
                 )}
             </div>

@@ -34,6 +34,9 @@ const TaskModal = ({
     tiposTarefa,
     tipoTarefaId,
     setTipoTarefaId,
+    fetchSectorUsers,
+    attachments,
+    setAttachments,
 }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [selectedFollower, setSelectedFollower] = useState(null);
@@ -50,11 +53,31 @@ const TaskModal = ({
         setSelectedFollower(e.target.value);
     };
 
-    const handleAddFollower = () => {
-        if (selectedFollower) {
-            setFollowerId(selectedFollower);
-            setSelectedFollower(null);
-            setShowFollowerModal(false);
+    const handleAddFollower = async () => {
+        if (!selectedFollower) return;
+
+        try {
+            const response = await fetch(`/cronograma/${selectedTask.id}/add-follower`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify({ follower_id: selectedFollower }),
+            });
+
+            const responseText = await response.text();
+            console.log('Response text:', responseText); // Add logging
+
+            const data = JSON.parse(responseText);
+            if (response.ok) {
+                selectedTask.followers.push(data);
+                setSelectedFollower('');
+            } else {
+                console.error('Erro ao adicionar seguidor:', data);
+            }
+        } catch (error) {
+            console.error('Erro ao adicionar seguidor:', error);
         }
     };
 
@@ -305,4 +328,3 @@ const TaskModal = ({
 };
 
 export default TaskModal;
-

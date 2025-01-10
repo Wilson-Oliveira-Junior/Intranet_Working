@@ -27,7 +27,7 @@ class TeamScheduleController extends Controller
         $users = User::where('status', 'Ativo')->get();
         $clients = Client::all();
         $tiposTarefa = TipoTarefa::all(); // Adicione esta linha
-        $teamSchedules = Schedule::with(['creator', 'client', 'tipoTarefa', 'comments.user']) // Atualize esta linha
+        $teamSchedules = Schedule::with(['creator', 'client', 'tipoTarefa', 'comments.user', 'followers']) // Atualize esta linha
             ->where('sector_id', $user->sector_id)
             ->orWhere('user_id', $user->id)
             ->get();
@@ -60,24 +60,26 @@ class TeamScheduleController extends Controller
             'date' => 'required|date',
             'sector_id' => 'required|integer|exists:sectors,id',
             'user_id' => 'nullable|integer|exists:users,id',
-            'client_id' => 'nullable|integer|exists:clients,id', // Garantir que o nome da tabela está correto
+            'client_id' => 'nullable|integer|exists:clients,id', // Ensure client_id is validated
             'tipo_tarefa_id' => 'nullable|integer|exists:tb_tipostarefas,id', // Adicione esta linha
             'hours_worked' => 'nullable|integer',
             'priority' => 'required|string',
             'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:2048', // Validação do arquivo
+            'follower_id' => 'nullable|integer|exists:users,id', // Ensure follower_id is validated
         ]);
 
         $validatedData['status'] = 'aberto';
-
-        if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('attachments', 'public');
-            $validatedData['file_path'] = $filePath;
-        }
 
         try {
             $schedule = Schedule::create($validatedData);
 
             if ($request->hasFile('file')) {
+                $clientFolder = 'public/img/tarefas/' . $validatedData['client_id'];
+                if (!Storage::exists($clientFolder)) {
+                    Storage::makeDirectory($clientFolder);
+                    Log::info('Client folder created: ' . $clientFolder); // Add logging
+                }
+                $filePath = $request->file('file')->store($clientFolder);
                 Attachment::create([
                     'task_id' => $schedule->id,
                     'file_path' => $filePath,
@@ -85,8 +87,13 @@ class TeamScheduleController extends Controller
                 ]);
             }
 
-            return response()->json($schedule);
+            if ($validatedData['follower_id']) {
+                $schedule->followers()->attach($validatedData['follower_id']);
+            }
+
+            return response()->json($schedule->load('followers'));
         } catch (\Exception $e) {
+            Log::error('Failed to store schedule', ['error' => $e->getMessage()]); // Add logging
             return response()->json(['error' => 'Failed to store schedule'], 500);
         }
     }
@@ -101,24 +108,26 @@ class TeamScheduleController extends Controller
             'date' => 'required|date',
             'sector_id' => 'required|integer|exists:sectors,id',
             'user_id' => 'nullable|integer|exists:users,id',
-            'client_id' => 'nullable|integer|exists:clients,id', // Garantir que o nome da tabela está correto
+            'client_id' => 'nullable|integer|exists:clients,id', // Ensure client_id is validated
             'tipo_tarefa_id' => 'nullable|integer|exists:tb_tipostarefas,id', // Adicione esta linha
             'hours_worked' => 'nullable|integer',
             'priority' => 'required|string',
             'status' => 'required|string',
             'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:2048', // Validação do arquivo
+            'follower_id' => 'nullable|integer|exists:users,id', // Ensure follower_id is validated
         ]);
-
-        if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('attachments', 'public');
-            $validatedData['file_path'] = $filePath;
-        }
 
         try {
             $schedule = Schedule::findOrFail($id);
             $schedule->update($validatedData);
 
             if ($request->hasFile('file')) {
+                $clientFolder = 'public/img/tarefas/' . $validatedData['client_id'];
+                if (!Storage::exists($clientFolder)) {
+                    Storage::makeDirectory($clientFolder);
+                    Log::info('Client folder created: ' . $clientFolder); // Add logging
+                }
+                $filePath = $request->file('file')->store($clientFolder);
                 Attachment::create([
                     'task_id' => $schedule->id,
                     'file_path' => $filePath,
@@ -126,8 +135,13 @@ class TeamScheduleController extends Controller
                 ]);
             }
 
-            return response()->json($schedule);
+            if ($validatedData['follower_id']) {
+                $schedule->followers()->sync([$validatedData['follower_id']]);
+            }
+
+            return response()->json($schedule->load('followers'));
         } catch (\Exception $e) {
+            Log::error('Failed to update schedule', ['error' => $e->getMessage()]); // Add logging
             return response()->json(['error' => 'Failed to update schedule'], 500);
         }
     }
@@ -177,6 +191,68 @@ class TeamScheduleController extends Controller
         } catch (\Exception $e) {
             Log::error('Failed to add comment', ['error' => $e->getMessage()]); // Adicione esta linha
             return response()->json(['error' => 'Failed to add comment'], 500);
+        }
+    }
+
+    public function uploadAttachment(Request $request)
+    {
+        $validatedData = $request->validate([
+            'file' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:2048',
+            'task_id' => 'required|integer|exists:schedules,id',
+        ]);
+
+        $task = Schedule::findOrFail($validatedData['task_id']);
+        $clientFolder = 'public/img/tarefas/' . $task->client_id;
+
+        if (!Storage::exists($clientFolder)) {
+            Storage::makeDirectory($clientFolder);
+            Log::info('Client folder created: ' . $clientFolder); // Add logging
+        }
+
+        $filePath = $request->file('file')->store($clientFolder);
+        $attachment = Attachment::create([
+            'task_id' => $task->id,
+            'file_path' => $filePath,
+            'file_name' => $request->file('file')->getClientOriginalName(),
+        ]);
+
+        return response()->json($attachment);
+    }
+
+    public function addFollower(Request $request, $id)
+    {
+        Log::info('addFollower called', ['id' => $id, 'request' => $request->all()]); // Add logging
+
+        $validatedData = $request->validate([
+            'follower_id' => 'required|integer|exists:users,id',
+        ]);
+
+        try {
+            $schedule = Schedule::findOrFail($id);
+            $schedule->followers()->attach($validatedData['follower_id']);
+            Log::info('Follower added successfully', ['schedule' => $schedule->load('followers')]); // Add logging
+            return response()->json($schedule->load('followers'));
+        } catch (\Exception $e) {
+            Log::error('Failed to add follower', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Failed to add follower'], 500);
+        }
+    }
+
+    public function removeFollower(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'follower_id' => 'required|integer|exists:users,id',
+        ]);
+
+        try {
+            $schedule = Schedule::findOrFail($id);
+            $schedule->followers()->detach($validatedData['follower_id']);
+            $updatedSchedule = $schedule->load('followers');
+            Log::info('Follower removed successfully', ['schedule' => $updatedSchedule]); // Add logging
+            return response()->json($updatedSchedule);
+        } catch (\Exception $e) {
+            Log::error('Failed to remove follower', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Failed to remove follower'], 500);
         }
     }
 }
