@@ -10,7 +10,7 @@ interface Client {
     id: number;
     nome: string;
     email: string;
-    dominio: string | null; // Allow dominio to be null
+    dominio: string; // Add dominio field
     status: number;
 }
 
@@ -45,9 +45,9 @@ interface PageProps {
 }
 
 const ClientList: React.FC = () => {
-    const { auth, clients: initialClients = [], links: initialLinks = [], projectTypes: initialProjectTypes = [], segments: initialSegments = [] } = usePage<PageProps>().props;
+    const { clients: initialClients = [], auth, links: initialLinks = [], projectTypes: initialProjectTypes = [], segments: initialSegments = [] } = usePage<PageProps>().props;
     const [clients, setClients] = useState<Client[]>(Array.isArray(initialClients) ? initialClients : []);
-    const [links, setLinks] = useState(Array.isArray(initialLinks) ? initialLinks : []);
+    const [links, setLinks] = useState(initialLinks);
     const [projectTypes, setProjectTypes] = useState<ProjectType[]>(initialProjectTypes);
     const [segments, setSegments] = useState<Segment[]>(initialSegments);
     const [searchTerm, setSearchTerm] = useState('');
@@ -68,27 +68,22 @@ const ClientList: React.FC = () => {
     });
     const [contacts, setContacts] = useState<string[]>([]);
     const [statusFilter, setStatusFilter] = useState('');
-    const [allClients, setAllClients] = useState<Client[]>([]);
-    const [filteredClients, setFilteredClients] = useState<Client[]>([]);
 
     useEffect(() => {
-        // Fetch all clients for filtering
-        axios.get('/clients')
-            .then(response => {
-                setAllClients(response.data);
-                setFilteredClients(response.data);
-            })
-            .catch(error => console.error('There was an error fetching the clients!', error));
-    }, []);
-
-    useEffect(() => {
-        // Filter clients based on the search input
-        const filtered = allClients.filter(client =>
-            client.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (client.dominio && client.dominio.toLowerCase().includes(searchTerm.toLowerCase()))
-        );
-        setFilteredClients(filtered);
-    }, [searchTerm, allClients]);
+        if (searchTerm) {
+            axios.get(`/clients/search`, { params: { searchTerm } })
+                .then(response => {
+                    setClients(response.data.clients);
+                    setLinks(response.data.links);
+                })
+                .catch(error => {
+                    console.error('There was an error searching the clients!', error);
+                });
+        } else {
+            setClients(initialClients);
+            setLinks(initialLinks);
+        }
+    }, [searchTerm, initialClients, initialLinks]);
 
     useEffect(() => {
         axios.get('/segments')
@@ -130,7 +125,7 @@ const ClientList: React.FC = () => {
             axios.get(url)
                 .then(response => {
                     setClients(Array.isArray(response.data.clients) ? response.data.clients : []);
-                    setLinks(Array.isArray(response.data.links) ? response.data.links : []);
+                    setLinks(response.data.links || '');
                 })
                 .catch(error => {
                     console.error('There was an error fetching the paginated clients!', error);
@@ -146,7 +141,7 @@ const ClientList: React.FC = () => {
             )
         );
 
-        axios.put(`/admin/clients/${id}/status`, { status: newStatus }) // Corrija a URL para atualizar o status do cliente
+        axios.put(`/clients/${id}/status`, { status: newStatus })
             .then(() => {
                 console.log(`Status do cliente atualizado para ${newStatus === 0 ? 'Ativo' : 'Inativo'}!`);
             })
@@ -225,7 +220,7 @@ const ClientList: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredClients.map((client: Client) => (
+                        {clients.map((client: Client) => (
                             <React.Fragment key={client.id}>
                                 <tr>
                                     <td>{client.nome}</td> {/* Keep this line as it is */}
@@ -282,18 +277,7 @@ const ClientList: React.FC = () => {
                         ))}
                     </tbody>
                 </table>
-                <div className="pagination">
-                    {links.map((link, index) => (
-                        <button
-                            key={index}
-                            onClick={() => handlePageChange(link.url)}
-                            disabled={!link.url}
-                            className={`px-4 py-2 border ${link.active ? 'bg-blue-500 text-white' : ''}`}
-                        >
-                            {link.label === 'Next &raquo;' ? 'Próximo' : link.label === '&laquo; Previous' ? 'Anterior' : link.label}
-                        </button>
-                    ))}
-                </div>
+                <div className="pagination" dangerouslySetInnerHTML={{ __html: links }} />
                 {isModalOpen && (
                     <div className="modal">
                         <div className="modal-content">
