@@ -95,6 +95,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/tasks/{taskId}/comments/{commentId}', [TeamScheduleController::class, 'deleteComment']);
     Route::post('/cronograma/{id}/add-follower', [TeamScheduleController::class, 'addFollower'])->name('teamSchedule.addFollower');
     Route::post('/cronograma/{id}/remove-follower', [TeamScheduleController::class, 'removeFollower'])->name('teamSchedule.removeFollower');
+    Route::post('/tasks/{task}/notify-creator', [TeamScheduleController::class, 'notifyCreator']);
+    Route::post('/tasks/{task}/notify-followers', [TeamScheduleController::class, 'notifyFollowers']);
+    Route::post('/tasks/{task}/log-hours', [TeamScheduleController::class, 'logHours']);
+
+    // Backlog da Equipe
+    Route::get('/team/backlog', [TeamScheduleController::class, 'getTeamBacklog'])->name('team.backlog');
+    Route::post('/team/backlog', [TeamScheduleController::class, 'addToTeamBacklog'])->name('team.backlog.add');
+    Route::delete('/team/backlog/{id}', [TeamScheduleController::class, 'removeFromTeamBacklog'])->name('team.backlog.remove');
 
     // Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');

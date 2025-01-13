@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import '../../../css/components/modal.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faPaperclip, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
@@ -25,10 +25,90 @@ const TaskResponseModal = ({
     const [editingComment, setEditingComment] = useState(null);
     const [editedCommentText, setEditedCommentText] = useState('');
     const fileInputRef = useRef(null);
+    const [workingUser, setWorkingUser] = useState(null);
+    const [startTime, setStartTime] = useState(null);
 
-    const handleStatusChange = (newStatus) => {
+    const handleStatusChange = async (newStatus) => {
         setStatus(newStatus);
         updateTaskStatus(newStatus);
+
+        if (newStatus === 'em andamento') {
+            setWorkingUser(user);
+            setStartTime(new Date());
+
+            // Inform the task creator
+            try {
+                await fetch(`/tasks/${task.id}/notify-creator`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: JSON.stringify({ message: `A tarefa está sendo trabalhada por ${user.name}` }),
+                });
+            } catch (error) {
+                console.error('Erro ao notificar o criador da tarefa:', error);
+            }
+
+            // Notify followers
+            try {
+                await fetch(`/tasks/${task.id}/notify-followers`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: JSON.stringify({ message: `A tarefa começou a ser trabalhada por ${user.name}` }),
+                });
+            } catch (error) {
+                console.error('Erro ao notificar os seguidores da tarefa:', error);
+            }
+        } else if (newStatus === 'concluído' || newStatus === 'finalizado') {
+            const endTime = new Date();
+            const hoursWorked = (endTime - startTime) / 1000 / 60 / 60;
+
+            // Log hours worked
+            try {
+                await fetch(`/tasks/${task.id}/log-hours`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: JSON.stringify({ hours: hoursWorked, user_id: user.id }),
+                });
+            } catch (error) {
+                console.error('Erro ao registrar horas trabalhadas:', error);
+            }
+
+            // Inform the task creator
+            try {
+                await fetch(`/tasks/${task.id}/notify-creator`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: JSON.stringify({ message: `A tarefa foi entregue por ${user.name}` }),
+                });
+            } catch (error) {
+                console.error('Erro ao notificar o criador da tarefa:', error);
+            }
+
+            // Notify followers
+            try {
+                await fetch(`/tasks/${task.id}/notify-followers`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: JSON.stringify({ message: `A tarefa foi entregue por ${user.name}` }),
+                });
+            } catch (error) {
+                console.error('Erro ao notificar os seguidores da tarefa:', error);
+            }
+        }
     };
 
     const handleTabChange = (tab) => {
@@ -255,6 +335,7 @@ const TaskResponseModal = ({
                                     <span className="deadline">Data Limite: {new Date(task.date).toLocaleDateString()}</span> {/* Adicione esta linha */}
                                     <span>Status: {status}</span>
                                     <span>Projeto: {task.client ? task.client.nome_fantasia : 'Desconhecido'}</span>
+                                    {workingUser && <span>Trabalhando por: {workingUser.name}</span>}
                                 </div>
                             </div>
                         </div>
