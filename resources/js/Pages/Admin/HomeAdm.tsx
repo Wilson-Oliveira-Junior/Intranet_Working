@@ -18,6 +18,8 @@ const HomeAdm: React.FC = () => {
   const [activeUsersCount, setActiveUsersCount] = useState<number>(activeUsersCountFromProps || 0);
   const [activeClientsCount, setActiveClientsCount] = useState<number>(0);
   const [birthdays, setBirthdays] = useState<User[]>([]);
+  const [tasksToDoCount, setTasksToDoCount] = useState<number>(0);
+  const [tasksDeliveredCount, setTasksDeliveredCount] = useState<number>(0);
 
   if (!user) {
     return <div>Erro: Usuário não encontrado. Verifique a autenticação.</div>;
@@ -49,6 +51,26 @@ const HomeAdm: React.FC = () => {
       .catch(error => console.error('Erro ao carregar aniversariantes', error));
   }, []);
 
+  useEffect(() => {
+    axios.get('/tasks-to-do-count')
+      .then(response => {
+        setTasksToDoCount(response.data.count);
+      })
+      .catch(error => {
+        console.error('Erro ao carregar dados de tarefas a fazer', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios.get('/tasks-delivered-count')
+      .then(response => {
+        setTasksDeliveredCount(response.data.count);
+      })
+      .catch(error => {
+        console.error('Erro ao carregar dados de tarefas entregues', error);
+      });
+  }, []);
+
   return (
     <AuthenticatedLayout user={user}>
       <div className="Home">
@@ -56,13 +78,13 @@ const HomeAdm: React.FC = () => {
           <div className="col-md-3 mb-4">
             <div className="card">
               <h2>ENTREGUES</h2>
-              <p>{/* valor para entregues */}</p>
+              <p>{tasksDeliveredCount}</p>
             </div>
           </div>
           <div className="col-md-3 mb-4">
             <div className="card">
               <h2>TAREFAS</h2>
-              <p>{/* valor para tarefas */}</p>
+              <p>{tasksToDoCount}</p>
             </div>
           </div>
           <div className="col-md-3 mb-4">

@@ -28,6 +28,8 @@ Route::get('/active-users-count', [AdminController::class, 'getActiveUsersCount'
 Route::get('/birthdays-this-month', [AdminController::class, 'getBirthdaysThisMonth']);
 Route::get('/active-clients-count', [AdminController::class, 'getActiveClientsCount']);
 Route::get('/segments', [AdminController::class, 'getSegments'])->name('segments.list');
+Route::get('/tasks-to-do-count', [AdminController::class, 'getTasksToDoCount']);
+Route::get('/tasks-delivered-count', [AdminController::class, 'getTasksDeliveredCount']);
 
 // Error boundary route
 Route::get('/error-boundary', function () {
@@ -122,6 +124,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/user-tasks', function () {
+        $user = Auth::user();
+        $tasks = \App\Models\Schedule::where('user_id', $user->id)->get();
+        return response()->json($tasks);
+    });
 });
 
 // API Routes

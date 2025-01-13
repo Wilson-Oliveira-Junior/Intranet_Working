@@ -13,16 +13,20 @@ class Schedule extends Model
     protected $fillable = [
         'title',
         'description',
+        'status',
+        'user_id', // Foreign key to relate schedules to users
         'date',
         'sector_id',
-        'user_id',
         'client_id',
         'tipo_tarefa_id',
         'hours_worked',
         'priority',
-        'status',
         'file_path',
     ];
+
+    // Definir os possíveis valores para o status
+    const STATUS_TO_DO = 'to_do';
+    const STATUS_DELIVERED = 'delivered';
 
     public function sector()
     {

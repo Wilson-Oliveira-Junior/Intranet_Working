@@ -63,4 +63,14 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Sector::class, 'sector');
     }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
+    }
 }

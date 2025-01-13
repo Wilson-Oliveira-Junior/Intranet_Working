@@ -15,6 +15,7 @@ use App\Models\GatilhoTemplate;
 use Illuminate\Support\Facades\DB;
 use App\Models\TipoProjeto;
 use App\Models\Segmento;
+use App\Models\Schedule; // Certifique-se de importar o modelo Schedule
 
 class AdminController extends Controller
 {
@@ -57,6 +58,40 @@ class AdminController extends Controller
             'birthdays' => $birthdays,
             'user' => $user,
         ]);
+    }
+
+    public function getTasksToDoCount()
+    {
+        try {
+            $user = Auth::user();
+            Log::info('Fetching tasks to do count for user', ['user_id' => $user->id]);
+            $tasksToDoCount = Schedule::where('user_id', $user->id)->where('status', Schedule::STATUS_TO_DO)->count();
+            Log::info('Tasks to do count fetched successfully', ['count' => $tasksToDoCount]);
+
+            return response()->json([
+                'count' => $tasksToDoCount
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching tasks to do count', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Error fetching tasks to do count'], 500);
+        }
+    }
+
+    public function getTasksDeliveredCount()
+    {
+        try {
+            $user = Auth::user();
+            Log::info('Fetching tasks delivered count for user', ['user_id' => $user->id]);
+            $tasksDeliveredCount = Schedule::where('user_id', $user->id)->where('status', Schedule::STATUS_DELIVERED)->count();
+            Log::info('Tasks delivered count fetched successfully', ['count' => $tasksDeliveredCount]);
+
+            return response()->json([
+                'count' => $tasksDeliveredCount
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching tasks delivered count', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Error fetching tasks delivered count'], 500);
+        }
     }
 
     public function userTypes()
