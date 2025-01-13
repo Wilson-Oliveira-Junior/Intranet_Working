@@ -69,12 +69,12 @@ const TaskModal = ({
             const responseText = await response.text();
             console.log('Response text:', responseText); // Add logging
 
-            const data = JSON.parse(responseText);
             if (response.ok) {
+                const data = JSON.parse(responseText);
                 selectedTask.followers.push(data);
                 setSelectedFollower('');
             } else {
-                console.error('Erro ao adicionar seguidor:', data);
+                console.error('Erro ao adicionar seguidor:', responseText);
             }
         } catch (error) {
             console.error('Erro ao adicionar seguidor:', error);

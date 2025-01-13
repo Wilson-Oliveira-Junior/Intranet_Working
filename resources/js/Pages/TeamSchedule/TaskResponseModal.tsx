@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import '../../../css/components/modal.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaperPlane, faPaperclip, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faPaperclip, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
 
 const TaskResponseModal = ({
     task,
@@ -20,6 +20,10 @@ const TaskResponseModal = ({
     const [activeTab, setActiveTab] = useState('comments');
     const [selectedFollower, setSelectedFollower] = useState('');
     const [selectedAttachments, setSelectedAttachments] = useState([]);
+    const [followers, setFollowers] = useState(task.followers);
+    const [taskComments, setTaskComments] = useState(comments);
+    const [editingComment, setEditingComment] = useState(null);
+    const [editedCommentText, setEditedCommentText] = useState('');
     const fileInputRef = useRef(null);
 
     const handleStatusChange = (newStatus) => {
@@ -31,7 +35,7 @@ const TaskResponseModal = ({
         setActiveTab(tab);
     };
 
-    const handleAddComment = () => {
+    const handleAddComment = async () => {
         if (newComment.trim() === '') return;
 
         const commentData = {
@@ -43,8 +47,80 @@ const TaskResponseModal = ({
             },
         };
 
-        addComment(commentData);
-        setNewComment('');
+        try {
+            const response = await fetch(`/tasks/${task.id}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify(commentData),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                setTaskComments((prevComments) => [...prevComments, data]);
+                setNewComment('');
+            } else {
+                console.error('Erro ao adicionar comentário:', data);
+            }
+        } catch (error) {
+            console.error('Erro ao adicionar comentário:', error);
+        }
+    };
+
+    const handleEditComment = (comment) => {
+        setEditingComment(comment);
+        setEditedCommentText(comment.text);
+    };
+
+    const handleUpdateComment = async () => {
+        if (editedCommentText.trim() === '') return;
+
+        try {
+            const response = await fetch(`/tasks/${task.id}/comments/${editingComment.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify({ text: editedCommentText }),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                setTaskComments((prevComments) =>
+                    prevComments.map((comment) =>
+                        comment.id === editingComment.id ? { ...comment, text: editedCommentText } : comment
+                    )
+                );
+                setEditingComment(null);
+                setEditedCommentText('');
+            } else {
+                console.error('Erro ao atualizar comentário:', data);
+            }
+        } catch (error) {
+            console.error('Erro ao atualizar comentário:', error);
+        }
+    };
+
+    const handleDeleteComment = async (commentId) => {
+        try {
+            const response = await fetch(`/tasks/${task.id}/comments/${commentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+            });
+
+            if (response.ok) {
+                setTaskComments((prevComments) => prevComments.filter((comment) => comment.id !== commentId));
+            } else {
+                console.error('Erro ao deletar comentário:', await response.json());
+            }
+        } catch (error) {
+            console.error('Erro ao deletar comentário:', error);
+        }
     };
 
     const handleFileChange = async (event) => {
@@ -114,7 +190,10 @@ const TaskResponseModal = ({
 
             const data = await response.json();
             if (response.ok) {
-                task.followers.push(data);
+                const newFollower = users.find(user => user.id === data.id);
+                if (newFollower && !followers.some(follower => follower.id === newFollower.id)) {
+                    setFollowers((prevFollowers) => [...prevFollowers, newFollower]);
+                }
                 setSelectedFollower('');
             } else {
                 console.error('Erro ao adicionar seguidor:', data);
@@ -135,12 +214,9 @@ const TaskResponseModal = ({
                 body: JSON.stringify({ follower_id: followerId }),
             });
 
-            const responseText = await response.text();
-            console.log('Response text:', responseText); // Add logging
-
-            const data = JSON.parse(responseText);
+            const data = await response.json();
             if (response.ok) {
-                task.followers = task.followers.filter(follower => follower.id !== followerId);
+                setFollowers((prevFollowers) => prevFollowers.filter(follower => follower.id !== followerId));
             } else {
                 console.error('Erro ao remover seguidor:', data);
             }
@@ -157,7 +233,7 @@ const TaskResponseModal = ({
         );
     };
 
-    const availableUsers = users ? users.filter(user => !task.followers.some(follower => follower.id === user.id)) : [];
+    const availableUsers = users ? users.filter(user => followers && followers.every(follower => follower && follower.id !== user.id)) : [];
 
     return (
         <div className="modal-container">
@@ -187,116 +263,140 @@ const TaskResponseModal = ({
                         </div>
                         <div className="tabs">
                             <button className={activeTab === 'comments' ? 'active' : ''} onClick={() => handleTabChange('comments')}>
-                                Comentário ({comments.length})
+                                Comentário ({taskComments.length})
                             </button>
                             <button className={activeTab === 'attachments' ? 'active' : ''} onClick={() => handleTabChange('attachments')}>
                                 Anexo ({attachments.length})
                             </button>
                             <button className={activeTab === 'followers' ? 'active' : ''} onClick={() => handleTabChange('followers')}>
-                                Seguidores ({task.followers ? task.followers.length : 0})
+                                Seguidores ({followers.length})
                             </button>
                         </div>
-                        {activeTab === 'comments' && (
-                            <div className="comment-section">
-                                <div className="input-group">
-                                    <textarea
-                                        placeholder="Escreva o comentário da tarefa..."
-                                        value={newComment}
-                                        onChange={(e) => setNewComment(e.target.value)}
-                                    />
-                                    <button onClick={handleAddComment}>
-                                        <FontAwesomeIcon icon={faPaperPlane} />
-                                    </button>
-                                </div>
-                                {comments.length === 0 ? (
-                                    <div className="no-comments">
-                                        <p>
-                                            Essa tarefa ainda não possui comentários.
-                                            <br />
-                                            Comentário de sistema não será postado.
-                                        </p>
-                                    </div>
-                                ) : (
-                                    comments.map((comment, index) => (
-                                        <div key={index} className="comment">
-                                            {comment.user && (
-                                                <>
-                                                    <small>{new Date(comment.date).toLocaleString()} - {comment.user.name}</small>
-                                                    <p>{comment.text}</p>
-                                                </>
-                                            )}
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        )}
-                        {activeTab === 'attachments' && (
-                            <div className="attachments-section">
-                                <div className="input-group">
-                                    <button type="button" className="btn btn-secondary" onClick={handleFileClick}>
-                                        <input
-                                            type="file"
-                                            ref={fileInputRef}
-                                            style={{ display: 'none' }}
-                                            onChange={handleFileChange}
+                        <div className="tab-content">
+                            {activeTab === 'comments' && (
+                                <>
+                                    <div className="input-group fixed-input">
+                                        <textarea
+                                            placeholder="Escreva o comentário da tarefa..."
+                                            value={newComment}
+                                            onChange={(e) => setNewComment(e.target.value)}
                                         />
-                                        <FontAwesomeIcon icon={faPaperclip} />
-                                    </button>
-                                    <button type="button" className="btn btn-danger" onClick={handleRemoveAttachment}>
-                                        <FontAwesomeIcon icon={faTrash} />
-                                    </button>
-                                </div>
-                                {attachments.length === 0 ? (
-                                    <p>Não há anexos para esta tarefa.</p>
-                                ) : (
-                                    attachments.map((attachment, index) => (
-                                        <div key={index} className="attachment">
+                                        <button onClick={handleAddComment}>
+                                            <FontAwesomeIcon icon={faPaperPlane} />
+                                        </button>
+                                    </div>
+                                    <div className="comment-section" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                                        {taskComments.length === 0 ? (
+                                            <div className="no-comments">
+                                                <p>
+                                                    Essa tarefa ainda não possui comentários.
+                                                    <br />
+                                                    Comentário de sistema não será postado.
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            taskComments.map((comment, index) => (
+                                                <div key={index} className="comment">
+                                                    {comment.user && (
+                                                        <>
+                                                            <small>{new Date(comment.date).toLocaleString()} - {comment.user.name}</small>
+                                                            {editingComment && editingComment.id === comment.id ? (
+                                                                <div className="edit-comment">
+                                                                    <textarea
+                                                                        value={editedCommentText}
+                                                                        onChange={(e) => setEditedCommentText(e.target.value)}
+                                                                    />
+                                                                    <button onClick={handleUpdateComment}>
+                                                                        <FontAwesomeIcon icon={faPaperPlane} />
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                <p>{comment.text}</p>
+                                                            )}
+                                                            <div className="comment-actions">
+                                                                <button onClick={() => handleEditComment(comment)}>
+                                                                    <FontAwesomeIcon icon={faEdit} />
+                                                                </button>
+                                                                <button onClick={() => handleDeleteComment(comment.id)}>
+                                                                    <FontAwesomeIcon icon={faTrash} />
+                                                                </button>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </>
+                            )}
+                            {activeTab === 'attachments' && (
+                                <div className="attachments-section" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                                    <div className="input-group">
+                                        <button type="button" className="btn btn-secondary" onClick={handleFileClick}>
                                             <input
-                                                type="checkbox"
-                                                checked={selectedAttachments.includes(attachment.id)}
-                                                onChange={() => handleAttachmentSelect(attachment.id)}
+                                                type="file"
+                                                ref={fileInputRef}
+                                                style={{ display: 'none' }}
+                                                onChange={handleFileChange}
                                             />
-                                            <a href={attachment.file_path} target="_blank" rel="noopener noreferrer">
-                                                {attachment.name || attachment.file_name}
-                                            </a>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        )}
-                        {activeTab === 'followers' && (
-                            <div className="followers-section">
-                                <div className="input-group">
-                                    <select
-                                        value={selectedFollower}
-                                        onChange={(e) => setSelectedFollower(e.target.value)}
-                                        className="form-control"
-                                    >
-                                        <option value="">Selecione um Usuário</option>
-                                        {availableUsers.map((user) => (
-                                            <option key={user.id} value={user.id}>
-                                                {user.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <button onClick={handleAddFollower} className="btn btn-primary">
-                                        Adicionar
-                                    </button>
+                                            <FontAwesomeIcon icon={faPaperclip} />
+                                        </button>
+                                        <button type="button" className="btn btn-danger" onClick={handleRemoveAttachment}>
+                                            <FontAwesomeIcon icon={faTrash} />
+                                        </button>
+                                    </div>
+                                    {attachments.length === 0 ? (
+                                        <p>Não há anexos para esta tarefa.</p>
+                                    ) : (
+                                        attachments.map((attachment, index) => (
+                                            <div key={index} className="attachment">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedAttachments.includes(attachment.id)}
+                                                    onChange={() => handleAttachmentSelect(attachment.id)}
+                                                />
+                                                <a href={attachment.file_path} target="_blank" rel="noopener noreferrer">
+                                                    {attachment.name || attachment.file_name}
+                                                </a>
+                                            </div>
+                                        ))
+                                    )}
                                 </div>
-                                {task.followers && task.followers.length > 0 ? (
-                                    task.followers.map((follower, index) => (
-                                        <div key={index} className="follower">
-                                            <p>{follower.name}</p>
-                                            <button onClick={() => handleRemoveFollower(follower.id)} className="btn btn-danger">
-                                                Remover
-                                            </button>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p>Não há seguidores para esta tarefa.</p>
-                                )}
-                            </div>
-                        )}
+                            )}
+                            {activeTab === 'followers' && (
+                                <div className="followers-section" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                                    <div className="input-group">
+                                        <select
+                                            value={selectedFollower}
+                                            onChange={(e) => setSelectedFollower(e.target.value)}
+                                            className="form-control"
+                                        >
+                                            <option value="">Selecione um Usuário</option>
+                                            {availableUsers.map((user) => (
+                                                <option key={user.id} value={user.id}>
+                                                    {user.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <button onClick={handleAddFollower} className="btn btn-primary">
+                                            Adicionar
+                                        </button>
+                                    </div>
+                                    {followers.length > 0 ? (
+                                        followers.map((follower, index) => (
+                                            <div key={index} className="follower">
+                                                <p>{follower.name}</p>
+                                                <button onClick={() => handleRemoveFollower(follower.id)} className="btn btn-danger">
+                                                    Remover
+                                                </button>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p>Não há seguidores para esta tarefa.</p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
                     <div className="modal-footer">
                         <button onClick={closeModal} className="modal-button">

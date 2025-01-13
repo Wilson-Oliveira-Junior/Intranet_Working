@@ -15,11 +15,19 @@
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 800px;
+    width: 800px; /* Largura do modal */
     max-width: 100%;
+    max-height: 90vh; /* Altura máxima do modal */
     padding: 0;
     box-sizing: border-box;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-container .modal-content .content {
+    overflow-y: auto;
+    flex-grow: 1;
 }
 
 .header {
@@ -151,6 +159,8 @@
     border: 1px solid #e0e0e0;
     border-radius: 4px;
     resize: none;
+    width: 100%; /* Ajuste a largura para 100% */
+    height: 150px; /* Ajuste a altura para 150px */
 }
 
 .comment-section .input-group button {
@@ -266,10 +276,19 @@
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 600px;
+    width: 800px; /* Largura do modal */
     max-width: 100%;
-    padding: 20px;
+    max-height: 90vh; /* Altura máxima do modal */
+    padding: 0;
     box-sizing: border-box;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-container .modal-content .content {
+    overflow-y: auto;
+    flex-grow: 1;
 }
 
 .modal-container .modal-header {
@@ -584,9 +603,28 @@
     background: #c82333;
 }
 
-/* ...existing code... */
+
 .deadline {
     color: red;
     font-weight: bold;
 }
-/* ...existing code... */
+
+
+
+.fixed-input {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+
+}
+
+.comment-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+

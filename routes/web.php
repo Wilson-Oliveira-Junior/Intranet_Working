@@ -91,6 +91,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/cronograma/{id}', [TeamScheduleController::class, 'update'])->name('teamSchedule.update');
     Route::delete('/cronograma/{id}', [TeamScheduleController::class, 'destroy'])->name('teamSchedule.destroy');
     Route::post('/tasks/{taskId}/comments', [TeamScheduleController::class, 'addComment']);
+    Route::put('/tasks/{taskId}/comments/{commentId}', [TeamScheduleController::class, 'updateComment']);
+    Route::delete('/tasks/{taskId}/comments/{commentId}', [TeamScheduleController::class, 'deleteComment']);
     Route::post('/cronograma/{id}/add-follower', [TeamScheduleController::class, 'addFollower'])->name('teamSchedule.addFollower');
     Route::post('/cronograma/{id}/remove-follower', [TeamScheduleController::class, 'removeFollower'])->name('teamSchedule.removeFollower');
 
@@ -112,7 +114,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-}); // Ensure this closing bracket is properly placed
+});
 
 // API Routes
 Route::get('/api/cronograma', [TeamScheduleController::class, 'getCronogramas']);
@@ -120,8 +122,13 @@ Route::get('/api/users', [AdminController::class, 'getUsers']);
 Route::get('/api/clients', [ClientController::class, 'getClients']);
 Route::get('/api/tasks', [TeamScheduleController::class, 'getTasksWithPriority']);
 Route::post('/tasks/{taskId}/comments', [TeamScheduleController::class, 'addComment']);
+Route::put('/tasks/{taskId}/comments/{commentId}', [TeamScheduleController::class, 'updateComment']);
+Route::delete('/tasks/{taskId}/comments/{commentId}', [TeamScheduleController::class, 'deleteComment']);
 Route::post('/api/teamSchedule/store', [TeamScheduleController::class, 'store'])->name('teamSchedule.store');
 Route::get('/api/sectors', [SectorController::class, 'getSectorByDescription']);
 Route::post('/api/uploadAttachment', [TeamScheduleController::class, 'uploadAttachment']);
+Route::post('/api/cronograma/{id}/add-follower', [TeamScheduleController::class, 'addFollower'])->name('web.teamSchedule.addFollower');
+Route::post('/api/cronograma/{id}/remove-follower', [TeamScheduleController::class, 'removeFollower'])->name('web.teamSchedule.removeFollower');
+Route::post('/api/uploadAttachment', [TeamScheduleController::class, 'uploadAttachment'])->name('web.teamSchedule.uploadAttachment');
 
 require __DIR__ . '/auth.php';
