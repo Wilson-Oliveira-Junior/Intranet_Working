@@ -36,6 +36,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
     const [attachments, setAttachments] = useState([]); // Add state for attachments
 
+
     const debounceTimeout = useRef(null);
 
     const getCsrfToken = () => {

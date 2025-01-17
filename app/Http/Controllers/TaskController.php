@@ -23,7 +23,7 @@ class TaskController extends Controller
             ->map(function ($task) {
                 $task->status = $task->status === Schedule::STATUS_OPEN ? 'open' : 'closed';
                 $task->client_name = $task->client ? $task->client->name : 'N/A';
-                $task->type = $task->tipoTarefa ? $task->tipoTarefa->name : 'N/A';
+                $task->tipo_tarefa = $task->tipoTarefa ? $task->tipoTarefa : null;
                 $task->due_date = $task->date;
                 return $task;
             });

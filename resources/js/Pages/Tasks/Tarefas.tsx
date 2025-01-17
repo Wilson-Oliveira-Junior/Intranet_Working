@@ -4,7 +4,7 @@ import { Head, Link } from '@inertiajs/react';
 import '../../../css/components/tarefas.css';
 import TaskResponseModal from '../TeamSchedule/TaskResponseModal';
 
-const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => { // Ensure users is passed as a prop
+const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
     const [activeTab, setActiveTab] = useState('paraMim');
     const [selectedTeam, setSelectedTeam] = useState(user?.sector_id || '');
     const [taskStatus, setTaskStatus] = useState('abertas');
@@ -52,13 +52,24 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => { // En
     const filteredTasks = tasks.filter(task => {
         if (activeTab === 'paraMim') {
             return task.user_id === user.id && task.status === (taskStatus === 'abertas' ? 'open' : 'closed');
+        } else if (activeTab === 'queCriei') {
+            return task.creator_id === user.id && task.status === (taskStatus === 'abertas' ? 'open' : 'closed');
+        } else if (activeTab === 'queEuSigo') {
+            return task.followers.some(follower => follower.id === user.id) && task.status === (taskStatus === 'abertas' ? 'open' : 'closed');
+        } else if (activeTab === 'backlog') {
+            return task.sector_id === parseInt(selectedTeam);
         }
         return false;
     });
 
     useEffect(() => {
         console.log('Filtered Tasks:', filteredTasks);
-    }, [filteredTasks]);
+    }, [filteredTasks, activeTab, taskStatus]);
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-BR');
+    };
 
     if (!user || !teams) {
         return <div>Loading...</div>;
@@ -96,7 +107,7 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => { // En
                     </button>
                 </div>
                 <div className="tab-content">
-                    {activeTab === 'paraMim' && (
+                    {['paraMim', 'queCriei', 'queEuSigo'].includes(activeTab) && (
                         <div>
                             <div className="fixed-buttons">
                                 <button
@@ -118,12 +129,12 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => { // En
                                         <div key={task.id} className="task-item">
                                             <div className="task-column">
                                                 <p>ID: {task.id}</p>
-                                                <p>Cliente: {task.client_name}</p>
+                                                <p>Cliente: {task.client ? task.client.nome_fantasia : 'Desconhecido'}</p>
                                                 <Link href={`/clients/${task.client_id}`}>Ver Cliente</Link>
-                                                <p>Tipo: {task.type}</p>
+                                                <p>Tarefa: {task.tipo_tarefa ? task.tipo_tarefa.nome.split(' - ')[1] : 'Desconhecido'}</p>
                                             </div>
                                             <div className="task-column">
-                                                <p>Data de Entrega: {task.due_date}</p>
+                                                <p>Data de Entrega: {formatDate(task.due_date)}</p>
                                             </div>
                                             <div className="task-column">
                                                 {taskStatus === 'abertas' ? (
@@ -140,20 +151,6 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => { // En
                             </div>
                         </div>
                     )}
-                    {activeTab === 'queCriei' && (
-                        <div>
-                            <button className="btn btn-primary">Abertas</button>
-                            <button className="btn btn-secondary">Entregues</button>
-                            <div>Conteúdo da aba Que criei</div>
-                        </div>
-                    )}
-                    {activeTab === 'queEuSigo' && (
-                        <div>
-                            <button className="btn btn-primary">Abertas</button>
-                            <button className="btn btn-secondary">Entregues</button>
-                            <div>Conteúdo da aba Que eu sigo</div>
-                        </div>
-                    )}
                     {activeTab === 'backlog' && (
                         <div>
                             <label htmlFor="team-select">Selecione a equipe:</label>
@@ -164,7 +161,28 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => { // En
                                     </option>
                                 ))}
                             </select>
-                            <div>Conteúdo da aba Backlog para a equipe {selectedTeam}</div>
+                            <div className="task-list">
+                                {filteredTasks.length > 0 ? (
+                                    filteredTasks.map(task => (
+                                        <div key={task.id} className="task-item">
+                                            <div className="task-column">
+                                                <p>ID: {task.id}</p>
+                                                <p>Cliente: {task.client ? task.client.nome_fantasia : 'Desconhecido'}</p>
+                                                <Link href={`/clients/${task.client_id}`}>Ver Cliente</Link>
+                                                <p>Tarefa: {task.tipo_tarefa ? task.tipo_tarefa.nome.split(' - ')[1] : 'Desconhecido'}</p>
+                                            </div>
+                                            <div className="task-column">
+                                                <p>Data de Entrega: {formatDate(task.due_date)}</p>
+                                            </div>
+                                            <div className="task-column">
+                                                <button className="btn btn-primary" onClick={() => openModal(task)}>Ver Detalhes</button>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>No tasks found.</p>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>
@@ -172,14 +190,14 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => { // En
                     <TaskResponseModal
                         task={selectedTask}
                         closeModal={closeModal}
-                        equipes={teams} // Ensure equipes prop is passed
-                        clients={clients} // Ensure clients prop is passed
-                        tiposTarefa={tiposTarefa} // Ensure tiposTarefa prop is passed
-                        comments={taskComments} // Ensure comments prop is passed
-                        attachments={attachments} // Ensure attachments prop is passed
-                        setAttachments={setAttachments} // Ensure setAttachments is passed
-                        followers={followers || []} // Ensure followers is initialized correctly
-                        users={users} // Ensure users prop is passed
+                        equipes={teams}
+                        clients={clients}
+                        tiposTarefa={tiposTarefa}
+                        comments={taskComments}
+                        attachments={attachments}
+                        setAttachments={setAttachments}
+                        followers={followers}
+                        users={users}
                     />
                 )}
             </div>

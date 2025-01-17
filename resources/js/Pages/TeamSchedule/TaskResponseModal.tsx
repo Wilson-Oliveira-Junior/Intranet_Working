@@ -332,8 +332,9 @@ const TaskResponseModal = ({
                                 <img src="https://placehold.co/50x50" alt="User profile picture" />
                                 <div className="details">
                                     <span>ID: {task.id} - Criado por: {task.creator ? task.creator.name : 'Desconhecido'} em {new Date(task.created_at).toLocaleDateString()}</span>
-                                    <span className="deadline">Data Limite: {new Date(task.date).toLocaleDateString()}</span> {/* Adicione esta linha */}
+                                    <span className="deadline">Data Limite: {new Date(task.date).toLocaleDateString()}</span>
                                     <span>Status: {status}</span>
+                                    <span>Tipo: {task.tipo_tarefa ? task.tipo_tarefa.nome.split(' - ')[1] : 'Desconhecido'} - Estimativa: {task.tipo_tarefa ? task.tipo_tarefa.estimativa : 'Desconhecido'}</span>
                                     <span>Projeto: {task.client ? task.client.nome_fantasia : 'Desconhecido'}</span>
                                     {workingUser && <span>Trabalhando por: {workingUser.name}</span>}
                                 </div>
