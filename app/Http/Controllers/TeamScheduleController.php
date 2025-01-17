@@ -71,7 +71,8 @@ class TeamScheduleController extends Controller
             'follower_id' => 'nullable|integer|exists:users,id',
         ]);
 
-        $validatedData['status'] = 'aberto';
+        // Definindo o status da tarefa como 'aberto' ao criar
+        $validatedData['status'] = Schedule::STATUS_OPEN;
 
         try {
             $schedule = Schedule::create($validatedData);
@@ -115,7 +116,7 @@ class TeamScheduleController extends Controller
             'tipo_tarefa_id' => 'nullable|integer|exists:tb_tipostarefas,id',
             'hours_worked' => 'nullable|integer',
             'priority' => 'required|string',
-            'status' => 'required|string',
+            'status' => 'required|string|in:' . Schedule::STATUS_OPEN . ',' . Schedule::STATUS_WORKING . ',' . Schedule::STATUS_CLOSED,
             'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:2048',
             'follower_id' => 'nullable|integer|exists:users,id',
         ]);
@@ -382,6 +383,41 @@ class TeamScheduleController extends Controller
         }
 
         return response()->json(['message' => 'Task not found in team backlog'], 404);
+    }
+
+    // Método para iniciar uma tarefa
+    public function startTask($id)
+    {
+        try {
+            $schedule = Schedule::findOrFail($id);
+            $schedule->status = Schedule::STATUS_WORKING;
+            $schedule->save();
+
+            return response()->json(['message' => 'Task started successfully']);
+        } catch (\Exception $e) {
+            Log::error('Failed to start task', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Failed to start task'], 500);
+        }
+    }
+
+    // Método para finalizar uma tarefa
+    public function completeTask(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'hours_worked' => 'required|integer',
+        ]);
+
+        try {
+            $schedule = Schedule::findOrFail($id);
+            $schedule->status = Schedule::STATUS_CLOSED;
+            $schedule->hours_worked = $validatedData['hours_worked'];
+            $schedule->save();
+
+            return response()->json(['message' => 'Task completed successfully']);
+        } catch (\Exception $e) {
+            Log::error('Failed to complete task', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Failed to complete task'], 500);
+        }
     }
 }
 

@@ -65,7 +65,7 @@ class AdminController extends Controller
         try {
             $user = Auth::user();
             Log::info('Fetching tasks to do count for user', ['user_id' => $user->id]);
-            $tasksToDoCount = Schedule::where('user_id', $user->id)->where('status', Schedule::STATUS_TO_DO)->count();
+            $tasksToDoCount = Schedule::where('user_id', $user->id)->where('status', Schedule::STATUS_OPEN)->count();
             Log::info('Tasks to do count fetched successfully', ['count' => $tasksToDoCount]);
 
             return response()->json([
@@ -82,7 +82,7 @@ class AdminController extends Controller
         try {
             $user = Auth::user();
             Log::info('Fetching tasks delivered count for user', ['user_id' => $user->id]);
-            $tasksDeliveredCount = Schedule::where('user_id', $user->id)->where('status', Schedule::STATUS_DELIVERED)->count();
+            $tasksDeliveredCount = Schedule::where('user_id', $user->id)->where('status', Schedule::STATUS_CLOSED)->count();
             Log::info('Tasks delivered count fetched successfully', ['count' => $tasksDeliveredCount]);
 
             return response()->json([

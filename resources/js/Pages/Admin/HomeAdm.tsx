@@ -153,14 +153,14 @@ const HomeAdm: React.FC = () => {
               </p>
               <h3>Wiki - Departamentos da Lógica Digital</h3>
               <ul>
-                <li>Atendimento</li>
-                <li>Comercial</li>
-                <li>Desenvolvimento</li>
-                <li>Criação</li>
-                <li>Marketing</li>
-                <li>RH</li>
+                <li><a href="http://wiki.logicadigital.com.br/atendimento/" target="_blank" rel="noopener noreferrer">Atendimento</a></li>
+                <li><a href="http://wiki.logicadigital.com.br/comercial/" target="_blank" rel="noopener noreferrer">Comercial</a></li>
+                <li><a href="http://wiki.logicadigital.com.br/desenvolvimento/" target="_blank" rel="noopener noreferrer">Desenvolvimento</a></li>
+                <li><a href="http://wiki.logicadigital.com.br/criacao/" target="_blank" rel="noopener noreferrer">Criação</a></li>
+                <li><a href="http://wiki.logicadigital.com.br/marketing/" target="_blank" rel="noopener noreferrer">Marketing</a></li>
+                <li><a href="http://wiki.logicadigital.com.br/rh/" target="_blank" rel="noopener noreferrer">RH</a></li>
               </ul>
-              <button>Acessar Wiki</button>
+              <button onClick={() => window.open('http://wiki.logicadigital.com.br/', '_blank')}>Acessar Wiki</button>
             </div>
           </div>
 

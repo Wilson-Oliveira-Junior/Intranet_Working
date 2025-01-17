@@ -10,6 +10,7 @@ use App\Http\Controllers\GuestController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\TeamScheduleController;
 use App\Http\Controllers\SectorController;
+use App\Http\Controllers\TaskController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -100,6 +101,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/tasks/{task}/notify-creator', [TeamScheduleController::class, 'notifyCreator']);
     Route::post('/tasks/{task}/notify-followers', [TeamScheduleController::class, 'notifyFollowers']);
     Route::post('/tasks/{task}/log-hours', [TeamScheduleController::class, 'logHours']);
+    Route::post('/tasks/{task}/start', [TeamScheduleController::class, 'startTask'])->name('tasks.start');
+    Route::post('/tasks/{task}/complete', [TeamScheduleController::class, 'completeTask'])->name('tasks.complete');
 
     // Backlog da Equipe
     Route::get('/team/backlog', [TeamScheduleController::class, 'getTeamBacklog'])->name('team.backlog');
@@ -130,6 +133,8 @@ Route::middleware('auth')->group(function () {
         $tasks = \App\Models\Schedule::where('user_id', $user->id)->get();
         return response()->json($tasks);
     });
+
+    Route::get('/tarefas', [TaskController::class, 'tarefas'])->name('tasks.index');
 });
 
 // API Routes

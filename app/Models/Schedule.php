@@ -25,8 +25,9 @@ class Schedule extends Model
     ];
 
     // Definir os possíveis valores para o status
-    const STATUS_TO_DO = 'to_do';
-    const STATUS_DELIVERED = 'delivered';
+    const STATUS_OPEN = 'aberto';
+    const STATUS_WORKING = 'trabalhando';
+    const STATUS_CLOSED = 'fechado';
 
     public function sector()
     {
