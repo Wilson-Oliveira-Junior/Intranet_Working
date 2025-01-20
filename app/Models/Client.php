@@ -48,4 +48,9 @@ class Client extends Model
     {
         return $this->hasMany(Client_Senhas::class, 'idCliente');
     }
+
+    public function tasks()
+    {
+        return $this->hasMany(Schedule::class, 'client_id');
+    }
 }

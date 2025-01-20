@@ -59,4 +59,12 @@ class TaskController extends Controller
 
         return response()->json(['message' => 'Task reopened successfully']);
     }
+
+    public function show($id)
+    {
+        $task = Schedule::findOrFail($id);
+        return Inertia::render('Tasks/Show', [
+            'task' => $task,
+        ]);
+    }
 }

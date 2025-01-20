@@ -122,6 +122,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/clients/{id}/passwords', [ClientController::class, 'getClientPasswords'])->name('clients.passwords');
     Route::get('/clients/paginated', [ClientController::class, 'getPaginatedClients'])->name('clients.paginated');
     Route::get('/clients/search', [ClientController::class, 'searchClients'])->name('clients.search');
+    Route::get('/clients/{id}/open-tasks-count', [ClientController::class, 'getOpenTasksCount'])->name('clients.openTasksCount');
+    Route::get('/clients/{id}/tasks', [ClientController::class, 'getClientTasks'])->name('clients.tasks');
 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -137,6 +139,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/tasks/{id}/reopen', [TaskController::class, 'reopenTask'])->name('tasks.reopen');
 
     Route::get('/tarefas', [TaskController::class, 'tarefas'])->name('tasks.index');
+
+    Route::get('/tasks/{id}', [TaskController::class, 'show'])->name('tasks.show');
 });
 
 // API Routes

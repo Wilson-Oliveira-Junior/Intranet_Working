@@ -37,6 +37,14 @@ interface Password {
     observacao: string;
 }
 
+interface Task {
+    id: number;
+    title: string;
+    description: string;
+    date: string;
+    status: string;
+}
+
 interface ClientDetailsProps {
     client: Client;
     auth: {
@@ -51,8 +59,10 @@ const ClientDetails: React.FC = () => {
     const [client, setClient] = useState<Client>(initialClient);
     const [contact, setContact] = useState<Contact | null>(null);
     const [passwords, setPasswords] = useState<Password[]>([]);
+    const [tasks, setTasks] = useState<Task[]>([]);
     const [showPassword, setShowPassword] = useState(false);
     const [currentPasswordIndex, setCurrentPasswordIndex] = useState(0);
+    const [openTasksCount, setOpenTasksCount] = useState(0);
 
     useEffect(() => {
         console.log('Fetching client details for ID:', initialClient.id);
@@ -82,6 +92,24 @@ const ClientDetails: React.FC = () => {
             })
             .catch(error => {
                 console.error('There was an error fetching the client passwords!', error);
+            });
+
+        axios.get(`/clients/${initialClient.id}/open-tasks-count`)
+            .then(response => {
+                console.log('Open tasks count fetched:', response.data);
+                setOpenTasksCount(response.data.openTasksCount);
+            })
+            .catch(error => {
+                console.error('There was an error fetching the open tasks count!', error);
+            });
+
+        axios.get(`/clients/${initialClient.id}/tasks`)
+            .then(response => {
+                console.log('Tasks fetched:', response.data);
+                setTasks(response.data);
+            })
+            .catch(error => {
+                console.error('There was an error fetching the tasks!', error);
             });
     }, [initialClient.id]);
 
@@ -142,9 +170,8 @@ const ClientDetails: React.FC = () => {
                     </div>
                     <div className="card">
                         <p>Tarefas</p>
-                        <p>{client.tarefas}</p>
+                        <p>{openTasksCount}</p>
                         <p><i className="fas fa-tasks"></i></p>
-                        <p>Detalhes da tarefa</p>
                     </div>
                     <div className="card">
                         <p>Redes Sociais</p>
@@ -199,44 +226,24 @@ const ClientDetails: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                    <h2>Tarefas para o cliente {client.nome_fantasia}</h2>
+                    <h2>Tarefas Abertas para o cliente {client.nome_fantasia}</h2>
                     <div className="task-list">
-                        <div className="task">
-                            <div className="details">
-                                <p>Reunião de Planejamento</p>
-                                <p>Data Limite: 01/06/2024 Data Conclusão: 05/06/2024 Quem Finalizou: João Silva</p>
+                        {tasks.map(task => (
+                            <div className="task" key={task.id}>
+                                <div className="details">
+                                    <p>
+                                        <a href={`/tasks/${task.id}`} target="_blank" rel="noopener noreferrer">
+                                            {task.title}
+                                        </a>
+                                    </p>
+                                    <p>{task.description}</p>
+                                    <p>Data Limite: {new Date(task.date).toLocaleDateString()}</p>
+                                </div>
+                                <div className="status">
+                                    <i className={`fas fa-${task.status === 'completed' ? 'check-square' : 'square'}`}></i>
+                                </div>
                             </div>
-                            <div className="status">
-                                <i className="fas fa-check-square"></i>
-                            </div>
-                        </div>
-                        <div className="task">
-                            <div className="details">
-                                <p>Desenvolvimento do Site</p>
-                                <p>Data Limite: 10/06/2024 Data Conclusão: 20/06/2024 Quem Finalizou: Maria Oliveira</p>
-                            </div>
-                            <div className="status">
-                                <i className="fas fa-check-square"></i>
-                            </div>
-                        </div>
-                        <div className="task">
-                            <div className="details">
-                                <p>Teste de Qualidade</p>
-                                <p>Data Limite: 15/06/2024 Data Conclusão: 25/06/2024 Quem Finalizou: Carlos Pereira</p>
-                            </div>
-                            <div className="status">
-                                <i className="fas fa-check-square"></i>
-                            </div>
-                        </div>
-                        <div className="task">
-                            <div className="details">
-                                <p>Entrega Final</p>
-                                <p>Data Limite: 30/06/2024 Data Conclusão: 01/07/2024 Quem Finalizou: Ana Costa</p>
-                            </div>
-                            <div className="status">
-                                <i className="fas fa-check-square"></i>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </div>

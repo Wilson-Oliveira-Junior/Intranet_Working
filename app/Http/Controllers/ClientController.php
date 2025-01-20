@@ -149,4 +149,26 @@ class ClientController extends Controller
             'links' => $clients->links('pagination::bootstrap-4')->toHtml(),
         ]);
     }
+
+    public function getOpenTasksCount($id)
+    {
+        try {
+            $client = Client::findOrFail($id);
+            $openTasksCount = $client->tasks()->where('status', 'aberto')->count();
+            return response()->json(['openTasksCount' => $openTasksCount]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error fetching open tasks count'], 500);
+        }
+    }
+
+    public function getClientTasks($id)
+    {
+        try {
+            $client = Client::findOrFail($id);
+            $tasks = $client->tasks()->where('status', 'aberto')->get(['id', 'title', 'description', 'date', 'status']);
+            return response()->json($tasks);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error fetching client tasks'], 500);
+        }
+    }
 }
