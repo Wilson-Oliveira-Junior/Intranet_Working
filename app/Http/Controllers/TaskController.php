@@ -8,6 +8,7 @@ use App\Models\Sector;
 use App\Models\Schedule;
 use App\Models\Client;
 use App\Models\TipoTarefa;
+use App\Models\User;
 
 class TaskController extends Controller
 {
@@ -17,14 +18,27 @@ class TaskController extends Controller
         $teams = Sector::all();
         $clients = Client::all();
         $tiposTarefa = TipoTarefa::all();
-        $tasks = Schedule::where('user_id', $user->id)
-            ->with(['client', 'tipoTarefa'])
+        $tasks = Schedule::with(['client', 'tipoTarefa', 'followers', 'comments.user', 'attachments', 'creator'])
+            ->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->orWhere('creator_id', $user->id)
+                    ->orWhereHas('followers', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    });
+            })
             ->get()
             ->map(function ($task) {
-                $task->status = $task->status === Schedule::STATUS_OPEN ? 'open' : 'closed';
+                if ($task->status === Schedule::STATUS_OPEN) {
+                    $task->status = 'abertas';
+                } else if ($task->status === Schedule::STATUS_WORKING) {
+                    $task->status = 'trabalhando';
+                } else {
+                    $task->status = 'fechadas';
+                }
                 $task->client_name = $task->client ? $task->client->name : 'N/A';
                 $task->tipo_tarefa = $task->tipoTarefa ? $task->tipoTarefa : null;
                 $task->due_date = $task->date;
+                $task->creator_name = $task->creator ? $task->creator->name : 'Desconhecido';
                 return $task;
             });
 
@@ -35,5 +49,14 @@ class TaskController extends Controller
             'clients' => $clients,
             'tiposTarefa' => $tiposTarefa,
         ]);
+    }
+
+    public function reopenTask(Request $request, $id)
+    {
+        $task = Schedule::findOrFail($id);
+        $task->status = Schedule::STATUS_OPEN;
+        $task->save();
+
+        return response()->json(['message' => 'Task reopened successfully']);
     }
 }

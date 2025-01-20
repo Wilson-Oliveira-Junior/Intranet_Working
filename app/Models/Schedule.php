@@ -9,12 +9,12 @@ class Schedule extends Model
 {
     use HasFactory;
 
-    // Definir os campos que podem ser preenchidos
+
     protected $fillable = [
         'title',
         'description',
         'status',
-        'user_id', // Foreign key to relate schedules to users
+        'user_id',
         'date',
         'sector_id',
         'client_id',
@@ -22,9 +22,10 @@ class Schedule extends Model
         'hours_worked',
         'priority',
         'file_path',
+        'creator_id',
+        'start_time', // Adicionar start_time como fillable
     ];
 
-    // Definir os possíveis valores para o status
     const STATUS_OPEN = 'aberto';
     const STATUS_WORKING = 'trabalhando';
     const STATUS_CLOSED = 'fechado';
@@ -46,7 +47,7 @@ class Schedule extends Model
 
     public function creator()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'creator_id');
     }
 
     public function tipoTarefa()

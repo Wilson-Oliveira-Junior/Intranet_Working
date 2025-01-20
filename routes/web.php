@@ -134,6 +134,8 @@ Route::middleware('auth')->group(function () {
         return response()->json($tasks);
     });
 
+    Route::post('/tasks/{id}/reopen', [TaskController::class, 'reopenTask'])->name('tasks.reopen');
+
     Route::get('/tarefas', [TaskController::class, 'tarefas'])->name('tasks.index');
 });
 

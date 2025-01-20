@@ -9,8 +9,6 @@ const TaskResponseModal = ({
     updateTaskStatus,
     addComment,
     comments,
-    newComment,
-    setNewComment,
     user,
     attachments,
     setAttachments,
@@ -27,6 +25,11 @@ const TaskResponseModal = ({
     const fileInputRef = useRef(null);
     const [workingUser, setWorkingUser] = useState(null);
     const [startTime, setStartTime] = useState(null);
+    const [newComment, setNewComment] = useState('');
+
+    useEffect(() => {
+        setTaskComments(comments);
+    }, [comments]);
 
     const handleStatusChange = async (newStatus) => {
         setStatus(newStatus);
@@ -367,7 +370,7 @@ const TaskResponseModal = ({
                                             <FontAwesomeIcon icon={faPaperPlane} />
                                         </button>
                                     </div>
-                                    <div className="comment-section" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                                    <div className="comment-section" style={{ maxHeight: '60vh', overflowY: 'auto', paddingBottom: '60px' }}>
                                         {taskComments.length === 0 ? (
                                             <div className="no-comments">
                                                 <p>

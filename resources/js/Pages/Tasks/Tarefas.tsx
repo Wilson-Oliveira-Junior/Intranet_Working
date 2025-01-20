@@ -13,6 +13,8 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
     const [taskComments, setTaskComments] = useState([]);
     const [attachments, setAttachments] = useState([]);
     const [followers, setFollowers] = useState([]);
+    const [elapsedTime, setElapsedTime] = useState({});
+    const [filteredTasks, setFilteredTasks] = useState([]);
 
     useEffect(() => {
         if (!user || !teams) {
@@ -20,6 +22,46 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
         }
         console.log('Tasks:', tasks);
     }, [user, teams, tasks]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const newElapsedTime = {};
+            tasks.forEach(task => {
+                if (task.status === 'trabalhando' && task.start_time) {
+                    const startTime = new Date(task.start_time);
+                    const now = new Date();
+                    const elapsed = Math.floor((now - startTime) / 1000);
+                    newElapsedTime[task.id] = elapsed;
+                }
+            });
+            setElapsedTime(newElapsedTime);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [tasks]);
+
+    useEffect(() => {
+        const newFilteredTasks = tasks.filter(task => {
+            if (activeTab === 'paraMim') {
+                return task.user_id === user.id && (taskStatus === 'abertas' ? (task.status === 'abertas' || task.status === 'trabalhando') : task.status === 'fechadas');
+            } else if (activeTab === 'queCriei') {
+                return task.creator_id === user.id && (taskStatus === 'abertas' ? (task.status === 'abertas' || task.status === 'trabalhando') : task.status === 'fechadas');
+            } else if (activeTab === 'queEuSigo') {
+                return task.followers && task.followers.some(follower => follower.id === user.id) && (taskStatus === 'abertas' ? (task.status === 'abertas' || task.status === 'trabalhando') : task.status === 'fechadas');
+            } else if (activeTab === 'backlog') {
+                return task.sector_id === parseInt(selectedTeam);
+            }
+            return false;
+        });
+        setFilteredTasks(newFilteredTasks);
+    }, [tasks, activeTab, taskStatus, user.id, selectedTeam]);
+
+    const formatElapsedTime = (seconds) => {
+        const hrs = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${hrs}h ${mins}m ${secs}s`;
+    };
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
@@ -49,22 +91,78 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
         setFollowers([]);
     };
 
-    const filteredTasks = tasks.filter(task => {
-        if (activeTab === 'paraMim') {
-            return task.user_id === user.id && task.status === (taskStatus === 'abertas' ? 'open' : 'closed');
-        } else if (activeTab === 'queCriei') {
-            return task.creator_id === user.id && task.status === (taskStatus === 'abertas' ? 'open' : 'closed');
-        } else if (activeTab === 'queEuSigo') {
-            return task.followers.some(follower => follower.id === user.id) && task.status === (taskStatus === 'abertas' ? 'open' : 'closed');
-        } else if (activeTab === 'backlog') {
-            return task.sector_id === parseInt(selectedTeam);
-        }
-        return false;
-    });
+    const handleAddComment = (comment) => {
+        setTaskComments((prevComments) => [...prevComments, comment]);
+    };
 
-    useEffect(() => {
-        console.log('Filtered Tasks:', filteredTasks);
-    }, [filteredTasks, activeTab, taskStatus]);
+    const handleReopenTask = async (task) => {
+        try {
+            const response = await fetch(`/tasks/${task.id}/reopen`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+            });
+
+            if (response.ok) {
+                task.status = 'abertas';
+                setTaskStatus('abertas');
+                console.log('Task reopened successfully');
+            } else {
+                console.error('Failed to reopen task:', await response.json());
+            }
+        } catch (error) {
+            console.error('Error reopening task:', error);
+        }
+    };
+
+    const handleStartTask = async (task) => {
+        try {
+            const response = await fetch(`/tasks/${task.id}/start`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+            });
+
+            if (response.ok) {
+                task.status = 'trabalhando';
+                task.start_time = new Date().toISOString();
+                setTaskStatus('trabalhando');
+                console.log('Task started successfully');
+            } else {
+                const errorData = await response.json();
+                console.error('Failed to start task:', errorData);
+            }
+        } catch (error) {
+            console.error('Error starting task:', error);
+        }
+    };
+
+    const handleCompleteTask = async (task) => {
+        try {
+            const response = await fetch(`/tasks/${task.id}/complete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify({ hours_worked: Math.floor((elapsedTime[task.id] || 0) / 3600) }),
+            });
+
+            if (response.ok) {
+                task.status = 'fechadas';
+                setTaskStatus('fechadas');
+                console.log('Task completed successfully');
+            } else {
+                console.error('Failed to complete task:', await response.json());
+            }
+        } catch (error) {
+            console.error('Error completing task:', error);
+        }
+    };
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -117,8 +215,8 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
                                     Abertas
                                 </button>
                                 <button
-                                    className={`btn ${taskStatus === 'entregues' ? 'btn-primary' : 'btn-secondary'}`}
-                                    onClick={() => handleStatusChange('entregues')}
+                                    className={`btn ${taskStatus === 'fechadas' ? 'btn-primary' : 'btn-secondary'}`}
+                                    onClick={() => handleStatusChange('fechadas')}
                                 >
                                     Entregues
                                 </button>
@@ -132,15 +230,25 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
                                                 <p>Cliente: {task.client ? task.client.nome_fantasia : 'Desconhecido'}</p>
                                                 <Link href={`/clients/${task.client_id}`}>Ver Cliente</Link>
                                                 <p>Tarefa: {task.tipo_tarefa ? task.tipo_tarefa.nome.split(' - ')[1] : 'Desconhecido'}</p>
+                                                <p>Criador: {task.creator_name}</p>
                                             </div>
                                             <div className="task-column">
                                                 <p>Data de Entrega: {formatDate(task.due_date)}</p>
+                                                {task.status === 'trabalhando' && (
+                                                    <p>Tempo decorrido: {formatElapsedTime(elapsedTime[task.id] || 0)}</p>
+                                                )}
                                             </div>
                                             <div className="task-column">
-                                                {taskStatus === 'abertas' ? (
-                                                    <button className="btn btn-primary" onClick={() => openModal(task)}>Ver Detalhes</button>
+                                                {task.status === 'fechadas' ? (
+                                                    <button className="btn btn-secondary" onClick={() => handleReopenTask(task)}>Reabrir</button>
                                                 ) : (
-                                                    <button className="btn btn-secondary">Reabrir</button>
+                                                    <button className="btn btn-primary" onClick={() => openModal(task)}>Ver Detalhes</button>
+                                                )}
+                                                {task.status === 'abertas' && (
+                                                    <button className="btn btn-secondary" onClick={() => handleStartTask(task)}>Iniciar</button>
+                                                )}
+                                                {task.status === 'trabalhando' && (
+                                                    <button className="btn btn-success" onClick={() => handleCompleteTask(task)}>Completar</button>
                                                 )}
                                             </div>
                                         </div>
@@ -170,6 +278,7 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
                                                 <p>Cliente: {task.client ? task.client.nome_fantasia : 'Desconhecido'}</p>
                                                 <Link href={`/clients/${task.client_id}`}>Ver Cliente</Link>
                                                 <p>Tarefa: {task.tipo_tarefa ? task.tipo_tarefa.nome.split(' - ')[1] : 'Desconhecido'}</p>
+                                                <p>Criador: {task.creator_name}</p>
                                             </div>
                                             <div className="task-column">
                                                 <p>Data de Entrega: {formatDate(task.due_date)}</p>
@@ -190,10 +299,10 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
                     <TaskResponseModal
                         task={selectedTask}
                         closeModal={closeModal}
-                        equipes={teams}
-                        clients={clients}
-                        tiposTarefa={tiposTarefa}
+                        updateTaskStatus={handleStatusChange}
+                        addComment={handleAddComment}
                         comments={taskComments}
+                        user={user}
                         attachments={attachments}
                         setAttachments={setAttachments}
                         followers={followers}

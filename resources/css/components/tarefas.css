@@ -219,6 +219,15 @@ h1 {
     background-color: #5a6268;
 }
 
+.btn-success {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
 /* Estilo dos botões fixos */
 .fixed-buttons {
     display: flex;

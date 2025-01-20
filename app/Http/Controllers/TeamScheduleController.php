@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\TaskStatusNotification;
-use App\Models\Task;
 
 class TeamScheduleController extends Controller
 {
@@ -31,8 +30,11 @@ class TeamScheduleController extends Controller
         $clients = Client::all();
         $tiposTarefa = TipoTarefa::all();
         $teamSchedules = Schedule::with(['creator', 'client', 'tipoTarefa', 'comments.user', 'followers'])
-            ->where('sector_id', $user->sector_id)
-            ->orWhere('user_id', $user->id)
+            ->where(function ($query) use ($user) {
+                $query->where('sector_id', $user->sector_id)
+                    ->orWhere('user_id', $user->id);
+            })
+            ->whereIn('status', [Schedule::STATUS_OPEN, Schedule::STATUS_WORKING]) // Only include open or in-progress tasks
             ->get();
 
         return Inertia::render('TeamSchedule/Cronograma', [
@@ -73,6 +75,7 @@ class TeamScheduleController extends Controller
 
         // Definindo o status da tarefa como 'aberto' ao criar
         $validatedData['status'] = Schedule::STATUS_OPEN;
+        $validatedData['creator_id'] = Auth::id(); // Adiciona o ID do criador
 
         try {
             $schedule = Schedule::create($validatedData);
@@ -345,57 +348,33 @@ class TeamScheduleController extends Controller
         return response()->json(['message' => 'Seguidores da tarefa não encontrados.'], 404);
     }
 
-    public function logHours(Request $request, $taskId)
+    public function logHours(Request $request, $taskId, $hoursWorked = null)
     {
         $task = Schedule::findOrFail($taskId);
-        $user = User::findOrFail($request->user_id);
-
-        // Assuming you have a TaskUser model to log hours
-        // If not, you need to define the relationship in the Schedule model
-        $task->users()->attach($user->id, ['hours' => $request->hours]);
+        $user = Auth::user();
+        $hours = $hoursWorked ?? $request->hours;
+        $task->users()->attach($user->id, ['hours' => $hours]);
 
         return response()->json(['message' => 'Horas trabalhadas registradas com sucesso.'], 200);
     }
 
-    public function getTeamBacklog()
-    {
-        $tasks = Task::where('assigned_to_team', true)->get();
-        return response()->json($tasks);
-    }
-
-    public function addToTeamBacklog(Request $request)
-    {
-        $task = new Task();
-        $task->title = $request->input('title');
-        $task->description = $request->input('description');
-        $task->assigned_to_team = true;
-        $task->save();
-
-        return response()->json(['message' => 'Task added to team backlog successfully']);
-    }
-
-    public function removeFromTeamBacklog($id)
-    {
-        $task = Task::findOrFail($id);
-        if ($task->assigned_to_team) {
-            $task->delete();
-            return response()->json(['message' => 'Task removed from team backlog successfully']);
-        }
-
-        return response()->json(['message' => 'Task not found in team backlog'], 404);
-    }
-
-    // Método para iniciar uma tarefa
     public function startTask($id)
     {
         try {
+            Log::info('Starting task', ['task_id' => $id]);
+
             $schedule = Schedule::findOrFail($id);
+            Log::info('Task found', ['task' => $schedule]);
+
             $schedule->status = Schedule::STATUS_WORKING;
+            $schedule->start_time = now(); // Salvar a hora de início
             $schedule->save();
+
+            Log::info('Task started successfully', ['task' => $schedule]);
 
             return response()->json(['message' => 'Task started successfully']);
         } catch (\Exception $e) {
-            Log::error('Failed to start task', ['error' => $e->getMessage()]);
+            Log::error('Failed to start task', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json(['error' => 'Failed to start task'], 500);
         }
     }
@@ -403,21 +382,36 @@ class TeamScheduleController extends Controller
     // Método para finalizar uma tarefa
     public function completeTask(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'hours_worked' => 'required|integer',
-        ]);
-
         try {
             $schedule = Schedule::findOrFail($id);
+
+            // Calcular as horas trabalhadas
+            $startTime = new \DateTime($schedule->start_time);
+            $endTime = new \DateTime();
+            $interval = $startTime->diff($endTime);
+            $hoursWorked = $interval->h + ($interval->days * 24) + ($interval->i / 60);
+
             $schedule->status = Schedule::STATUS_CLOSED;
-            $schedule->hours_worked = $validatedData['hours_worked'];
+            $schedule->hours_worked = $hoursWorked;
             $schedule->save();
+
+            // Log hours worked
+            $this->logHours($request, $id, $hoursWorked);
 
             return response()->json(['message' => 'Task completed successfully']);
         } catch (\Exception $e) {
             Log::error('Failed to complete task', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Failed to complete task'], 500);
         }
+    }
+
+    public function reopenTask(Request $request, $id)
+    {
+        $task = Schedule::findOrFail($id);
+        $task->status = Schedule::STATUS_OPEN;
+        $task->save();
+
+        return response()->json(['message' => 'Task reopened successfully']);
     }
 }
 
