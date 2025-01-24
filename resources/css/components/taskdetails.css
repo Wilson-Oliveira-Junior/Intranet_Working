@@ -1,0 +1,54 @@
+.task-details-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.task-title {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.task-description {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+.task-date,
+.task-status {
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+
+.task-comments,
+.task-attachments {
+    margin-top: 20px;
+}
+
+.task-comments h2,
+.task-attachments h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.comment-item,
+.attachment-item {
+    margin-bottom: 10px;
+}
+
+.comment-item p,
+.attachment-item a {
+    font-size: 1em;
+}
+
+.attachment-item a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.attachment-item a:hover {
+    text-decoration: underline;
+}

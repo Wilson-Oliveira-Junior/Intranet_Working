@@ -65,19 +65,12 @@ const ClientDetails: React.FC = () => {
     const [openTasksCount, setOpenTasksCount] = useState(0);
 
     useEffect(() => {
-        console.log('Fetching client details for ID:', initialClient.id);
-        axios.get(`/clients/${initialClient.id}/details`)
-            .then(response => {
-                console.log('Client details fetched:', response.data);
-                setClient(response.data);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the client details!', error);
-            });
+        setClient(initialClient);
+    }, [initialClient]);
 
+    useEffect(() => {
         axios.get(`/clients/${initialClient.id}/contacts`)
             .then(response => {
-                console.log('Client contacts fetched:', response.data);
                 if (response.data.length > 0) {
                     setContact(response.data[0]); // Assuming the first contact is the responsible person
                 }
@@ -96,7 +89,6 @@ const ClientDetails: React.FC = () => {
 
         axios.get(`/clients/${initialClient.id}/open-tasks-count`)
             .then(response => {
-                console.log('Open tasks count fetched:', response.data);
                 setOpenTasksCount(response.data.openTasksCount);
             })
             .catch(error => {
@@ -105,7 +97,6 @@ const ClientDetails: React.FC = () => {
 
         axios.get(`/clients/${initialClient.id}/tasks`)
             .then(response => {
-                console.log('Tasks fetched:', response.data);
                 setTasks(response.data);
             })
             .catch(error => {
@@ -123,6 +114,11 @@ const ClientDetails: React.FC = () => {
 
     const handlePrevPassword = () => {
         setCurrentPasswordIndex((prevIndex) => (prevIndex - 1 + passwords.length) % passwords.length);
+    };
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return isNaN(date.getTime()) ? 'Data Inválida' : date.toLocaleDateString();
     };
 
     return (
@@ -237,7 +233,7 @@ const ClientDetails: React.FC = () => {
                                         </a>
                                     </p>
                                     <p>{task.description}</p>
-                                    <p>Data Limite: {new Date(task.date).toLocaleDateString()}</p>
+                                    <p>Data Limite: {formatDate(task.date)}</p>
                                 </div>
                                 <div className="status">
                                     <i className={`fas fa-${task.status === 'completed' ? 'check-square' : 'square'}`}></i>

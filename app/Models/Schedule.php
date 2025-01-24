@@ -9,71 +9,56 @@ class Schedule extends Model
 {
     use HasFactory;
 
+    const STATUS_OPEN = 'open';
+    const STATUS_WORKING = 'working';
+    const STATUS_CLOSED = 'closed';
 
     protected $fillable = [
-        'title',
-        'description',
+        'titulo',
+        'gravidade',
+        'urgencia',
+        'tendencia',
+        'tarefa_ordem',
+        'created_at',
+        'data_desejada',
         'status',
-        'user_id',
-        'date',
-        'sector_id',
-        'client_id',
-        'tipo_tarefa_id',
-        'hours_worked',
-        'priority',
-        'file_path',
-        'creator_id',
-        'start_time', // Adicionar start_time como fillable
+        'id_responsavel',
+        'id_equipe',
+        'idusuario_gut'
     ];
 
-    const STATUS_OPEN = 'aberto';
-    const STATUS_WORKING = 'trabalhando';
-    const STATUS_CLOSED = 'fechado';
-
-    public function sector()
+    public function responsavel()
     {
-        return $this->belongsTo(Sector::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'id_responsavel');
     }
 
     public function client()
     {
-        return $this->belongsTo(Client::class, 'client_id', 'id');
+        return $this->belongsTo(Client::class);
+    }
+
+    public function tipoTarefa()
+    {
+        return $this->belongsTo(TipoTarefa::class);
+    }
+
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'schedule_followers');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(Attachment::class);
     }
 
     public function creator()
     {
         return $this->belongsTo(User::class, 'creator_id');
-    }
-
-    public function tipoTarefa()
-    {
-        return $this->belongsTo(TipoTarefa::class, 'tipo_tarefa_id');
-    }
-
-    public function comments()
-    {
-        return $this->hasMany(Comment::class, 'task_id');
-    }
-
-    public function attachments()
-    {
-        return $this->hasMany(Attachment::class, 'task_id');
-    }
-
-    public function followers()
-    {
-        return $this->belongsToMany(User::class, 'schedule_followers', 'schedule_id', 'user_id');
-    }
-
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'task_user', 'task_id', 'user_id')
-                    ->withPivot('hours')
-                    ->withTimestamps();
     }
 }

@@ -11,6 +11,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\TeamScheduleController;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\GUTController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -141,6 +142,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/tarefas', [TaskController::class, 'tarefas'])->name('tasks.index');
 
     Route::get('/tasks/{id}', [TaskController::class, 'show'])->name('tasks.show');
+
+    Route::get('/GUT', [GUTController::class, 'index'])->middleware(['auth', 'verified'])->name('GUT');
+    Route::get('/GUT/tarefas/{idequipe}', [GUTController::class, 'listarTarefas'])->middleware(['auth', 'verified']);
+    Route::post('/GUT/tarefas/{id}/atualizar-prioridade', [GUTController::class, 'atualizarPrioridade'])->middleware(['auth', 'verified']);
 });
 
 // API Routes

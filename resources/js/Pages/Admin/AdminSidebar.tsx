@@ -1,6 +1,16 @@
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
-import "../../../css/components/Sidebar.css"
+import "../../../css/components/Sidebar.css";
+
+const Menu = ({ title, icon, children, isOpen, toggle }) => (
+    <div className="menu">
+        <div onClick={toggle} className="menu-title">
+            <i className={`fas ${icon}`}></i> {title}
+            <i className={`fas fa-chevron-right ml-auto ${isOpen ? 'rotate-90' : ''}`}></i>
+        </div>
+        {isOpen && <div className="menu-content">{children}</div>}
+    </div>
+);
 
 const AdminSidebar = ({ setActivePage }) => {
     const [openMenus, setOpenMenus] = useState({
@@ -9,7 +19,6 @@ const AdminSidebar = ({ setActivePage }) => {
         relatorios: false,
         documentos: false,
         gestao: false,
-        gatilhos: false,
         financeiro: false
     });
 
@@ -23,146 +32,122 @@ const AdminSidebar = ({ setActivePage }) => {
     return (
         <div className="sidebar">
             <div id="teste" className="teste w-64 bg-white shadow-md p-4">
-                <Link href="/admin/dashboard" className="flex items-center py-2">
+                <Link href="/admin/dashboard" className="sidebar-link">
                     <i className="fas fa-tv"></i> Dashboard
                 </Link>
-                <Link href="/cronograma" className="flex items-center py-2">
+                <Link href="/cronograma" className="sidebar-link">
                     <i className="fas fa-calendar-alt" aria-label="Cronograma Equipes"></i>
                     Cronograma Equipes
                 </Link>
-                <Link href="/tarefas" className="flex items-center py-2">
+                <Link href="/tarefas" className="sidebar-link">
                     <i className="fas fa-tasks" aria-label="Tarefas"></i>
                     Tarefas
                 </Link>
-                <Link href="/GUT" className="flex items-center py-2">
+                <Link href="/GUT" className="sidebar-link">
                     <i className="fas fa-sort-amount-up" aria-label="GUT - Priorização"></i>
                     GUT - Priorização
                 </Link>
-                <a href="#" className="flex items-center py-2">
+                <a href="#" className="sidebar-link">
                     <i className="fas fa-list-alt" aria-label="Pautas"></i>
                     Pautas
                 </a>
 
-                {/* Menu Meu Espaço */}
-                <div className="flex flex-col">
-                    <button onClick={() => toggleMenu('meuEspaco')} className="flex items-center py-2">
-                        <i className="fas fa-user"></i> Meu Espaço
-                        <i className={`fas fa-chevron-right ml-auto ${openMenus.meuEspaco ? 'rotate-90' : ''}`}></i>
-                    </button>
-                    {openMenus.meuEspaco && (
-                        <div className="pl-6">
-                            <Link href="/profile" className="py-2">Meu Perfil</Link>
-                            <Link href="/meu-cronograma" className="py-2">Meu Cronograma</Link>
-                            <Link href="/meu-calendario" className="py-2">Meu Calendário</Link>
-                        </div>
-                    )}
-                </div>
+                <Menu
+                    title="Meu Espaço"
+                    icon="fa-user"
+                    isOpen={openMenus.meuEspaco}
+                    toggle={() => toggleMenu('meuEspaco')}
+                >
+                    <Link href="/profile" className="sidebar-link">Meu Perfil</Link>
+                    <Link href="/meu-cronograma" className="sidebar-link">Meu Cronograma</Link>
+                    <Link href="/meu-calendario" className="sidebar-link">Meu Calendário</Link>
+                </Menu>
 
-                {/* Menu Tarefas */}
-                <div className="flex flex-col">
-                    <button onClick={() => toggleMenu('tarefa')} className="flex items-center py-2">
-                        <i className="fas fa-tasks"></i> Módulo de Tarefas
-                        <i className={`fas fa-chevron-right ml-auto ${openMenus.tarefa ? 'rotate-90' : ''}`}></i>
-                    </button>
-                    {openMenus.tarefa && (
-                        <div className="pl-6">
-                            <Link href="/admin/clients" className="py-2">Clientes</Link>
-                            <Link href="/tipo-tarefa" className="py-2">Tipo de Tarefa</Link>
-                            <Link href="/status" className="py-2">Status</Link>
-                            <Link href="/segmentos-clientes" className="py-2">Segmentos Clientes</Link>
-                            <Link href="/tipo-projeto" className="py-2">Tipo de Projeto</Link>
-                        </div>
-                    )}
-                </div>
+                <Menu
+                    title="Módulo de Tarefas"
+                    icon="fa-tasks"
+                    isOpen={openMenus.tarefa}
+                    toggle={() => toggleMenu('tarefa')}
+                >
+                    <Link href="/admin/clients" className="sidebar-link">Clientes</Link>
+                    <Link href="/tipo-tarefa" className="sidebar-link">Tipo de Tarefa</Link>
+                    <Link href="/status" className="sidebar-link">Status</Link>
+                    <Link href="/segmentos-clientes" className="sidebar-link">Segmentos Clientes</Link>
+                    <Link href="/tipo-projeto" className="sidebar-link">Tipo de Projeto</Link>
+                </Menu>
 
-                {/* Menu Relatórios */}
-                <div className="flex flex-col">
-                    <button onClick={() => toggleMenu('relatorios')} className="flex items-center py-2">
-                        <i className="fas fa-clipboard"></i> Relatórios
-                        <i className={`fas fa-chevron-right ml-auto ${openMenus.relatorios ? 'rotate-90' : ''}`}></i>
-                    </button>
-                    {openMenus.relatorios && (
-                        <div className="pl-6">
-                            <Link href="/admin/clients" className="py-2">Listagem de Clientes</Link>
-                            <Link href="/listagem-ftps" className="py-2">Listagem de FTPs</Link>
-                            <Link href="/registro-senha" className="py-2">Registro de Senha</Link>
-                            <Link href="/relatorio-tarefas" className="py-2">Relatório de Tarefas</Link>
+                <Menu
+                    title="Relatórios"
+                    icon="fa-clipboard"
+                    isOpen={openMenus.relatorios}
+                    toggle={() => toggleMenu('relatorios')}
+                >
+                    <Link href="/admin/clients" className="sidebar-link">Listagem de Clientes</Link>
+                    <Link href="/listagem-ftps" className="sidebar-link">Listagem de FTPs</Link>
+                    <Link href="/registro-senha" className="sidebar-link">Registro de Senha</Link>
+                    <Link href="/relatorio-tarefas" className="sidebar-link">Relatório de Tarefas</Link>
 
-                            {/* Sub-menu Documentos */}
-                            <div className="flex flex-col">
-                                <button onClick={() => toggleMenu('documentos')} className="flex items-center py-2">
-                                    Documentos
-                                    <i className={`fas fa-chevron-right ml-auto ${openMenus.documentos ? 'rotate-90' : ''}`}></i>
-                                </button>
-                                {openMenus.documentos && (
-                                    <div className="pl-6">
-                                        <Link href="/documentos/administrativo" className="py-2">Administrativo</Link>
-                                        <Link href="/documentos/atendimento" className="py-2">Atendimento</Link>
-                                        <Link href="/documentos/comercial" className="py-2">Comercial</Link>
-                                        <Link href="/documentos/criacao" className="py-2">Criação</Link>
-                                        <Link href="/documentos/desenvolvimento" className="py-2">Desenvolvimento</Link>
-                                        <Link href="/documentos/marketing" className="py-2">Marketing</Link>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </div>
+                    <Menu
+                        title="Documentos"
+                        icon=""
+                        isOpen={openMenus.documentos}
+                        toggle={() => toggleMenu('documentos')}
+                    >
+                        <Link href="/documentos/administrativo" className="sidebar-link">Administrativo</Link>
+                        <Link href="/documentos/atendimento" className="sidebar-link">Atendimento</Link>
+                        <Link href="/documentos/comercial" className="sidebar-link">Comercial</Link>
+                        <Link href="/documentos/criacao" className="sidebar-link">Criação</Link>
+                        <Link href="/documentos/desenvolvimento" className="sidebar-link">Desenvolvimento</Link>
+                        <Link href="/documentos/marketing" className="sidebar-link">Marketing</Link>
+                    </Menu>
+                </Menu>
 
-                {/* Menu Gestão */}
-                <div className="flex flex-col">
-                    <button onClick={() => toggleMenu('gestao')} className="flex items-center py-2">
-                        <i className="fas fa-tasks"></i> Gestão
-                        <i className={`fas fa-chevron-right ml-auto ${openMenus.gestao ? 'rotate-90' : ''}`}></i>
-                    </button>
-                    {openMenus.gestao && (
-                        <div className="pl-6">
-                            <Link href="/admin/usertypes" className="flex items-center py-2">
-                                <i className="fas fa-tasks" aria-label="Tipos de Usuários"></i> Tipos de Usuários
-                            </Link>
-                            <Link href="/admin/users" className="flex items-center py-2">
-                                <i className="fas fa-users" aria-label="Usuários"></i> Usuários
-                            </Link>
-                            <Link href="/admin/setores" className="flex items-center py-2">
-                                <i className="fas fa-building" aria-label="Setores"></i> Setores
-                            </Link>
-                            <Link href="/admin/permissoes" className="flex items-center py-2">
-                                <i className="fas fa-lock" aria-label="Permissões"></i> Permissões
-                            </Link>
-                            <Link href="/admin/gatilhos" className="flex items-center py-2">
-                                <i className="fas fa-lock" aria-label="Gatilhos"></i> Gatilhos
-                            </Link>
-                            <Link href="/admin/configuracao" className="flex items-center py-2">
-                                <i className="fas fa-lock" aria-label="Configuração"></i> Configuração
-                            </Link>
-                        </div>
-                    )}
-                </div>
+                <Menu
+                    title="Gestão"
+                    icon="fa-tasks"
+                    isOpen={openMenus.gestao}
+                    toggle={() => toggleMenu('gestao')}
+                >
+                    <Link href="/admin/usertypes" className="sidebar-link">
+                        <i className="fas fa-tasks" aria-label="Tipos de Usuários"></i> Tipos de Usuários
+                    </Link>
+                    <Link href="/admin/users" className="sidebar-link">
+                        <i className="fas fa-users" aria-label="Usuários"></i> Usuários
+                    </Link>
+                    <Link href="/admin/setores" className="sidebar-link">
+                        <i className="fas fa-building" aria-label="Setores"></i> Setores
+                    </Link>
+                    <Link href="/admin/permissoes" className="sidebar-link">
+                        <i className="fas fa-lock" aria-label="Permissões"></i> Permissões
+                    </Link>
+                    <Link href="/admin/gatilhos" className="sidebar-link">
+                        <i className="fas fa-lock" aria-label="Gatilhos"></i> Gatilhos
+                    </Link>
+                    <Link href="/admin/configuracao" className="sidebar-link">
+                        <i className="fas fa-lock" aria-label="Configuração"></i> Configuração
+                    </Link>
+                </Menu>
 
-                {/* Menu Financeiro */}
-                <div className="flex flex-col">
-                    <button onClick={() => toggleMenu('financeiro')} className="flex items-center py-2">
-                        <i className="fas fa-tasks"></i> Financeiro
-                        <i className={`fas fa-chevron-right ml-auto ${openMenus.financeiro ? 'rotate-90' : ''}`}></i>
-                    </button>
-                    {openMenus.financeiro && (
-                        <div className="pl-6">
-                            <Link href="/boletos-vencidos-asaas" className="py-2">Boletos Vencidos Asaas</Link>
-                            <Link href="/devedores-ca" className="py-2">Devedores CA</Link>
-                        </div>
-                    )}
-                </div>
+                <Menu
+                    title="Financeiro"
+                    icon="fa-tasks"
+                    isOpen={openMenus.financeiro}
+                    toggle={() => toggleMenu('financeiro')}
+                >
+                    <Link href="/boletos-vencidos-asaas" className="sidebar-link">Boletos Vencidos Asaas</Link>
+                    <Link href="/devedores-ca" className="sidebar-link">Devedores CA</Link>
+                </Menu>
 
                 <div className="section-title">REDES SOCIAIS</div>
-                <a href="https://www.facebook.com/agencialogicadigital/" className="flex items-center py-2">
+                <a href="https://www.facebook.com/agencialogicadigital/" className="sidebar-link">
                     <i className="fab fa-facebook" aria-label="Facebook"></i>
                     Facebook
                 </a>
-                <a href="https://www.instagram.com/agencialogicadigital/" className="flex items-center py-2">
+                <a href="https://www.instagram.com/agencialogicadigital/" className="sidebar-link">
                     <i className="fab fa-instagram" aria-label="Instagram"></i>
                     Instagram
                 </a>
-                <a href="https://www.linkedin.com/company/logicadigital" className="flex items-center py-2">
+                <a href="https://www.linkedin.com/company/logicadigital" className="sidebar-link">
                     <i className="fab fa-linkedin" aria-label="LinkedIn"></i>
                     LinkedIn
                 </a>

@@ -5,6 +5,16 @@ import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState, useEffect } from 'react';
 import SidebarADM from '@/Pages/Admin/AdminSidebar';
 
+const Menu = ({ title, icon, children, isOpen, toggle }) => (
+    <div className="flex flex-col">
+        <button onClick={toggle} className="flex items-center py-2">
+            <i className={`fas ${icon}`}></i> {title}
+            <i className={`fas fa-chevron-right ml-auto ${isOpen ? 'rotate-90' : ''}`}></i>
+        </button>
+        {isOpen && <div className="pl-6">{children}</div>}
+    </div>
+);
+
 export default function Authenticated({
     header,
     children,
