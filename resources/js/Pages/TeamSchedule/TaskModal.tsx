@@ -97,8 +97,17 @@ const TaskModal = ({
         setPriority(e.target.value);
     };
 
+    const handleDateConfirm = () => {
+        setShowDateModal(false);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!reminderDate) {
+            alert('Por favor, selecione uma data.');
+            return;
+        }
 
         const formData = new FormData();
         formData.append('title', taskTitle);
@@ -318,6 +327,9 @@ const TaskModal = ({
                                 <option value="atencao">Atenção</option>
                                 <option value="urgente">Urgente</option>
                             </select>
+                            <button className="btn btn-primary" onClick={handleDateConfirm}>
+                                Confirmar
+                            </button>
                             <button className="btn btn-secondary" onClick={() => setShowDateModal(false)}>
                                 Cancelar
                             </button>

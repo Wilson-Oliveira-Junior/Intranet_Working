@@ -37,6 +37,8 @@ class TeamScheduleController extends Controller
             ->whereIn('status', [Schedule::STATUS_OPEN, Schedule::STATUS_WORKING]) // Only include open or in-progress tasks
             ->get();
 
+        Log::info('Team schedules fetched', ['teamSchedules' => $teamSchedules]);
+
         return Inertia::render('TeamSchedule/Cronograma', [
             'user' => $user,
             'teamSchedules' => $teamSchedules,
@@ -50,6 +52,8 @@ class TeamScheduleController extends Controller
     // Método para criar um novo cronograma
     public function store(Request $request)
     {
+        Log::info('Store method called', ['request' => $request->all()]);
+
         // Listar todas as tabelas no banco de dados
         $tables = DB::select('SELECT name FROM sqlite_master WHERE type="table"');
 
@@ -73,12 +77,21 @@ class TeamScheduleController extends Controller
             'follower_id' => 'nullable|integer|exists:users,id',
         ]);
 
+        Log::info('Validated data', ['validatedData' => $validatedData]);
+
+        // Ensure follower_id is always present
+        if (!array_key_exists('follower_id', $validatedData)) {
+            $validatedData['follower_id'] = null;
+        }
+
         // Definindo o status da tarefa como 'aberto' ao criar
-        $validatedData['status'] = Schedule::STATUS_OPEN;
+        $validatedData['status'] = 'aberto';
         $validatedData['creator_id'] = Auth::id(); // Adiciona o ID do criador
 
+        DB::beginTransaction();
         try {
             $schedule = Schedule::create($validatedData);
+            Log::info('Schedule created', ['schedule' => $schedule]);
 
             if ($request->hasFile('file')) {
                 $clientFolder = 'public/img/tarefas/' . $validatedData['client_id'];
@@ -98,8 +111,10 @@ class TeamScheduleController extends Controller
                 $schedule->followers()->attach($validatedData['follower_id']);
             }
 
+            DB::commit();
             return response()->json($schedule->load('followers'));
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Failed to store schedule', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Failed to store schedule'], 500);
         }
@@ -108,6 +123,8 @@ class TeamScheduleController extends Controller
     // Método para atualizar um cronograma existente
     public function update(Request $request, $id)
     {
+        Log::info('Update method called', ['request' => $request->all(), 'id' => $id]);
+
         // Valida os dados da requisição
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
@@ -124,9 +141,15 @@ class TeamScheduleController extends Controller
             'follower_id' => 'nullable|integer|exists:users,id',
         ]);
 
+        // Ensure follower_id is always present
+        if (!array_key_exists('follower_id', $validatedData)) {
+            $validatedData['follower_id'] = null;
+        }
+
         try {
             $schedule = Schedule::findOrFail($id);
             $schedule->update($validatedData);
+            Log::info('Schedule updated', ['schedule' => $schedule]);
 
             if ($request->hasFile('file')) {
                 $clientFolder = 'public/img/tarefas/' . $validatedData['client_id'];

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Inertia } from '@inertiajs/inertia';
 import '../../../css/components/gutcss.css'; // Import the CSS file
 
 const GUTTarefas = ({ arrTarefas }) => {
     const options = [0, 1, 2, 3, 4, 5];
+    const debounceTimeout = useRef(null);
 
     const calculateP = (g, u, t) => {
         const gravidade = Number(g);
@@ -22,6 +23,18 @@ const GUTTarefas = ({ arrTarefas }) => {
         }
     };
 
+    const getInitialGUTValues = (priority) => {
+        switch (priority) {
+            case 'urgente':
+                return { gravidade: 5, urgencia: 5, tendencia: 5 };
+            case 'atencao':
+                return { gravidade: 3, urgencia: 3, tendencia: 3 };
+            case 'normal':
+            default:
+                return { gravidade: 0, urgencia: 0, tendencia: 0 };
+        }
+    };
+
     const atualizarPrioridade = (id, priority) => {
         Inertia.post(`/GUT/tarefas/${id}/atualizar-prioridade`, { priority }, {
             onSuccess: (page) => {
@@ -31,6 +44,20 @@ const GUTTarefas = ({ arrTarefas }) => {
                 console.error('Erro ao atualizar prioridade:', errors);
             }
         });
+    };
+
+    const handleChange = (id, setFunc, value, otherValues, setPontuacao, setPriority) => {
+        setFunc(value);
+        if (debounceTimeout.current) {
+            clearTimeout(debounceTimeout.current);
+        }
+        debounceTimeout.current = setTimeout(() => {
+            const newPontuacao = calculateP(...otherValues);
+            setPontuacao(newPontuacao);
+            const newPriority = getPriority(newPontuacao);
+            setPriority(newPriority);
+            atualizarPrioridade(id, newPriority);
+        }, 500);
     };
 
     return (
@@ -50,21 +77,28 @@ const GUTTarefas = ({ arrTarefas }) => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
                 {arrTarefas.map((tarefa, key) => {
-                    const [gravidade, setGravidade] = useState(tarefa.gravidade || 0);
-                    const [urgencia, setUrgencia] = useState(tarefa.urgencia || 0);
-                    const [tendencia, setTendencia] = useState(tarefa.tendencia || 0);
-                    const [pontuacao, setPontuacao] = useState(calculateP(tarefa.gravidade, tarefa.urgencia, tarefa.tendencia));
-                    const [priority, setPriority] = useState(getPriority(pontuacao));
+                    const initialValues = getInitialGUTValues(tarefa.priority);
+                    const [gravidade, setGravidade] = useState(tarefa.gravidade ?? initialValues.gravidade);
+                    const [urgencia, setUrgencia] = useState(tarefa.urgencia ?? initialValues.urgencia);
+                    const [tendencia, setTendencia] = useState(tarefa.tendencia ?? initialValues.tendencia);
+                    const [pontuacao, setPontuacao] = useState(calculateP(gravidade, urgencia, tendencia));
+                    const [priority, setPriority] = useState(tarefa.priority ?? getPriority(pontuacao));
 
                     useEffect(() => {
                         const newPontuacao = calculateP(gravidade, urgencia, tendencia);
                         setPontuacao(newPontuacao);
-                        const newPriority = getPriority(newPontuacao);
-                        if (newPriority !== priority) {
-                            setPriority(newPriority);
-                            atualizarPrioridade(tarefa.id, newPriority);
-                        }
+                        setPriority(getPriority(newPontuacao));
+                        console.log(`Tarefa ID: ${tarefa.id}, Gravidade: ${gravidade}, Urgência: ${urgencia}, Tendência: ${tendencia}, Pontuação: ${newPontuacao}, Prioridade: ${getPriority(newPontuacao)}`);
                     }, [gravidade, urgencia, tendencia]);
+
+                    useEffect(() => {
+                        const initialValues = getInitialGUTValues(tarefa.priority);
+                        setGravidade(initialValues.gravidade);
+                        setUrgencia(initialValues.urgencia);
+                        setTendencia(initialValues.tendencia);
+                        setPontuacao(calculateP(initialValues.gravidade, initialValues.urgencia, initialValues.tendencia));
+                        console.log(`Tarefa ID: ${tarefa.id}, Prioridade Inicial: ${tarefa.priority}, Gravidade Inicial: ${initialValues.gravidade}, Urgência Inicial: ${initialValues.urgencia}, Tendência Inicial: ${initialValues.tendencia}`);
+                    }, [tarefa.priority]);
 
                     return (
                         <tr key={tarefa.id}>
@@ -74,21 +108,33 @@ const GUTTarefas = ({ arrTarefas }) => {
                                 </a>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                                <select className="border border-gray-300 rounded p-1" value={gravidade} onChange={(e) => setGravidade(Number(e.target.value))}>
+                                <select
+                                    className="border border-gray-300 rounded p-1"
+                                    value={gravidade}
+                                    onChange={(e) => handleChange(tarefa.id, setGravidade, Number(e.target.value), [Number(e.target.value), urgencia, tendencia], setPontuacao, setPriority)}
+                                >
                                     {options.map(option => (
                                         <option key={option} value={option}>{option}</option>
                                     ))}
                                 </select>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                                <select className="border border-gray-300 rounded p-1" value={urgencia} onChange={(e) => setUrgencia(Number(e.target.value))}>
+                                <select
+                                    className="border border-gray-300 rounded p-1"
+                                    value={urgencia}
+                                    onChange={(e) => handleChange(tarefa.id, setUrgencia, Number(e.target.value), [gravidade, Number(e.target.value), tendencia], setPontuacao, setPriority)}
+                                >
                                     {options.map(option => (
                                         <option key={option} value={option}>{option}</option>
                                     ))}
                                 </select>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                                <select className="border border-gray-300 rounded p-1" value={tendencia} onChange={(e) => setTendencia(Number(e.target.value))}>
+                                <select
+                                    className="border border-gray-300 rounded p-1"
+                                    value={tendencia}
+                                    onChange={(e) => handleChange(tarefa.id, setTendencia, Number(e.target.value), [gravidade, urgencia, Number(e.target.value)], setPontuacao, setPriority)}
+                                >
                                     {options.map(option => (
                                         <option key={option} value={option}>{option}</option>
                                     ))}

@@ -13,7 +13,7 @@ class Comment extends Model
         'text',
         'date',
         'user_id',
-        'task_id',
+        'task_id', // Add task_id to fillable
     ];
 
     public function user()

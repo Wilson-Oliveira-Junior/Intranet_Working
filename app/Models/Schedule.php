@@ -15,6 +15,7 @@ class Schedule extends Model
 
     protected $fillable = [
         'titulo',
+        'title', // Add title to fillable
         'gravidade',
         'urgencia',
         'tendencia',
@@ -24,7 +25,16 @@ class Schedule extends Model
         'status',
         'id_responsavel',
         'id_equipe',
-        'idusuario_gut'
+        'idusuario_gut',
+        'description', // Add description to fillable
+        'date', // Add date to fillable
+        'sector_id', // Add sector_id to fillable
+        'user_id', // Add user_id to fillable
+        'client_id', // Add client_id to fillable
+        'tipo_tarefa_id', // Add tipo_tarefa_id to fillable
+        'hours_worked', // Add hours_worked to fillable
+        'priority', // Add priority to fillable
+        'creator_id', // Add creator_id to fillable
     ];
 
     public function responsavel()

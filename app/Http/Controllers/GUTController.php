@@ -65,6 +65,27 @@ class GUTController extends Controller
 
         Log::info('Tarefas:', $arrTarefas->toArray());
 
+        foreach ($arrTarefas as $tarefa) {
+            // Inicialize os valores de gravidade, urgência e tendência se estiverem nulos
+            $tarefa->gravidade = $tarefa->gravidade ?? 0;
+            $tarefa->urgencia = $tarefa->urgencia ?? 0;
+            $tarefa->tendencia = $tarefa->tendencia ?? 0;
+
+            // Calcule a pontuação se estiver nula
+            if (is_null($tarefa->tarefa_ordem)) {
+                $tarefa->tarefa_ordem = $tarefa->gravidade * $tarefa->urgencia * $tarefa->tendencia;
+            }
+
+            Log::info('Tarefa detalhes:', [
+                'id' => $tarefa->id,
+                'gravidade' => $tarefa->gravidade,
+                'urgencia' => $tarefa->urgencia,
+                'tendencia' => $tarefa->tendencia,
+                'pontuacao' => $tarefa->tarefa_ordem,
+                'priority' => $tarefa->priority
+            ]);
+        }
+
         if ($arrTarefas->isEmpty()) {
             Log::warning('No tasks found for the specified criteria.', ['sector_id' => $sector_id, 'usuarios' => $usuarios]);
         }
@@ -111,9 +132,13 @@ class GUTController extends Controller
         $tarefa->priority = $request->input('priority');
         $tarefa->save();
 
+        $sector_id = $tarefa->sector_id;
+        $arrTarefas = $this->fetchTarefas($sector_id);
+
         return Inertia::render('GUT/Index', [
             'message' => 'Prioridade atualizada com sucesso',
             'tarefa' => $tarefa,
+            'arrTarefas' => $arrTarefas,
         ]);
     }
 }

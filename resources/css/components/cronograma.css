@@ -90,11 +90,15 @@ body {
 }
 
 .task.normal {
-    background-color: green;
+    background-color: #d3d3d3; /* Cor para tarefas normais */
+}
+
+.task.atencao {
+    background-color: #ffcc00; /* Cor para tarefas de atenção */
 }
 
 .task.urgente {
-    background-color: red;
+    background-color: #ff0000; /* Cor para tarefas urgentes */
 }
 
 .header-container {
@@ -229,7 +233,7 @@ body {
 }
 
 .calendar-navigation button:hover {
-    background-color: #0056b3;
+    background-color: #00b315;
 }
 
 .calendar-navigation span {

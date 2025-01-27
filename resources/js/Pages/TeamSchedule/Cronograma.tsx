@@ -35,7 +35,8 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
     const [attachments, setAttachments] = useState([]); // Add state for attachments
-
+    const [tipoTarefaId, setTipoTarefaId] = useState(''); // Add state for tipoTarefaId
+    const [loading, setLoading] = useState(false); // Add loading state
 
     const debounceTimeout = useRef(null);
 
@@ -101,6 +102,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
         setSelectedSector(task ? task.sector_id.toString() : '');
         setTaskStatus(task ? task.status : 'aberto');
         setAttachments(task ? task.attachments || [] : []); // Ensure setAttachments is defined
+        setTipoTarefaId(task ? task.tipo_tarefa_id : ''); // Ensure setTipoTarefaId is defined
         setModalIsOpen(true);
     };
 
@@ -129,41 +131,17 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
         setTaskStatus('aberto');
         setNewComment('');
         setAttachments([]); // Reset attachments
+        setTipoTarefaId(''); // Reset tipoTarefaId
     };
 
-    const saveTaskDetails = async () => {
-        let sectorId = selectedSector;
-        if (taskType === 'sector' && !selectedSector) {
-            const sectorResponse = await fetch(`/api/sectors?name=${user.sector}`);
-            const sectorData = await sectorResponse.json();
-            if (sectorData.error) {
-                alert('Erro ao buscar setor: ' + sectorData.error);
-                return;
-            }
-            sectorId = sectorData.id.toString();
-        }
-
-        const newTask = {
-            title: taskTitle,
-            description: taskDescription,
-            date: reminderDate || new Date().toISOString().slice(0, 10),
-            sector_id: parseInt(sectorId),
-            user_id: taskType === 'individual' ? followerId : null,
-            client_id: clientId,
-            priority: priority,
-            status: 'aberto',
-            attachments: attachments, // Include attachments
-            follower_id: followerId, // Include follower_id
-        };
-
+    const saveTaskDetails = async (formData) => {
         try {
             const response = await fetch('/api/teamSchedule/store', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': getCsrfToken(),
                 },
-                body: JSON.stringify(newTask),
+                body: formData,
             });
 
             const responseText = await response.text();
@@ -186,39 +164,14 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
         closeModal();
     };
 
-    const updateTaskDetails = async () => {
-        let sectorId = selectedSector;
-        if (taskType === 'sector' && !selectedSector) {
-            const sectorResponse = await fetch(`/api/sectors?name=${user.sector}`);
-            const sectorData = await sectorResponse.json();
-            if (sectorData.error) {
-                alert('Erro ao buscar setor: ' + sectorData.error);
-                return;
-            }
-            sectorId = sectorData.id.toString();
-        }
-
-        const updatedTask = {
-            title: taskTitle,
-            description: taskDescription,
-            date: reminderDate,
-            sector_id: parseInt(sectorId),
-            user_id: taskType === 'individual' ? followerId : null,
-            client_id: clientId,
-            priority: priority,
-            status: taskStatus,
-            attachments: attachments, // Include attachments
-            follower_id: followerId, // Include follower_id
-        };
-
+    const updateTaskDetails = async (formData) => {
         try {
             const response = await fetch(`/cronograma/${selectedTask.id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': getCsrfToken(),
                 },
-                body: JSON.stringify(updatedTask),
+                body: formData,
             });
 
             const responseText = await response.text();
@@ -336,7 +289,8 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
                 const taskDate = new Date(task.date);
                 const isTaskForDay = taskDate.getUTCDate() === day && taskDate.getUTCMonth() === currentMonth && taskDate.getUTCFullYear() === currentYear;
                 const isTaskForUser = task.sector_id === user.sector_id || task.user_id === user.id;
-                return isTaskForDay && isTaskForUser;
+                const isTaskOpenOrWorking = task.status === 'aberto' || task.status === 'trabalhando';
+                return isTaskForDay && isTaskForUser && isTaskOpenOrWorking;
             });
 
             days.push(
@@ -461,7 +415,9 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
                         setTaskStatus={setTaskStatus}
                         fetchSectorUsers={fetchSectorUsers}
                         users={users} // Pass the list of active users to TaskModal
-                        tiposTarefa={tiposTarefa} // Adicione esta linha
+                        tiposTarefa={tiposTarefa} // Pass tiposTarefa to TaskModal
+                        tipoTarefaId={tipoTarefaId} // Pass tipoTarefaId to TaskModal
+                        setTipoTarefaId={setTipoTarefaId} // Pass setTipoTarefaId to TaskModal
                         attachments={attachments} // Pass attachments to TaskModal
                         setAttachments={setAttachments} // Pass setAttachments to TaskModal
                     />
