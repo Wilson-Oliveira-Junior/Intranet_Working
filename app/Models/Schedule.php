@@ -9,9 +9,9 @@ class Schedule extends Model
 {
     use HasFactory;
 
-    const STATUS_OPEN = 'open';
-    const STATUS_WORKING = 'working';
-    const STATUS_CLOSED = 'closed';
+    const STATUS_OPEN = 'aberto';
+    const STATUS_WORKING = 'trabalhando';
+    const STATUS_CLOSED = 'concluído';
 
     protected $fillable = [
         'titulo',
