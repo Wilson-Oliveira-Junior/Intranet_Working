@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Inertia } from '@inertiajs/inertia';
+import axios from 'axios';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import GUTTarefas from './Tarefas';
-import '../../../css/components/gutcss.css'; // Import the CSS file
+import '../../../css/components/gutcss.css';
 
 interface Equipe {
     id: number;
@@ -49,34 +50,52 @@ const GUTIndex: React.FC<GUTIndexProps> = ({ equipe, setores, arrTarefas = [] })
     const [selectedEquipe, setSelectedEquipe] = useState(equipe.id);
     const [tarefas, setTarefas] = useState<Tarefa[]>(arrTarefas);
     const [warning, setWarning] = useState<string | null>(null);
+    const [selectedTarefa, setSelectedTarefa] = useState<Tarefa | null>(null);
+    const [gravidade, setGravidade] = useState(0);
+    const [urgencia, setUrgencia] = useState(0);
+    const [tendencia, setTendencia] = useState(0);
+    const [pontuacao, setPontuacao] = useState(0);
 
-    const fetchTarefas = (sector_id: number) => {
+    useEffect(() => {
+        if (selectedTarefa) {
+            setGravidade(selectedTarefa.gravidade);
+            setUrgencia(selectedTarefa.urgencia);
+            setTendencia(selectedTarefa.tendencia);
+            setPontuacao(selectedTarefa.tarefa_ordem);
+        }
+    }, [selectedTarefa]);
+
+    const fetchTarefas = async (sector_id: number) => {
         console.log(`Fetching tasks for sector ID: ${sector_id}`);
-        Inertia.visit(`/GUT/tarefas/${sector_id}`, {
-            method: 'get',
-            onSuccess: (page) => {
-                if (page.props.arrTarefas && page.props.arrTarefas.length > 0) {
-                    console.log('Tasks fetched successfully:', page.props.arrTarefas);
-                    setTarefas(page.props.arrTarefas as Tarefa[]);
-                    setWarning(null);
-                } else {
-                    console.error('No tasks found for the specified criteria.');
-                    setTarefas([]);
-                    setWarning('Sem tarefas para esse setor');
-                }
-            },
-            onError: (errors) => {
-                console.error('Error fetching tasks:', errors);
-                setWarning('Erro ao buscar tarefas');
+        try {
+            if (selectedTarefa) {
+                await axios.post(`/GUT/tarefas/${selectedTarefa.id}/atualizar-prioridade`, {
+                    idtarefa: selectedTarefa.id,
+                    gravidade,
+                    urgencia,
+                    tendencia,
+                    pontuacao,
+                });
             }
-        });
+
+            const response = await axios.get(`/GUT/tarefas/${sector_id}`);
+            const { arrTarefas } = response.data;
+            setTarefas(arrTarefas);
+            setWarning(null);
+        } catch (error) {
+            console.error('Erro ao buscar tarefas:', error);
+            setWarning('Erro ao buscar tarefas');
+        }
     };
 
     const handleEquipeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newEquipeId = Number(event.target.value);
         console.log(`Equipe changed to: ${newEquipeId}`);
         setSelectedEquipe(newEquipeId);
-        fetchTarefas(newEquipeId);
+    };
+
+    const handleUpdateList = () => {
+        fetchTarefas(selectedEquipe);
     };
 
     return (
@@ -97,7 +116,7 @@ const GUTIndex: React.FC<GUTIndexProps> = ({ equipe, setores, arrTarefas = [] })
                                     Você está visualizando a área de: <strong>{equipe.name}</strong>
                                 </div>
                             </div>
-                            <button onClick={() => fetchTarefas(selectedEquipe)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            <button onClick={handleUpdateList} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                 Atualizar Listagem
                             </button>
                         </div>

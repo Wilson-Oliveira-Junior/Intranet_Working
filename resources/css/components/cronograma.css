@@ -90,7 +90,7 @@ body {
 }
 
 .task.normal {
-    background-color: #d3d3d3; /* Cor para tarefas normais */
+    background-color: #00fd1e; /* Cor para tarefas normais */
 }
 
 .task.atencao {

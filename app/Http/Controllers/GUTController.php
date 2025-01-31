@@ -119,7 +119,10 @@ class GUTController extends Controller
         $tarefa->idusuario_gut = Auth::id();
         $tarefa->save();
 
-        return response()->json($tarefa);
+        // Atualizar a lista de tarefas após salvar a pontuação
+        $arrTarefas = $this->fetchTarefas($tarefa->sector_id);
+
+        return response()->json(['tarefa' => $tarefa, 'arrTarefas' => $arrTarefas]);
     }
 
     public function atualizarPrioridade(Request $request, $id)

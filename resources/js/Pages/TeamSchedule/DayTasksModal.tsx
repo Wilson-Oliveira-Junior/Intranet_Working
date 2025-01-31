@@ -2,22 +2,31 @@ import React from 'react';
 import '../../../css/components/modal.css';
 
 const DayTasksModal = ({ tasks, openResponseModal, closeModal }) => {
+    const handleTaskClick = (task) => {
+        closeModal();
+        openResponseModal(task);
+    };
+
     return (
         <div className="modal-container">
             <div className="modal">
                 <div className="modal-content">
                     <div className="header">
-                        <h1>Tarefas do Dia</h1>
+                        <h2>Tarefas do Dia</h2>
+                        <span className="close" onClick={closeModal}>&times;</span>
                     </div>
                     <div className="content">
-                        {tasks.map((task, index) => (
-                            <div key={index} className="task-item" onClick={() => openResponseModal(task)}>
-                                <div className={`task ${task.priority}`}>
-                                    <h3>{task.title}</h3>
-                                    <p>{task.description}</p>
-                                </div>
-                            </div>
-                        ))}
+                        {tasks.length === 0 ? (
+                            <p>Não há tarefas para este dia.</p>
+                        ) : (
+                            <ul>
+                                {tasks.map((task) => (
+                                    <li key={task.id} onClick={() => handleTaskClick(task)}>
+                                        {task.title} - {task.priority}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                     <div className="modal-footer">
                         <button onClick={closeModal} className="modal-button">

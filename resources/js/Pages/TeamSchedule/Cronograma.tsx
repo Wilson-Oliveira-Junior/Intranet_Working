@@ -36,7 +36,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
     const [attachments, setAttachments] = useState([]); // Add state for attachments
     const [tipoTarefaId, setTipoTarefaId] = useState(''); // Add state for tipoTarefaId
-    const [loading, setLoading] = useState(false); // Add loading state
+
 
     const debounceTimeout = useRef(null);
 
