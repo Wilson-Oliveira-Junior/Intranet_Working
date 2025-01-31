@@ -34,3 +34,45 @@ createInertiaApp({
         color: '#4B5563',
     },
 });
+
+function registerDarkModeToggle() {
+    const toggleDarkMode = document.getElementById('toggle-dark-mode');
+    const body = document.body;
+
+    if (toggleDarkMode) {
+        console.log('Toggle Dark Mode button found');
+        toggleDarkMode.addEventListener('click', function () {
+            console.log('Toggle Dark Mode button clicked');
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                console.log('Dark mode enabled');
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                console.log('Dark mode disabled');
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+    } else {
+        console.log('Toggle Dark Mode button not found');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Load the user's preference from localStorage
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+    }
+
+    // Register the dark mode toggle after the initial render
+    registerDarkModeToggle();
+
+    // Use MutationObserver to register the dark mode toggle when the button is added to the DOM
+    const observer = new MutationObserver(() => {
+        registerDarkModeToggle();
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+    });
+});

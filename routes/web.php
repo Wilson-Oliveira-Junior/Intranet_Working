@@ -163,4 +163,8 @@ Route::post('/api/cronograma/{id}/add-follower', [TeamScheduleController::class,
 Route::post('/api/cronograma/{id}/remove-follower', [TeamScheduleController::class, 'removeFollower'])->name('web.teamSchedule.removeFollower');
 Route::post('/api/uploadAttachment', [TeamScheduleController::class, 'uploadAttachment'])->name('web.teamSchedule.uploadAttachment');
 
+Route::get('/css/app.css', function () {
+    return response()->file(public_path('css/app.css'));
+});
+
 require __DIR__ . '/auth.php';
