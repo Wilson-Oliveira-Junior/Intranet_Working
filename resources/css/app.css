@@ -11,6 +11,11 @@ body.dark-mode a {
     color: #bb86fc;
 }
 
+body.dark-mode .navbar a,
+body.dark-mode .sidebar a {
+    background-color: #1f1f1f;
+}
+
 body.dark-mode .navbar,
 body.dark-mode .sidebar,
 body.dark-mode .content,
@@ -28,7 +33,12 @@ body.dark-mode .sidebar {
     color: #e0e0e0;
 }
 
-body.dark-mode .card h2{
+body.dark-mode .menu-title {
+    color: #bb86fc;
+    background-color: #1f1f1f;
+}
+
+body.dark-mode .card h2 {
     color: #ffffff;
 }
 
@@ -48,7 +58,7 @@ body.dark-mode .footer {
 }
 
 body.dark-mode .card {
-    background-color: #2c2c2c;
+    background-color: #555454;
     color: #e0e0e0;
 }
 
@@ -63,18 +73,17 @@ body.dark-mode .table {
 }
 
 body.dark-mode button {
-    background-color: #2c2c2c;
+    background-color: #1a067b;
     color: #e0e0e0;
+    border-radius: 0.2%;
 }
 
 body.dark-mode #topbar {
     background-color: #1f1f1f;
     color: #e0e0e0;
-}
-
-body.dark-mode #navbar-top {
-    background-color: #1f1f1f;
-    color: #e0e0e0;
+    border-bottom: 1px solid #ffffff;
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .bg-light {
@@ -85,5 +94,288 @@ body.dark-mode #navbar-top {
     background-color: #1f1f1f;
 }
 
-/* Adicione mais estilos conforme necessário para outros elementos */
+.navbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
 
+.navbar.dark-mode {
+    background-color: #1f1f1f;
+    border-bottom: 1px solid #374151;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.logo {
+    height: 2.25rem;
+    width: auto;
+    fill: currentColor;
+    color: #1f2937;
+    padding-left: 2rem;
+}
+
+.logo.dark-mode {
+    color: #e0e0e0;
+}
+
+.toggle-dark-mode {
+    margin-right: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #4a5568;
+    color: #ffffff;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-dark-mode:hover {
+    background-color: #2d3748;
+}
+
+.dropdown-button {
+    display: inline-flex;
+    align-items: center;
+    border: none;
+    background-color: #ffffff;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    transition: color 0.15s ease-in-out;
+}
+
+body.dark-mode .dropdown-button {
+    display: inline-flex;
+    background-color: #3c3c3c;
+    color: #e0e0e0;
+    align-items: center;
+    border: 1px solid #e0e0e0;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    transition: color 0.15s ease-in-out;
+    border-radius: 10%;
+}
+
+.dropdown-icon {
+    margin-left: 0.5rem;
+    height: 1rem;
+    width: 1rem;
+}
+
+.dropdown-menu {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    padding: 0.5rem 0;
+}
+
+body.dark-mode .dropdown-menu {
+    background-color: #3c3c3c;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #6b7280;
+    text-decoration: none;
+    transition: background-color 0.15s ease-in-out;
+}
+
+body.dark-mode .dropdown-menu a {
+    color: #e0e0e0;
+}
+
+.dropdown-menu a:hover {
+    background-color: #f9fafb;
+}
+
+body.dark-mode .dropdown-menu a:hover {
+    background-color: #4b5563;
+}
+
+.header {
+    background-color: #ffffff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.header.dark-mode {
+    background-color: #1f1f1f;
+}
+
+.content {
+    background-color: #ffffff;
+}
+
+.content.dark-mode {
+    background-color: #1f1f1f;
+}
+
+.sidebar {
+    background-color: #ffffff;
+    color: #1f2937;
+}
+
+.sidebar.dark-mode {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+}
+
+.dark-mode .teste {
+    border-right: 1px solid #e0e0e0;
+}
+
+* {
+	border: 0;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body, input {
+	color: hsl(0,0%,10%);
+	font: 1em/1.5 sans-serif;
+}
+
+#dark-mode-form, #dark-mode-form .toggle:before, #dark-mode-form .toggle:after {
+	background: hsl(0,0%,100%);
+}
+
+#dark-mode-form, #dark-mode-form .toggle {
+	position: relative;
+}
+
+#dark-mode-form {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: auto;
+}
+
+.curtain, .sr, .toggle:before, .toggle:after {
+	position: absolute;
+}
+
+.curtain, .toggle:before, .toggle:after {
+	transition: transform var(--dur);
+}
+
+.curtain, .toggle:before, .toggle:checked:after  {
+	transition-timing-function: ease-out;
+}
+
+.curtain, .sr {
+	top: 0;
+	left: 0;
+}
+
+.curtain {
+	background: hsl(0,0%,100%);
+	mix-blend-mode: difference;
+	pointer-events: none;
+	width: 100%;
+	height: 100%;
+	transform: scaleX(0);
+	transform-origin: 0 50%;
+	transition: transform var(--dur) ease-out;
+}
+
+.sr, .toggle {
+	overflow: hidden;
+}
+
+.sr {
+	clip: rect(1px,1px,1px,1px);
+	color: transparent;
+	width: 1px;
+	height: 1px;
+}
+
+.toggle {
+	background: currentColor;
+	border-radius: 0.75em;
+	cursor: pointer;
+	width: 2.3em; /* Increase width by 15% */
+	height: 1.15em; /* Increase height by 15% */
+	-webkit-appearance: none;
+	appearance: none;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.toggle:before, .toggle:after {
+	border-radius: 50%;
+	content: "";
+	display: block;
+	top: 0.15em; /* Adjust top to fit the new size */
+	left: 0.15em; /* Adjust left to fit the new size */
+	width: 0.9em; /* Increase width by 15% */
+	height: 0.9em; /* Increase height by 15% */
+}
+
+.toggle:before, .toggle:checked:after {
+	transition-delay: 0s;
+}
+
+.toggle:checked:before, .toggle:after {
+	transition-delay: calc(var(--dur) * 0.75);
+	transition-timing-function: cubic-bezier(0.3,1.6,0.5,0.7);
+}
+
+.toggle:before {
+	transform: translateX(-1.5em);
+}
+
+.toggle:checked:before {
+	transform: translateX(1.5em);
+}
+
+.toggle:checked:after {
+	transform: translateX(3em);
+}
+
+.toggle:checked ~ .curtain {
+	transform: scaleX(1);
+}
+
+.toggle:focus {
+	outline: transparent;
+}
+
+.text-white {
+    color: #ffffff !important;
+}
+
+.text-black {
+    color: #000000 !important;
+}
+
+.flex {
+    display: flex;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.space-x-8 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(2rem * var(--tw-space-x-reverse));
+    margin-left: calc(2rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+.ml-2 {
+    margin-left: 0.5rem;
+}

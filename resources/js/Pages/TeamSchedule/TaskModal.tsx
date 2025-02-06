@@ -142,7 +142,7 @@ const TaskModal = ({
                             <h2>{selectedTask ? 'Editar Tarefa' : 'Criar nova Tarefa'}</h2>
                             <span className="close" onClick={closeModal}>&times;</span>
                         </div>
-                        <form onSubmit={handleSubmit}>
+                        <form id="task-modal-form" onSubmit={handleSubmit}>
                             <div className="task-form-group">
                                 <label htmlFor="titulo">Título da tarefa</label>
                                 <input

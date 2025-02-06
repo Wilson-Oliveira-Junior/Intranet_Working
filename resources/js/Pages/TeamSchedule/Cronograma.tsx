@@ -281,7 +281,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
         let days = [];
 
         for (let i = 0; i < firstDay; i++) {
-            days.push(<div key={`empty-${i}`} className="calendar-day empty" />);
+            days.push(<div key={`empty-${i}`} className="cronograma-calendar-day empty" />);
         }
 
         for (let day = 1; day <= daysInMonth; day++) {
@@ -294,15 +294,15 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
             });
 
             days.push(
-                <div key={day} className="calendar-day" onClick={() => tasksForDay.length > 1 ? openDayTasksModal(tasksForDay) : openResponseModal(tasksForDay[0])}>
-                    <div className="day-number">{day}</div>
+                <div key={day} className="cronograma-calendar-day" onClick={() => tasksForDay.length > 1 ? openDayTasksModal(tasksForDay) : openResponseModal(tasksForDay[0])}>
+                    <div className="cronograma-day-number">{day}</div>
                     {tasksForDay.length > 1 ? (
                         <div className="multiple-tasks-indicator">
                             {tasksForDay.length} tarefas
                         </div>
                     ) : (
                         tasksForDay.map((task, index) => (
-                            <div key={index} className={`task ${task.priority}`}>
+                            <div key={index} className={`cronograma-task ${task.priority}`}>
                                 {task.title}
                             </div>
                         ))
@@ -312,7 +312,7 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
 
             if (days.length === 7 || day === daysInMonth) {
                 weeks.push(
-                    <div key={weeks.length} className="calendar-week">
+                    <div key={weeks.length} className="cronograma-calendar-week">
                         {days}
                     </div>
                 );
@@ -341,43 +341,43 @@ const Cronograma = ({ user, teamSchedules, sectors, users, tiposTarefa }) => {
 
     return (
         <AuthenticatedLayout user={user}>
-            <div className="calendar-container">
+            <div className="cronograma-calendar-container">
                 <h1>Calendário de Tarefas</h1>
-                <div className="tab-container">
+                <div className="cronograma-tab-container">
                     {equipes.map((equipe, index) => (
-                        <div key={index} className="tab">
+                        <div key={index} className="cronograma-tab">
                             <input
                                 type="radio"
                                 name="tab"
                                 id={`tab${index}`}
-                                className="tab_input"
+                                className="cronograma-tab_input"
                                 checked={selectedEquipe === equipe.name}
                                 onChange={() => handleTabChange(equipe.name, index)}
                             />
-                            <label className="tab_label" htmlFor={`tab${index}`}>
+                            <label className="cronograma-tab_label" htmlFor={`tab${index}`}>
                                 {equipe.name}
                             </label>
                         </div>
                     ))}
-                    <div className="indicator" style={{ left: `${indicatorPosition}px` }} />
+                    <div className="cronograma-indicator" style={{ left: `${indicatorPosition}px` }} />
                 </div>
 
-                <div className="header-container">
-                    <button className="add-task-button" onClick={() => openModal(null)}>Adicionar Tarefa</button>
-                    <div className="legenda-container">
-                        <div className="legenda-item">
-                            <span className="legenda-task normal" /> Normal
+                <div className="cronograma-header-container">
+                    <button className="cronograma-add-task-button" onClick={() => openModal(null)}>Adicionar Tarefa</button>
+                    <div className="cronograma-legenda-container">
+                        <div className="cronograma-legenda-item">
+                            <span className="cronograma-legenda-task normal" /> Normal
                         </div>
-                        <div className="legenda-item">
-                            <span className="legenda-task atencao" /> Atenção
+                        <div className="cronograma-legenda-item">
+                            <span className="cronograma-legenda-task atencao" /> Atenção
                         </div>
-                        <div className="legenda-item">
-                            <span className="legenda-task urgente" /> Urgente
+                        <div className="cronograma-legenda-item">
+                            <span className="cronograma-legenda-task urgente" /> Urgente
                         </div>
                     </div>
                 </div>
 
-                <div className="calendar-navigation">
+                <div className="cronograma-calendar-navigation">
                     <button onClick={handlePrevMonth}>Anterior</button>
                     <span>{new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
                     <button onClick={handleNextMonth}>Próximo</button>

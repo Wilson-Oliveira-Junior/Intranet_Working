@@ -625,4 +625,93 @@
     gap: 10px;
 }
 
+/* Dark mode styles */
+body.dark-mode .modal {
+    background-color: #333;
+    color: #fff;
+}
+
+body.dark-mode .modal .header {
+    background-color: #2a2a2a;
+    border-bottom: 1px solid #444;
+}
+
+body.dark-mode .modal .header h1 {
+    color: #fff;
+}
+
+body.dark-mode .modal .content {
+    background-color: #333;
+    color: #fff;
+}
+
+body.dark-mode .modal .content .info .left img {
+    background-color: #444;
+}
+
+body.dark-mode .modal .content .info .right .time {
+    color: #fff;
+}
+
+body.dark-mode .modal .content .info .right .time span {
+    color: #aaa;
+}
+
+body.dark-mode .modal .content .description {
+    border-top: 1px solid #444;
+    border-bottom: 1px solid #444;
+}
+
+body.dark-mode .modal .content .description p {
+    color: #aaa;
+}
+
+body.dark-mode .modal .content .tabs button {
+    color: #aaa;
+}
+
+body.dark-mode .modal .content .tabs button.active {
+    border-bottom: 2px solid #0056b3;
+    color: #0056b3;
+}
+
+body.dark-mode .modal .comment-section .input-group textarea {
+    background-color: #444;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+body.dark-mode .modal .comment-section .input-group button {
+    background-color: #0056b3;
+}
+
+body.dark-mode .modal .comment-section .no-comments {
+    color: #aaa;
+}
+
+body.dark-mode .modal .comment-section .no-comments img {
+    background-color: #444;
+}
+
+body.dark-mode .modal-footer {
+    border-top: 1px solid #444;
+}
+
+body.dark-mode .modal-footer .modal-button {
+    background-color: #0056b3;
+}
+
+body.dark-mode .modal-footer .modal-button:hover {
+    background-color: #003f7f;
+}
+
+body.dark-mode .fixed-input {
+    background: #333;
+    border-bottom: 1px solid #444;
+}
+
+body.dark-mode .comment-actions {
+    color: #fff;
+}
+
 
