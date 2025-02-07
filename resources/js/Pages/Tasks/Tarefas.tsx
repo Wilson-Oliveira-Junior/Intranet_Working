@@ -131,10 +131,8 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
                 task.status = 'trabalhando';
                 task.start_time = new Date().toISOString();
                 setTaskStatus('trabalhando');
-                console.log('Task started successfully');
             } else {
                 const errorData = await response.json();
-                console.error('Failed to start task:', errorData);
             }
         } catch (error) {
             console.error('Error starting task:', error);
@@ -155,7 +153,6 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
             if (response.ok) {
                 task.status = 'fechadas';
                 setTaskStatus('fechadas');
-                console.log('Task completed successfully');
             } else {
                 console.error('Failed to complete task:', await response.json());
             }

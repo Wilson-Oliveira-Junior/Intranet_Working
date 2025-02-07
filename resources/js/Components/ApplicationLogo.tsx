@@ -1,14 +1,13 @@
 import { ImgHTMLAttributes } from 'react';
 
-interface ApplicationLogoProps extends ImgHTMLAttributes<HTMLImageElement> {
+interface ApplicationLogoProps extends ImgHTMLAttributes<HTMLDivElement> {
     size?: string;
 }
 
-export default function ApplicationLogo({ size = 'auto', ...props }: ApplicationLogoProps) {
+export default function ApplicationLogo({ size = '10rem', ...props }: ApplicationLogoProps) {
     return (
-        <img
-            src="/img/logo.png"
-            alt="Logo"
+        <div
+            className="logo"
             style={{ width: size }}
             {...props}
         />

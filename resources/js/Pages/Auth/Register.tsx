@@ -2,9 +2,10 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
+import Layout from '@/Layouts/Layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -23,8 +24,12 @@ export default function Register() {
     };
 
     return (
-        <GuestLayout>
+        <Layout>
             <Head title="Register" />
+
+            <div className="flex justify-center mb-4">
+                <img src="/img/logo.png" alt="Logo" className="w-120 h-20" />
+            </div>
 
             <form onSubmit={submit}>
                 <div>
@@ -116,6 +121,6 @@ export default function Register() {
                     </PrimaryButton>
                 </div>
             </form>
-        </GuestLayout>
+        </Layout>
     );
 }

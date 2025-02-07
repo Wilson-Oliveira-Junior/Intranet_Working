@@ -169,7 +169,7 @@ const ClientList: React.FC = () => {
 
     return (
         <AuthenticatedLayout user={auth.user}>
-            <div className="container">
+            <div className="list-container">
                 <h1>Listagem de Clientes</h1>
                 <div className="filters">
                     <label>
@@ -223,20 +223,21 @@ const ClientList: React.FC = () => {
                         {clients.map((client: Client) => (
                             <React.Fragment key={client.id}>
                                 <tr>
-                                    <td>{client.nome}</td> {/* Keep this line as it is */}
+                                    <td>{client.nome}</td>
                                     <td>
                                         <button onClick={() => toggleClientDetails(client.id)}>
                                             {expandedClientId === client.id ? '-' : '+'}
                                         </button>
                                     </td>
                                     <td>
-                                        <label className="switch">
+                                        <label className="switch-list">
                                             <input
                                                 type="checkbox"
+                                                className="checkbox-list"
                                                 checked={client.status === 0}
                                                 onChange={() => toggleClientStatus(client.id, client.status)}
                                             />
-                                            <span className="slider"></span>
+                                            <span className="slider-list"></span>
                                         </label>
                                     </td>
                                     <td>

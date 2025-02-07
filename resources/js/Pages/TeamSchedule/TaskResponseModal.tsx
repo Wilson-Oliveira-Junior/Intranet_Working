@@ -318,10 +318,12 @@ const TaskResponseModal = ({
 
     const availableUsers = users ? users.filter(user => followers && followers.every(follower => follower && follower.id !== user.id)) : [];
 
+    const isDarkMode = document.body.classList.contains('dark-mode');
+
     return (
         <div className="modal-container">
-            <div className="modal">
-                <div className="modal-content">
+            <div className={`modal ${isDarkMode ? 'dark-mode' : ''}`}>
+                <div className={`modal-content ${isDarkMode ? 'dark-mode' : ''}`}>
                     <div className="header">
                         <h1>{task.title}</h1>
                         <div className="buttons">
@@ -483,7 +485,7 @@ const TaskResponseModal = ({
                             )}
                         </div>
                     </div>
-                    <div className="modal-footer">
+                    <div className="modal-footer dark-mode">
                         <button onClick={closeModal} className="modal-button">
                             Fechar
                         </button>

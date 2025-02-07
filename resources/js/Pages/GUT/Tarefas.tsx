@@ -75,7 +75,7 @@ const GUTTarefas = ({ arrTarefas }) => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">RESPONSÁVEL</th>
                 </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="gut-table-body">
                 {arrTarefas.map((tarefa, key) => {
                     const initialValues = getInitialGUTValues(tarefa.priority);
                     const [gravidade, setGravidade] = useState(tarefa.gravidade ?? initialValues.gravidade);

@@ -30,6 +30,12 @@ select, input[type="text"], button {
     margin-bottom: 10px;
 }
 
+select {
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #ccc;
+}
+
 button {
     background-color: #3182ce;
     color: white;
@@ -411,6 +417,173 @@ a:hover {
         padding: 5px;
         font-size: 0.8rem;
     }
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark-mode .container {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+}
+
+body.dark-mode h1 {
+    color: #e0e0e0;
+}
+
+body.dark-mode select,
+body.dark-mode input[type="text"],
+body.dark-mode button {
+    background-color: #3c3c3c;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+body.dark-mode button {
+    background-color: #007bff;
+}
+
+body.dark-mode button:hover {
+    background-color: #0056b3;
+}
+
+body.dark-mode table {
+    background-color: #1f1f1f;
+}
+
+body.dark-mode thead {
+    background-color: #3c3c3c;
+}
+
+body.dark-mode th,
+body.dark-mode td {
+    border-color: #555;
+}
+
+body.dark-mode th {
+    color: #e0e0e0;
+}
+
+body.dark-mode td {
+    color: #e0e0e0;
+}
+
+body.dark-mode a {
+    color: #bb86fc;
+}
+
+body.dark-mode a:hover {
+    color: #bb86fc;
+    text-decoration: underline;
+}
+
+body.dark-mode .calendar-container {
+    background-color: #1f1f1f;
+    border-color: #555;
+}
+
+body.dark-mode .calendar-day {
+    background-color: #2c2c2c;
+}
+
+body.dark-mode .calendar-day:hover {
+    background-color: #555;
+}
+
+body.dark-mode .day-number {
+    color: #e0e0e0;
+}
+
+body.dark-mode .task.normal {
+    background-color: green;
+}
+
+body.dark-mode .task.urgente {
+    background-color: red;
+}
+
+body.dark-mode .header-container {
+    background-color: #2c2c2c;
+}
+
+body.dark-mode .legenda-container {
+    background-color: #2c2c2c;
+}
+
+body.dark-mode .legenda-task.normal {
+    background-color: #09ff00;
+}
+
+body.dark-mode .legenda-task.urgente {
+    background-color: #fe0000;
+}
+
+body.dark-mode .legenda-task.atencao {
+    background-color: #ffea00;
+}
+
+body.dark-mode .tab-container {
+    background-color: #3c3c3c;
+}
+
+body.dark-mode .indicator {
+    background-color: #555;
+}
+
+body.dark-mode .tab_label {
+    color: #e0e0e0;
+}
+
+body.dark-mode .add-task-button {
+    background-color: #007bff;
+}
+
+body.dark-mode .add-task-button:hover {
+    background-color: #0056b3;
+}
+
+body.dark-mode .calendar-navigation button {
+    background-color: #007bff;
+}
+
+body.dark-mode .calendar-navigation button:hover {
+    background-color: #0056b3;
+}
+
+body.dark-mode .calendar-navigation span {
+    color: #e0e0e0;
+}
+
+/* Dark mode styles for container */
+body.dark-mode .container.mx-auto.p-4.bg-gray-900.text-white {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+}
+
+/* Dark mode styles for table body */
+body.dark-mode .gut-table-body {
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+/* Styles for GUT select element */
+.gut-select {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+body.dark-mode .gut-select {
+    background-color: #3c3c3c;
+    color: #e0e0e0;
+    border-color: #555;
 }
 
 

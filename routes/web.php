@@ -38,6 +38,17 @@ Route::get('/error-boundary', function () {
     return Inertia::render('ErrorBoundary');
 })->name('error.boundary');
 
+// Guest routes
+Route::middleware('guest')->group(function () {
+    Route::get('/login', function () {
+        return Inertia::render('Auth/Login');
+    })->name('login');
+
+    Route::get('/register', function () {
+        return Inertia::render('Auth/Register');
+    })->name('register');
+});
+
 // Rotas específicas para diferentes níveis de acesso
 Route::middleware('auth')->group(function () {
     // Admin

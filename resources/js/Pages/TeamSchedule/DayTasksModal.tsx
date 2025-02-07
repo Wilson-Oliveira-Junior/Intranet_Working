@@ -7,10 +7,12 @@ const DayTasksModal = ({ tasks, openResponseModal, closeModal }) => {
         openResponseModal(task);
     };
 
+    const isDarkMode = document.body.classList.contains('dark-mode');
+
     return (
         <div className="modal-container">
-            <div className="modal">
-                <div className="modal-content">
+            <div className={`modal ${isDarkMode ? 'dark-mode' : ''}`}>
+                <div className={`modal-content ${isDarkMode ? 'dark-mode' : ''}`}>
                     <div className="header">
                         <h2>Tarefas do Dia</h2>
                         <span className="close" onClick={closeModal}>&times;</span>

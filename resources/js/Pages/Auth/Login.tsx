@@ -3,9 +3,10 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
+import Layout from '@/Layouts/Layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function Login({
     status,
@@ -29,8 +30,12 @@ export default function Login({
     };
 
     return (
-        <GuestLayout>
+        <Layout>
             <Head title="Log in" />
+
+            <div className="flex justify-center mb-4">
+                <img src="/img/logo.png" alt="Logo" className="w-120 h-20" />
+            </div>
 
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600">
@@ -102,6 +107,6 @@ export default function Login({
                     </PrimaryButton>
                 </div>
             </form>
-        </GuestLayout>
+        </Layout>
     );
 }

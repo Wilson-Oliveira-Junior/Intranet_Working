@@ -100,13 +100,13 @@ const GUTIndex: React.FC<GUTIndexProps> = ({ equipe, setores, arrTarefas = [] })
 
     return (
         <AuthenticatedLayout>
-            <div className="container mx-auto p-4">
+            <div className="gut-container">
                 <div className="row mb-4">
                     <div className="col-12">
                         <h1 className="text-2xl font-bold mb-4">GUT - Matriz de Priorização</h1>
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center">
-                                <select value={selectedEquipe} onChange={handleEquipeChange} className="border border-gray-300 rounded p-2 mr-4">
+                                <select value={selectedEquipe} onChange={handleEquipeChange} className="gut-select">
                                     <option value="0">Qual equipe deseja ver o GUT?</option>
                                     {setores.map((setor) => (
                                         <option key={setor.id} value={setor.id}>{setor.name}</option>

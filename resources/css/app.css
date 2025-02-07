@@ -78,12 +78,18 @@ body.dark-mode button {
     border-radius: 0.2%;
 }
 
-body.dark-mode #topbar {
-    background-color: #1f1f1f;
-    color: #e0e0e0;
-    border-bottom: 1px solid #ffffff;
+#topbar {
+    background: linear-gradient(150deg, #00BBF2, #9E25FB,  #CF7DFF);
+    color: #0E0D0E; /* Cor do texto no modo claro */
+    border-bottom: 1px solid #e5e7eb;
     padding-left: 1rem;
     padding-right: 1rem;
+}
+
+body.dark-mode #topbar {
+    background: linear-gradient(90deg, #0E0D0E, #1f1f1f, #2c2c2c, #3c3c3c, #555454);
+    color: #e0e0e0; /* Cor do texto no modo escuro */
+    border-bottom: 1px solid #374151;
 }
 
 .bg-light {
@@ -118,14 +124,17 @@ body.dark-mode #topbar {
 
 .logo {
     height: 2.25rem;
-    width: auto;
+    width: 10rem; /* Adjust the width to match the previous size */
     fill: currentColor;
     color: #1f2937;
     padding-left: 2rem;
+    background-image: url('/img/logo-variacoes_branco.png'); /* Logo for light mode */
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
-.logo.dark-mode {
-    color: #e0e0e0;
+body.dark-mode .logo {
+    background-image: url('/img/logo.png'); /* Logo for dark mode */
 }
 
 .toggle-dark-mode {
@@ -251,7 +260,7 @@ body, input {
 }
 
 #dark-mode-form, #dark-mode-form .toggle:before, #dark-mode-form .toggle:after {
-	background: hsl(0,0%,100%);
+	background: transparent; /* Ensure background is transparent */
 }
 
 #dark-mode-form, #dark-mode-form .toggle {
@@ -283,7 +292,7 @@ body, input {
 }
 
 .curtain {
-	background: hsl(0,0%,100%);
+	background: transparent; /* Ensure curtain background is transparent */
 	mix-blend-mode: difference;
 	pointer-events: none;
 	width: 100%;
@@ -378,4 +387,102 @@ body, input {
 
 .ml-2 {
     margin-left: 0.5rem;
+}
+
+.topbar-switch {
+    --false: #E81B1B;
+    --true: #009068;
+}
+
+.topbar-switch .checkbox-topbar {
+    appearance: none;
+    height: 2rem;
+    width: 3.5rem;
+    background-color: #fff; /* Fundo branco */
+    position: relative;
+    border-radius: .2em;
+    cursor: pointer;
+    border: 2px solid #000000; /* Adicionando borda para garantir que o contorno do switch esteja visível */
+}
+
+.topbar-switch .checkbox-topbar::before {
+    content: '';
+    display: block;
+    height: 1.9em;
+    width: 1.9em;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: calc(1.9em/2 + .3em);
+    background-color: #fff; /* Cor para o estado 'off' */
+    border-radius: .2em;
+    transition: .3s ease;
+}
+
+.topbar-switch .checkbox-topbar:checked::before {
+    background-color: #fff; /* Cor para o estado 'on' */
+    left: calc(100% - (1.9em/2 + .3em)); /* Movimento do botão para a direita */
+}
+
+.topbar-switch .checkbox-topbar:checked {
+    background-color: var(--true); /* Cor de fundo quando o switch está 'on' */
+}
+
+.topbar-switch .checkbox-topbar:not(:checked) {
+    background-color: var(--false); /* Cor de fundo quando o switch está 'off' */
+}
+
+.switch {
+    --false: #E81B1B;
+    --true: #009068;
+}
+
+.switch .checkbox {
+    appearance: none;
+    height: 2rem;
+    width: 3.5rem;
+    background-color: var(--false); /* Default background color */
+    position: relative;
+    border-radius: .2em;
+    cursor: pointer;
+    border: 2px solid #000000; /* Border to ensure visibility */
+    transition: background-color 0.3s ease;
+}
+
+.switch .checkbox::before {
+    content: '';
+    display: block;
+    height: 1.9em;
+    width: 1.9em;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: calc(1.9em/2 + .3em);
+    background-color: #fff; /* Default knob color */
+    border-radius: .2em;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.switch .checkbox:checked::before {
+    left: calc(100% - (1.9em/2 + .3em)); /* Move knob to the right */
+}
+
+.switch .checkbox:checked {
+    background-color: var(--true); /* Background color when checked */
+}
+
+.switch .checkbox:not(:checked) {
+    background-color: var(--false); /* Background color when not checked */
+}
+
+.switch .checkbox:hover::before {
+    background-color: #f0f0f0; /* Hover color for the knob */
+}
+
+body.dark-mode .switch .checkbox {
+    border: 2px solid #e0e0e0; /* Border color in dark mode */
+}
+
+body.dark-mode .switch .checkbox:hover::before {
+    background-color: #555; /* Hover color for the knob in dark mode */
 }

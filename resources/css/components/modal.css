@@ -714,4 +714,9 @@ body.dark-mode .comment-actions {
     color: #fff;
 }
 
+.modal-content.dark-mode {
+    background-color: #000;
+    color: #fff;
+}
+
 
