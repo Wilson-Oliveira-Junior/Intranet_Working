@@ -294,6 +294,11 @@ input[type="checkbox"]:not(:checked) {
     background-color: var(--false); /* Cor de fundo quando o switch está 'off' */
 }
 
+/* Remover o estilo de background-image */
+input[type="checkbox"]:checked {
+    background-image: none;
+}
+
 body.dark-mode .container {
     background-color: #1f1f1f;
     color: #e0e0e0;
@@ -628,11 +633,11 @@ body.dark-mode .modal button[type="submit"]:hover {
     appearance: none;
     height: 2rem;
     width: 3.5rem;
-    background-color: #fff; /* Fundo branco */
+    background-color: #fff;
     position: relative;
     border-radius: .2em;
     cursor: pointer;
-    border: 2px solid #000000; /* Adicionando borda para garantir que o contorno do switch esteja visível */
+    border: 2px solid #000000;
 }
 
 .list-container .switch-list .checkbox-list::before {
@@ -644,22 +649,22 @@ body.dark-mode .modal button[type="submit"]:hover {
     position: absolute;
     top: 50%;
     left: calc(1.9em/2 + .3em);
-    background-color: #fff; /* Cor para o estado 'off' */
+    background-color: #fff;
     border-radius: .2em;
     transition: .3s ease;
 }
 
 .list-container .switch-list .checkbox-list:checked::before {
-    background-color: #fff; /* Cor para o estado 'on' */
-    left: calc(100% - (1.9em/2 + .3em)); /* Movimento do botão para a direita */
+    background-color: #fff;
+    left: calc(100% - (1.9em/2 + .3em));
 }
 
 .list-container .switch-list .checkbox-list:checked {
-    background-color: var(--true); /* Cor de fundo quando o switch está 'on' */
+    background-color: var(--true);
 }
 
 .list-container .switch-list .checkbox-list:not(:checked) {
-    background-color: var(--false); /* Cor de fundo quando o switch está 'off' */
+    background-color: var(--false);
 }
 
 body.dark-mode .list-container {

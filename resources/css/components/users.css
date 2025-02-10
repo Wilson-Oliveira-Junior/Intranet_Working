@@ -272,50 +272,6 @@ table tbody tr:nth-child(even) {
     /* Remove o espaçamento do último botão */
 }
 
-
-.switch {
-    --false: #E81B1B;
-    --true: #009068;
-}
-
-input[type="checkbox"] {
-    appearance: none;
-    height: 2rem;
-    width: 3.5rem;
-    background-color: #fff; /* Fundo branco */
-    position: relative;
-    border-radius: .2em;
-    cursor: pointer;
-    border: 2px solid #000000; /* Adicionando borda para garantir que o contorno do switch esteja visível */
-}
-
-input[type="checkbox"]::before {
-    content: '';
-    display: block;
-    height: 1.9em;
-    width: 1.9em;
-    transform: translate(-50%, -50%);
-    position: absolute;
-    top: 50%;
-    left: calc(1.9em/2 + .3em);
-    background-color: #fff; /* Cor para o estado 'off' */
-    border-radius: .2em;
-    transition: .3s ease;
-}
-
-input[type="checkbox"]:checked::before {
-    background-color: #fff; /* Cor para o estado 'on' */
-    left: calc(100% - (1.9em/2 + .3em)); /* Movimento do botão para a direita */
-}
-
-input[type="checkbox"]:checked {
-    background-color: var(--true); /* Cor de fundo quando o switch está 'on' */
-}
-
-input[type="checkbox"]:not(:checked) {
-    background-color: var(--false); /* Cor de fundo quando o switch está 'off' */
-}
-
 /* Modal geral */
 .modal-overlay.edit-modal-overlay {
     position: fixed;
@@ -509,4 +465,47 @@ textarea.form-control {
 
 .default {
     border-radius: 0;
+}
+
+.switch {
+    --false: #E81B1B;
+    --true: #009068;
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    height: 2rem;
+    width: 3.5rem;
+    background-color: #fff;
+    position: relative;
+    border-radius: .2em;
+    cursor: pointer;
+    border: 2px solid #000000;
+}
+
+input[type="checkbox"]::before {
+    content: '';
+    display: block;
+    height: 1.9em;
+    width: 1.9em;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: calc(1.9em/2 + .3em);
+    background-color: #fff;
+    border-radius: .2em;
+    transition: .3s ease;
+}
+
+input[type="checkbox"]:checked::before {
+    background-color: #fff;
+    left: calc(100% - (1.9em/2 + .3em));
+}
+
+input[type="checkbox"]:checked {
+    background-color: var(--true);
+}
+
+input[type="checkbox"]:not(:checked) {
+    background-color: var(--false);
 }

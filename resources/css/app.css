@@ -75,12 +75,12 @@ body.dark-mode .table {
 body.dark-mode button {
     background-color: #1a067b;
     color: #e0e0e0;
-    border-radius: 0.2%;
+
 }
 
 #topbar {
-    background: linear-gradient(150deg, #00BBF2, #9E25FB,  #CF7DFF);
-    color: #0E0D0E; /* Cor do texto no modo claro */
+    background: linear-gradient(150deg, #00BBF2, #9E25FB, #CF7DFF);
+    color: #0E0D0E;
     border-bottom: 1px solid #e5e7eb;
     padding-left: 1rem;
     padding-right: 1rem;
@@ -88,7 +88,7 @@ body.dark-mode button {
 
 body.dark-mode #topbar {
     background: linear-gradient(90deg, #0E0D0E, #1f1f1f, #2c2c2c, #3c3c3c, #555454);
-    color: #e0e0e0; /* Cor do texto no modo escuro */
+    color: #e0e0e0;
     border-bottom: 1px solid #374151;
 }
 
@@ -135,21 +135,6 @@ body.dark-mode #topbar {
 
 body.dark-mode .logo {
     background-image: url('/img/logo.png'); /* Logo for dark mode */
-}
-
-.toggle-dark-mode {
-    margin-right: 1rem;
-    padding: 0.5rem 1rem;
-    background-color: #4a5568;
-    color: #ffffff;
-    border: none;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.toggle-dark-mode:hover {
-    background-color: #2d3748;
 }
 
 .dropdown-button {
@@ -260,7 +245,7 @@ body, input {
 }
 
 #dark-mode-form, #dark-mode-form .toggle:before, #dark-mode-form .toggle:after {
-	background: transparent; /* Ensure background is transparent */
+	background: transparent;
 }
 
 #dark-mode-form, #dark-mode-form .toggle {
@@ -274,34 +259,6 @@ body, input {
 	height: auto;
 }
 
-.curtain, .sr, .toggle:before, .toggle:after {
-	position: absolute;
-}
-
-.curtain, .toggle:before, .toggle:after {
-	transition: transform var(--dur);
-}
-
-.curtain, .toggle:before, .toggle:checked:after  {
-	transition-timing-function: ease-out;
-}
-
-.curtain, .sr {
-	top: 0;
-	left: 0;
-}
-
-.curtain {
-	background: transparent; /* Ensure curtain background is transparent */
-	mix-blend-mode: difference;
-	pointer-events: none;
-	width: 100%;
-	height: 100%;
-	transform: scaleX(0);
-	transform-origin: 0 50%;
-	transition: transform var(--dur) ease-out;
-}
-
 .sr, .toggle {
 	overflow: hidden;
 }
@@ -313,56 +270,6 @@ body, input {
 	height: 1px;
 }
 
-.toggle {
-	background: currentColor;
-	border-radius: 0.75em;
-	cursor: pointer;
-	width: 2.3em; /* Increase width by 15% */
-	height: 1.15em; /* Increase height by 15% */
-	-webkit-appearance: none;
-	appearance: none;
-	-webkit-tap-highlight-color: transparent;
-}
-
-.toggle:before, .toggle:after {
-	border-radius: 50%;
-	content: "";
-	display: block;
-	top: 0.15em; /* Adjust top to fit the new size */
-	left: 0.15em; /* Adjust left to fit the new size */
-	width: 0.9em; /* Increase width by 15% */
-	height: 0.9em; /* Increase height by 15% */
-}
-
-.toggle:before, .toggle:checked:after {
-	transition-delay: 0s;
-}
-
-.toggle:checked:before, .toggle:after {
-	transition-delay: calc(var(--dur) * 0.75);
-	transition-timing-function: cubic-bezier(0.3,1.6,0.5,0.7);
-}
-
-.toggle:before {
-	transform: translateX(-1.5em);
-}
-
-.toggle:checked:before {
-	transform: translateX(1.5em);
-}
-
-.toggle:checked:after {
-	transform: translateX(3em);
-}
-
-.toggle:checked ~ .curtain {
-	transform: scaleX(1);
-}
-
-.toggle:focus {
-	outline: transparent;
-}
-
 .text-white {
     color: #ffffff !important;
 }
@@ -371,41 +278,19 @@ body, input {
     color: #000000 !important;
 }
 
-.flex {
-    display: flex;
-}
 
-.items-center {
-    align-items: center;
-}
-
-.space-x-8 > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-x-reverse: 0;
-    margin-right: calc(2rem * var(--tw-space-x-reverse));
-    margin-left: calc(2rem * calc(1 - var(--tw-space-x-reverse)));
-}
-
-.ml-2 {
-    margin-left: 0.5rem;
-}
-
-.topbar-switch {
-    --false: #E81B1B;
-    --true: #009068;
-}
-
-.topbar-switch .checkbox-topbar {
+.switch-layout .checkbox-layout {
     appearance: none;
     height: 2rem;
     width: 3.5rem;
-    background-color: #fff; /* Fundo branco */
+    background-color: #fff;
     position: relative;
-    border-radius: .2em;
+    border: none;
     cursor: pointer;
-    border: 2px solid #000000; /* Adicionando borda para garantir que o contorno do switch esteja visível */
+
 }
 
-.topbar-switch .checkbox-topbar::before {
+.switch-layout .checkbox-layout::before {
     content: '';
     display: block;
     height: 1.9em;
@@ -414,75 +299,33 @@ body, input {
     position: absolute;
     top: 50%;
     left: calc(1.9em/2 + .3em);
-    background-color: #fff; /* Cor para o estado 'off' */
-    border-radius: .2em;
+    background-color: #fff;
     transition: .3s ease;
 }
 
-.topbar-switch .checkbox-topbar:checked::before {
-    background-color: #fff; /* Cor para o estado 'on' */
-    left: calc(100% - (1.9em/2 + .3em)); /* Movimento do botão para a direita */
+.switch-layout .checkbox-layout:checked::before {
+    background-color: #fff;
+    left: calc(100% - (1.9em/2 + .3em));
 }
 
-.topbar-switch .checkbox-topbar:checked {
-    background-color: var(--true); /* Cor de fundo quando o switch está 'on' */
+.switch-layout .checkbox-layout:checked {
+    background-color: var(--true);
 }
 
-.topbar-switch .checkbox-topbar:not(:checked) {
-    background-color: var(--false); /* Cor de fundo quando o switch está 'off' */
+.switch-layout .checkbox-layout:not(:checked) {
+    background-color: var(--false);
 }
 
-.switch {
-    --false: #E81B1B;
-    --true: #009068;
-}
-
-.switch .checkbox {
-    appearance: none;
-    height: 2rem;
-    width: 3.5rem;
-    background-color: var(--false); /* Default background color */
-    position: relative;
-    border-radius: .2em;
-    cursor: pointer;
-    border: 2px solid #000000; /* Border to ensure visibility */
-    transition: background-color 0.3s ease;
-}
-
-.switch .checkbox::before {
-    content: '';
-    display: block;
-    height: 1.9em;
-    width: 1.9em;
-    transform: translate(-50%, -50%);
+.switch-layout .checkbox-layout::after {
+    content: '☀️';
     position: absolute;
     top: 50%;
-    left: calc(1.9em/2 + .3em);
-    background-color: #fff; /* Default knob color */
-    border-radius: .2em;
-    transition: transform 0.3s ease, background-color 0.3s ease;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2em;
+    transition: .3s ease;
 }
 
-.switch .checkbox:checked::before {
-    left: calc(100% - (1.9em/2 + .3em)); /* Move knob to the right */
-}
-
-.switch .checkbox:checked {
-    background-color: var(--true); /* Background color when checked */
-}
-
-.switch .checkbox:not(:checked) {
-    background-color: var(--false); /* Background color when not checked */
-}
-
-.switch .checkbox:hover::before {
-    background-color: #f0f0f0; /* Hover color for the knob */
-}
-
-body.dark-mode .switch .checkbox {
-    border: 2px solid #e0e0e0; /* Border color in dark mode */
-}
-
-body.dark-mode .switch .checkbox:hover::before {
-    background-color: #555; /* Hover color for the knob in dark mode */
+.switch-layout .checkbox-layout:checked::after {
+    content: '🌙';
 }

@@ -94,9 +94,9 @@ export default function Authenticated({
                     </div>
                     <div className="flex items-center">
                         <form id="dark-mode-form" className="flex items-center">
-                            <label className="switch">
-                                <input id="dark-mode" className="toggle checkbox" type="checkbox" name="Dark mode" role="switch" value="on" onChange={toggleDarkMode} checked={darkMode} />
-                                <span className="slider"></span>
+                            <label className="switch-layout">
+                                <input id="dark-mode" className="toggle checkbox-layout" type="checkbox" name="Dark mode" role="switch" value="on" onChange={toggleDarkMode} checked={darkMode} />
+                                <span className="slider-layout"></span>
                             </label>
                             <label htmlFor="dark-mode" className="sr">Dark Mode</label>
                             <div className="curtain"></div>
