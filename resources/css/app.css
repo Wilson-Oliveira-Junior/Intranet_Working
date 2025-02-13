@@ -78,6 +78,7 @@ body.dark-mode button {
 
 }
 
+
 #topbar {
     background: linear-gradient(150deg, #00BBF2, #9E25FB, #CF7DFF);
     color: #0E0D0E;
@@ -140,25 +141,31 @@ body.dark-mode .logo {
 .dropdown-button {
     display: inline-flex;
     align-items: center;
-    border: none;
+    border: 1px solid #000000; /* Adicionando borda ao botão no modo claro */
     background-color: #ffffff;
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     font-weight: 500;
     color: #6b7280;
-    transition: color 0.15s ease-in-out;
+    border-radius: 10%; /* Adicionando borda arredondada */
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
 }
 
 body.dark-mode .dropdown-button {
-    display: inline-flex;
     background-color: #3c3c3c;
     color: #e0e0e0;
-    align-items: center;
     border: 1px solid #e0e0e0;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    transition: color 0.15s ease-in-out;
     border-radius: 10%;
+}
+
+.dropdown-button:hover {
+    background-color: #f1f1f1;
+    color: #000000;
+}
+
+body.dark-mode .dropdown-button:hover {
+    background-color: #4b4b4b;
+    color: #ffffff;
 }
 
 .dropdown-icon {
@@ -173,6 +180,16 @@ body.dark-mode .dropdown-button {
     border-radius: 0.25rem;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     padding: 0.5rem 0;
+    transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+    opacity: 0;
+    transform: translateY(-10px);
+    visibility: hidden;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
 }
 
 body.dark-mode .dropdown-menu {
@@ -186,7 +203,7 @@ body.dark-mode .dropdown-menu {
     padding: 0.5rem 1rem;
     color: #6b7280;
     text-decoration: none;
-    transition: background-color 0.15s ease-in-out;
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 }
 
 body.dark-mode .dropdown-menu a {
@@ -195,10 +212,12 @@ body.dark-mode .dropdown-menu a {
 
 .dropdown-menu a:hover {
     background-color: #f9fafb;
+    color: #000000;
 }
 
 body.dark-mode .dropdown-menu a:hover {
     background-color: #4b5563;
+    color: #ffffff;
 }
 
 .header {
