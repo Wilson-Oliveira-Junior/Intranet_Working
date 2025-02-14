@@ -12,6 +12,7 @@ use App\Http\Controllers\TeamScheduleController;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\GUTController;
+use App\Http\Controllers\StatusController;
 
 // Página inicial
 Route::get('/', function () {
@@ -40,6 +41,11 @@ Route::get('/tasks-delivered-count', [AdminController::class, 'getTasksDelivered
 Route::get('/error-boundary', function () {
     return Inertia::render('ErrorBoundary');
 })->name('error.boundary');
+
+// Rota para a página de Status
+Route::get('/status', function () {
+    return Inertia::render('Tarefas/Status');
+})->middleware(['auth', 'verified'])->name('status');
 
 // Rotas para convidados
 Route::middleware('guest')->group(function () {
@@ -179,6 +185,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/GUT', [GUTController::class, 'index'])->middleware(['auth', 'verified'])->name('GUT');
     Route::get('/GUT/tarefas/{idequipe}', [GUTController::class, 'listarTarefas'])->middleware(['auth', 'verified']);
     Route::post('/GUT/tarefas/{id}/atualizar-prioridade', [GUTController::class, 'atualizarPrioridade'])->middleware(['auth', 'verified']);
+
+    // Status
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/status', [StatusController::class, 'index'])->name('status.index');
+        Route::get('/status/create', [StatusController::class, 'create'])->name('status.create');
+        Route::post('/status', [StatusController::class, 'store'])->name('status.store');
+        Route::get('/status/{id}/edit', [StatusController::class, 'edit'])->name('status.edit');
+        Route::put('/status/{id}', [StatusController::class, 'update'])->name('status.update');
+        Route::delete('/status/{id}', [StatusController::class, 'destroy'])->name('status.destroy');
+    });
 });
 
 // API Routes
