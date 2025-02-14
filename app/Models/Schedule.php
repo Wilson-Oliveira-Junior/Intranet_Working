@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
+use App\Enums\TaskStatus;
 
 class Schedule extends Model
 {
@@ -35,6 +37,10 @@ class Schedule extends Model
         'hours_worked', // Add hours_worked to fillable
         'priority', // Add priority to fillable
         'creator_id', // Add creator_id to fillable
+    ];
+
+    protected $casts = [
+        'status' => TaskStatus::class,
     ];
 
     public function responsavel()
@@ -70,5 +76,20 @@ class Schedule extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'creator_id');
+    }
+
+    public function getClientNameAttribute()
+    {
+        return $this->client ? $this->client->name : 'N/A';
+    }
+
+    public function getDueDateAttribute()
+    {
+        return Carbon::parse($this->date)->format('Y-m-d');
+    }
+
+    public function getCreatorNameAttribute()
+    {
+        return $this->creator ? $this->creator->name : 'Desconhecido';
     }
 }

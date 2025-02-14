@@ -12,6 +12,7 @@
         "@types/node": "^18.13.0",
         "@types/react": "^18.0.28",
         "@types/react-dom": "^18.0.10",
+        "@types/react-router-dom": "^5.3.3",
         "@vitejs/plugin-react": "^4.2.0",
         "autoprefixer": "^10.4.12",
         "axios": "^1.7.7",
@@ -34,6 +35,7 @@
         "bootstrap": "^5.3.3",
         "bootstrap-icons": "^1.11.3",
         "laravel-vite-plugin": "^1.0",
+        "react-router-dom": "^7.1.5",
         "typeface-montserrat": "^1.1.13",
         "vite-plugin-laravel": "^0.3.1",
         "ziggy-js": "^2.5.1"

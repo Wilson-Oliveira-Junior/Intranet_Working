@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Models\Sector;
 use App\Models\Schedule;
@@ -11,6 +10,7 @@ use App\Models\TipoTarefa;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class TaskController extends Controller
 {
@@ -44,7 +44,7 @@ class TaskController extends Controller
                 return $task;
             });
 
-        return Inertia::render('Tasks/Tarefas', [
+        return response()->json([
             'user' => $user,
             'teams' => $teams,
             'tasks' => $tasks,
@@ -68,7 +68,7 @@ class TaskController extends Controller
         $task->comments = $task->comments ?? [];
         $task->attachments = $task->attachments ?? [];
         $task->date = Carbon::parse($task->date)->format('Y-m-d'); // Certifique-se de que a data é um objeto Carbon
-        return Inertia::render('Tasks/Show', [
+        return response()->json([
             'task' => $task,
         ]);
     }
@@ -98,6 +98,102 @@ class TaskController extends Controller
         $task->creator_id = Auth::id();
         $task->save();
 
-        return redirect()->route('tasks.index')->with('success', 'Tarefa criada com sucesso.');
+        return response()->json(['message' => 'Tarefa criada com sucesso.']);
+    }
+
+    public function indexTipoTarefa(Request $request)
+    {
+        $tiposTarefa = TipoTarefa::paginate(10);
+        return Inertia::render('Tasks/TipoTarefa/Index', [
+            'tiposTarefa' => $tiposTarefa,
+            'links' => $tiposTarefa->links()->render(),
+            'csrf_token' => csrf_token(), // Garanta que o token CSRF está sendo passado
+        ]);
+    }
+
+    public function createTipoTarefa()
+    {
+        return Inertia::render('Tasks/TipoTarefa/Create');
+    }
+
+    public function storeTipoTarefa(Request $request)
+    {
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'descricao' => 'required|string|max:255',
+            'status' => 'required|in:Ativo,Inativo',
+            'estimativa' => 'nullable|integer', // Adicionar validação para estimativa
+        ]);
+
+        TipoTarefa::create([
+            'nome' => $request->input('nome'),
+            'descricao' => $request->input('descricao'),
+            'status' => $request->input('status'),
+            'estimativa' => $request->input('estimativa'), // Adicionar estimativa
+        ]);
+
+        return response()->json(['message' => 'Tipo de Tarefa criado com sucesso.']);
+    }
+
+    public function editTipoTarefa($id)
+    {
+        $tipoTarefa = TipoTarefa::findOrFail($id);
+        return Inertia::render('Tasks/TipoTarefa/Edit', [
+            'tipoTarefa' => $tipoTarefa,
+        ]);
+    }
+
+    public function updateTipoTarefa(Request $request, $id)
+    {
+        $tipoTarefa = TipoTarefa::findOrFail($id);
+
+        // Validação dos campos
+        $request->validate([
+            'nome' => 'sometimes|required|string|max:255',
+            'descricao' => 'sometimes|required|string|max:255',
+            'status' => 'sometimes|required|in:Ativo,Inativo',
+            'estimativa' => 'sometimes|nullable|date_format:H:i:s',
+        ]);
+
+        // Atualiza os campos
+        if ($request->has('nome')) {
+            $tipoTarefa->nome = $request->input('nome');
+        }
+        if ($request->has('descricao')) {
+            $tipoTarefa->descricao = $request->input('descricao');
+        }
+        if ($request->has('status')) {
+            $tipoTarefa->status = $request->input('status');
+        }
+        if ($request->has('estimativa')) {
+            $tipoTarefa->estimativa = $request->input('estimativa');
+        }
+        $tipoTarefa->save();
+
+        return redirect()->route('tipo-tarefa.index')->with('success', 'Tipo de Tarefa atualizado com sucesso');
+    }
+
+    public function updateTipoTarefaStatus(Request $request, $id)
+    {
+        $tipoTarefa = TipoTarefa::findOrFail($id);
+
+        // Validação do status
+        $request->validate([
+            'status' => 'required|in:Ativo,Inativo',
+        ]);
+
+        // Atualiza o status
+        $tipoTarefa->status = $request->input('status');
+        $tipoTarefa->save();
+
+        return response()->json(['message' => 'Status atualizado com sucesso']);
+    }
+
+    public function destroyTipoTarefa($id)
+    {
+        $tipoTarefa = TipoTarefa::findOrFail($id);
+        $tipoTarefa->delete();
+
+        return response()->json(['message' => 'Tipo de Tarefa deletado com sucesso']);
     }
 }

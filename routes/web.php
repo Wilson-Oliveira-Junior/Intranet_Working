@@ -13,6 +13,7 @@ use App\Http\Controllers\SectorController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\GUTController;
 
+// Página inicial
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -22,10 +23,12 @@ Route::get('/', function () {
     ]);
 });
 
-// Rota do dashboard principal, que pode ser acessada por qualquer usuário autenticado
+// Dashboard principal
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+// Admin - Contadores
 Route::get('/active-users-count', [AdminController::class, 'getActiveUsersCount']);
 Route::get('/birthdays-this-month', [AdminController::class, 'getBirthdaysThisMonth']);
 Route::get('/active-clients-count', [AdminController::class, 'getActiveClientsCount']);
@@ -38,7 +41,7 @@ Route::get('/error-boundary', function () {
     return Inertia::render('ErrorBoundary');
 })->name('error.boundary');
 
-// Guest routes
+// Rotas para convidados
 Route::middleware('guest')->group(function () {
     Route::get('/login', function () {
         return Inertia::render('Auth/Login');
@@ -57,7 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/clients', [AdminController::class, 'showClientList'])->name('admin.clients');
     Route::post('/admin/clients', [AdminController::class, 'storeClient'])->name('admin.clients.store');
 
-    //Senhas
+    // Senhas
     Route::get('/registro-senha', [AdminController::class, 'showPasswordRegistration'])->name('password.registration');
 
     // Tipos de Usuários
@@ -90,7 +93,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/admin/project-types', [AdminController::class, 'getProjectTypes'])->name('admin.projectTypes');
 
-    //Gatilhos
+    // Gatilhos
     Route::get('/admin/gatilhos', [AdminController::class, 'getGatilhosData'])->name('admin.gatilhos');
     Route::get('/admin/gatilhos/template/{id}', [AdminController::class, 'templateGatilhos'])->name('admin.gatilhos.template');
     Route::get('/admin/gatilhos/adicionar', [AdminController::class, 'adicionarGatilho'])->name('admin.gatilhos.adicionar');
@@ -127,6 +130,7 @@ Route::middleware('auth')->group(function () {
     // Guest
     Route::get('/guest/dashboard', [GuestController::class, 'index'])->name('guest.dashboard');
 
+    // Clientes
     Route::get('/clients', [ClientController::class, 'getClients'])->name('clients.list');
     Route::get('/clients/{id}/details', [ClientController::class, 'getClientDetails'])->name('clients.details');
     Route::get('/clients/{id}', [ClientController::class, 'show'])->name('clients.show');
@@ -136,24 +140,42 @@ Route::middleware('auth')->group(function () {
     Route::get('/clients/search', [ClientController::class, 'searchClients'])->name('clients.search');
     Route::get('/clients/{id}/open-tasks-count', [ClientController::class, 'getOpenTasksCount'])->name('clients.openTasksCount');
     Route::get('/clients/{id}/tasks', [ClientController::class, 'getClientTasks'])->name('clients.tasks');
+    Route::delete('/clients/{id}', [ClientController::class, 'destroy'])->name('clients.destroy');
 
+    // Perfil
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Tarefas do usuário
     Route::get('/user-tasks', function () {
         $user = Auth::user();
         $tasks = \App\Models\Schedule::where('user_id', $user->id)->get();
         return response()->json($tasks);
     });
 
+    // Tarefas
     Route::post('/tasks/{id}/reopen', [TaskController::class, 'reopenTask'])->name('tasks.reopen');
-
     Route::get('/tarefas', [TaskController::class, 'tarefas'])->name('tasks.index');
-
     Route::get('/tasks/{id}', [TaskController::class, 'show'])->name('tasks.show');
+    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.list');
 
+    // Tipos de Tarefas
+    Route::get('/tipo-tarefa', [TaskController::class, 'indexTipoTarefa'])->name('tipo-tarefa.index');
+    Route::get('/tipo-tarefa/create', [TaskController::class, 'createTipoTarefa'])->name('tipo-tarefa.create');
+    Route::post('/tipo-tarefa', [TaskController::class, 'storeTipoTarefa'])->name('tipo-tarefa.store');
+    Route::get('/tipo-tarefa/{id}/edit', [TaskController::class, 'editTipoTarefa'])->name('tipo-tarefa.edit');
+    Route::put('/tipo-tarefa/{id}', [TaskController::class, 'updateTipoTarefa'])->name('tipo-tarefa.update');
+    Route::delete('/tipo-tarefa/{id}', [TaskController::class, 'destroyTipoTarefa'])->name('tipo-tarefa.destroy');
+    Route::put('/tipo-tarefa/{id}/status', [TaskController::class, 'updateTipoTarefaStatus']);
+
+    // Tipos de Tarefas API
+    Route::get('/api/tipo-tarefa', [TaskController::class, 'apiIndexTipoTarefa']);
+    Route::put('/api/tipo-tarefa/{id}', [TaskController::class, 'apiUpdateTipoTarefa']);
+    Route::delete('/api/tipo-tarefa/{id}', [TaskController::class, 'apiDestroyTipoTarefa']);
+
+    // GUT
     Route::get('/GUT', [GUTController::class, 'index'])->middleware(['auth', 'verified'])->name('GUT');
     Route::get('/GUT/tarefas/{idequipe}', [GUTController::class, 'listarTarefas'])->middleware(['auth', 'verified']);
     Route::post('/GUT/tarefas/{id}/atualizar-prioridade', [GUTController::class, 'atualizarPrioridade'])->middleware(['auth', 'verified']);
@@ -174,8 +196,10 @@ Route::post('/api/cronograma/{id}/add-follower', [TeamScheduleController::class,
 Route::post('/api/cronograma/{id}/remove-follower', [TeamScheduleController::class, 'removeFollower'])->name('web.teamSchedule.removeFollower');
 Route::post('/api/uploadAttachment', [TeamScheduleController::class, 'uploadAttachment'])->name('web.teamSchedule.uploadAttachment');
 
+// Rota para o CSS
 Route::get('/css/app.css', function () {
     return response()->file(public_path('css/app.css'));
 });
 
+// Autenticação
 require __DIR__ . '/auth.php';
