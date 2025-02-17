@@ -20,6 +20,8 @@ const HomeAdm: React.FC = () => {
   const [birthdays, setBirthdays] = useState<User[]>([]);
   const [tasksToDoCount, setTasksToDoCount] = useState<number>(0);
   const [tasksDeliveredCount, setTasksDeliveredCount] = useState<number>(0);
+  const [ramais, setRamais] = useState<{ name: string, ramal: string }[]>([]);
+  const [commemorativeDates, setCommemorativeDates] = useState<{ name: string, date: string }[]>([]);
 
   if (!user) {
     return <div>Erro: Usuário não encontrado. Verifique a autenticação.</div>;
@@ -70,6 +72,28 @@ const HomeAdm: React.FC = () => {
         console.error('Erro ao carregar dados de tarefas entregues', error);
       });
   }, []);
+
+  useEffect(() => {
+    axios.get('/ramais')
+      .then(response => {
+        setRamais(response.data);
+      })
+      .catch(error => {
+        console.error('Erro ao carregar dados dos ramais', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios.get('/commemorative-dates-this-month')
+      .then(response => {
+        setCommemorativeDates(response.data);
+      })
+      .catch(error => {
+        console.error('Erro ao carregar datas comemorativas', error);
+      });
+  }, []);
+
+  const colors = ['#00c851', '#33b5e5', '#ff4444', '#aa66cc', '#ffbb33'];
 
   return (
     <AuthenticatedLayout user={user}>
@@ -144,6 +168,34 @@ const HomeAdm: React.FC = () => {
         <div className="row">
           <div className="col-md-6 mb-4">
             <div className="card">
+              <h2>Documentos da Área</h2>
+              <p>Acesse os documentos da sua área de trabalho.</p>
+              <button onClick={() => alert('Funcionalidade em desenvolvimento')}>Acessar Documentos</button>
+            </div>
+          </div>
+
+          <div className="col-md-6 mb-4">
+            <div className="card">
+              <h2>Datas Comemorativas do Mês</h2>
+              {Array.isArray(commemorativeDates) && commemorativeDates.length > 0 ? (
+                <div className="commemorative-dates-list">
+                  {commemorativeDates.map((date, index) => (
+                    <div key={index} className="commemorative-date-item">
+                      <p>{date.name}</p>
+                      <p>{new Date(date.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p>Nenhuma data comemorativa este mês.</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-md-6 mb-4">
+            <div className="card">
               <h2>Wiki Lógica Digital</h2>
               <p>
                 O wiki da lógica digital foi desenvolvido com o intuito de expor as etapas de
@@ -168,11 +220,12 @@ const HomeAdm: React.FC = () => {
             <div className="card">
               <h2>Ramais</h2>
               <div className="contact">
-                <div><i className="bi bi-telephone-fill" style={{ color: '#00c851' }}></i>Marcelo Abib - 7210</div>
-                <div><i className="bi bi-telephone-fill" style={{ color: '#33b5e5' }}></i> Rodrigo Camillo - 7211</div>
-                <div><i className="bi bi-telephone-fill" style={{ color: '#ff4444' }}></i> Letícia dos Santos Couto - 7201</div>
-                <div><i className="bi bi-telephone-fill" style={{ color: '#ff4444' }}></i> José Carvalho - 7202</div>
-                <div><i className="bi bi-telephone-fill" style={{ color: '#aa66cc' }}></i> Andre Magalhães - 7209</div>
+                {ramais.map((ramal, index) => (
+                  <div key={index}>
+                    <i className="bi bi-telephone-fill" style={{ color: colors[index % colors.length] }}></i>
+                    {ramal.name} - {ramal.ramal}
+                  </div>
+                ))}
               </div>
             </div>
           </div>

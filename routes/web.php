@@ -13,6 +13,8 @@ use App\Http\Controllers\SectorController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\GUTController;
 use App\Http\Controllers\StatusController;
+use App\Http\Controllers\CommemorativeDateController;
+use App\Http\Controllers\FixedCommemorativeDateController;
 
 // Página inicial
 Route::get('/', function () {
@@ -36,6 +38,8 @@ Route::get('/active-clients-count', [AdminController::class, 'getActiveClientsCo
 Route::get('/segments', [AdminController::class, 'getSegments'])->name('segments.list');
 Route::get('/tasks-to-do-count', [AdminController::class, 'getTasksToDoCount']);
 Route::get('/tasks-delivered-count', [AdminController::class, 'getTasksDeliveredCount']);
+Route::get('/ramais', [AdminController::class, 'getRamais']);
+Route::get('/commemorative-dates-this-month', [AdminController::class, 'getCommemorativeDatesThisMonth']);
 
 // Error boundary route
 Route::get('/error-boundary', function () {
@@ -61,52 +65,54 @@ Route::middleware('guest')->group(function () {
 // Rotas específicas para diferentes níveis de acesso
 Route::middleware('auth')->group(function () {
     // Admin
-    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
-    Route::get('/admin/usertypes', [AdminController::class, 'userTypes'])->name('admin.usertypes');
-    Route::get('/admin/clients', [AdminController::class, 'showClientList'])->name('admin.clients');
-    Route::post('/admin/clients', [AdminController::class, 'storeClient'])->name('admin.clients.store');
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+        Route::get('/usertypes', [AdminController::class, 'userTypes'])->name('usertypes');
+        Route::get('/clients', [AdminController::class, 'showClientList'])->name('clients');
+        Route::post('/clients', [AdminController::class, 'storeClient'])->name('clients.store');
+
+        // Tipos de Usuários
+        Route::post('/user-types', [AdminController::class, 'store']);
+        Route::get('/user-types/{id}/edit', [AdminController::class, 'edit'])->name('userTypes.edit');
+        Route::put('/user-types/{id}', [AdminController::class, 'update'])->name('userTypes.update');
+        Route::delete('/user-types/{id}', [AdminController::class, 'destroy'])->name('userTypes.destroy');
+
+        // Usuários
+        Route::get('/users', [AdminController::class, 'userControl'])->name('users');
+        Route::put('/users/{id}/assign-role', [AdminController::class, 'assignRole'])->name('users.assignRole');
+        Route::put('/users/{id}/status', [AdminController::class, 'updateStatus'])->name('users.updateStatus');
+        Route::put('/users/{id}/update-profile', [AdminController::class, 'updateUserProfile'])->name('users.updateProfile');
+        Route::get('/users/{id}/get-user-details', [AdminController::class, 'getUserDetails']);
+
+        // Setores
+        Route::get('/setores', [AdminController::class, 'indexSectors'])->name('sectors');
+        Route::post('/setores', [AdminController::class, 'storeSector']);
+        Route::get('/setores/{id}/edit', [AdminController::class, 'editSector']);
+        Route::put('/setores/{id}', [AdminController::class, 'updateSector']);
+        Route::delete('/setores/{id}', [AdminController::class, 'destroySector']);
+
+        // Permissões
+        Route::get('/permissoes', [AdminController::class, 'indexPermissions'])->name('permissions.index');
+        Route::post('/permissoes', [AdminController::class, 'storePermission'])->name('permissions.store');
+        Route::get('/permissoes/{id}/edit', [AdminController::class, 'editPermission'])->name('permissions.edit');
+        Route::put('/permissoes/{id}', [AdminController::class, 'updatePermission'])->name('permissions.update');
+        Route::delete('/permissoes/{id}', [AdminController::class, 'destroyPermission'])->name('permissions.destroy');
+        Route::post('/user-types/{id}/permissions', [AdminController::class, 'storePermissions']);
+
+        Route::get('/project-types', [AdminController::class, 'getProjectTypes'])->name('projectTypes');
+
+        // Gatilhos
+        Route::get('/gatilhos', [AdminController::class, 'getGatilhosData'])->name('gatilhos');
+        Route::get('/gatilhos/template/{id}', [AdminController::class, 'templateGatilhos'])->name('gatilhos.template');
+        Route::get('/gatilhos/adicionar', [AdminController::class, 'adicionarGatilho'])->name('gatilhos.adicionar');
+        Route::post('/gatilhos/salvar', [AdminController::class, 'salvarGatilho'])->name('gatilhos.salvar');
+        Route::get('/gatilhos/editar/{id}', [AdminController::class, 'editarGatilho'])->name('gatilhos.editar');
+        Route::put('/gatilhos/atualizar/{id}', [AdminController::class, 'atualizarGatilho'])->name('gatilhos.atualizar');
+        Route::delete('/gatilhos/deletar/{id}', [AdminController::class, 'deletarGatilho'])->name('gatilhos.deletar');
+    });
 
     // Senhas
     Route::get('/registro-senha', [AdminController::class, 'showPasswordRegistration'])->name('password.registration');
-
-    // Tipos de Usuários
-    Route::post('/admin/user-types', [AdminController::class, 'store']);
-    Route::get('/admin/user-types/{id}/edit', [AdminController::class, 'edit'])->name('admin.userTypes.edit');
-    Route::put('/admin/user-types/{id}', [AdminController::class, 'update'])->name('admin.userTypes.update');
-    Route::delete('/admin/user-types/{id}', [AdminController::class, 'destroy'])->name('admin.userTypes.destroy');
-
-    // Usuários
-    Route::get('/admin/users', [AdminController::class, 'userControl'])->name('admin.users');
-    Route::put('/admin/users/{id}/assign-role', [AdminController::class, 'assignRole'])->name('admin.users.assignRole');
-    Route::put('/admin/users/{id}/status', [AdminController::class, 'updateStatus'])->name('admin.users.updateStatus');
-    Route::put('/admin/users/{id}/update-profile', [AdminController::class, 'updateUserProfile'])->name('admin.users.updateProfile');
-    Route::get('/admin/users/{id}/get-user-details', [AdminController::class, 'getUserDetails']);
-
-    // Setores
-    Route::get('/admin/setores', [AdminController::class, 'indexSectors'])->name('admin.sectors');
-    Route::post('/admin/setores', [AdminController::class, 'storeSector']);
-    Route::get('/admin/setores/{id}/edit', [AdminController::class, 'editSector']);
-    Route::put('/admin/setores/{id}', [AdminController::class, 'updateSector']);
-    Route::delete('/admin/setores/{id}', [AdminController::class, 'destroySector']);
-
-    // Permissões
-    Route::get('/admin/permissoes', [AdminController::class, 'indexPermissions'])->name('admin.permissions.index');
-    Route::post('/admin/permissoes', [AdminController::class, 'storePermission'])->name('admin.permissions.store');
-    Route::get('/admin/permissoes/{id}/edit', [AdminController::class, 'editPermission'])->name('admin.permissions.edit');
-    Route::put('/admin/permissoes/{id}', [AdminController::class, 'updatePermission'])->name('admin.permissions.update');
-    Route::delete('/admin/permissoes/{id}', [AdminController::class, 'destroyPermission'])->name('admin.permissions.destroy');
-    Route::post('/admin/user-types/{id}/permissions', [AdminController::class, 'storePermissions']);
-
-    Route::get('/admin/project-types', [AdminController::class, 'getProjectTypes'])->name('admin.projectTypes');
-
-    // Gatilhos
-    Route::get('/admin/gatilhos', [AdminController::class, 'getGatilhosData'])->name('admin.gatilhos');
-    Route::get('/admin/gatilhos/template/{id}', [AdminController::class, 'templateGatilhos'])->name('admin.gatilhos.template');
-    Route::get('/admin/gatilhos/adicionar', [AdminController::class, 'adicionarGatilho'])->name('admin.gatilhos.adicionar');
-    Route::post('/admin/gatilhos/salvar', [AdminController::class, 'salvarGatilho'])->name('admin.gatilhos.salvar');
-    Route::get('/admin/gatilhos/editar/{id}', [AdminController::class, 'editarGatilho'])->name('admin.gatilhos.editar');
-    Route::put('/admin/gatilhos/atualizar/{id}', [AdminController::class, 'atualizarGatilho'])->name('admin.gatilhos.atualizar');
-    Route::delete('/admin/gatilhos/deletar/{id}', [AdminController::class, 'deletarGatilho'])->name('admin.gatilhos.deletar');
 
     // Cronograma de Equipes
     Route::get('/cronograma', [TeamScheduleController::class, 'index'])->name('teamSchedule.index');
@@ -200,6 +206,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/tipo-projeto/{id}/status', [StatusController::class, 'updateTipoProjetoStatus']);
     });
 
+    //Segmentos de Clientes
     Route::get('/segmentos-clientes', [StatusController::class, 'showSegmentosClientes'])->name('segmentos.clientes');
     Route::get('/segmentos/create', [StatusController::class, 'createSegmento'])->name('segmentos.create');
     Route::post('/segmentos', [StatusController::class, 'storeSegmento'])->name('segmentos.store');
@@ -236,6 +243,13 @@ Route::get('/api/segmentos', [StatusController::class, 'getSegmentos']);
 Route::get('/css/app.css', function () {
     return response()->file(public_path('css/app.css'));
 });
+
+
+// Datas Comemorativas
+ Route::resource('commemorative-dates', CommemorativeDateController::class);
+
+// Datas Comemorativas Fixas
+ Route::resource('fixed-commemorative-dates', FixedCommemorativeDateController::class);
 
 // Autenticação
 require __DIR__ . '/auth.php';

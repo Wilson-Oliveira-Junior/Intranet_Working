@@ -15,7 +15,8 @@ use App\Models\GatilhoTemplate;
 use Illuminate\Support\Facades\DB;
 use App\Models\TipoProjeto;
 use App\Models\Segmento;
-use App\Models\Schedule; // Certifique-se de importar o modelo Schedule
+use App\Models\Schedule;
+use App\Models\FixedCommemorativeDate;
 
 class AdminController extends Controller
 {
@@ -100,7 +101,6 @@ class AdminController extends Controller
         ]);
     }
 
-
     public function store(Request $request)
     {
         $request->validate([
@@ -122,8 +122,6 @@ class AdminController extends Controller
         return redirect()->route('admin.usertypes')
             ->with('successMessage', 'Tipo de usuário adicionado com sucesso!');
     }
-
-
 
     public function edit($id)
     {
@@ -155,7 +153,6 @@ class AdminController extends Controller
         // Retorna uma resposta, pode ser um JSON para frontend
         return response()->json(['message' => 'Permissões atualizadas com sucesso!']);
     }
-
 
     public function update(Request $request, $id)
     {
@@ -219,7 +216,6 @@ class AdminController extends Controller
             'sectors' => $sectors,
         ]);
     }
-
 
     public function assignRole(Request $request, $id)
     {
@@ -316,7 +312,6 @@ class AdminController extends Controller
         return redirect()->route('profile.show')->with('successMessage', 'Detalhes do usuário atualizados com sucesso!');
     }
 
-
     // Página de setores
     public function indexSectors()
     {
@@ -379,6 +374,7 @@ class AdminController extends Controller
         return redirect()->route('admin.sectors')
             ->with('successMessage', 'Setor atualizado com sucesso!');
     }
+
     // Deletar um setor
     public function destroySector($id)
     {
@@ -415,7 +411,6 @@ class AdminController extends Controller
         return redirect()->route('admin.usertypes')->with('success', 'Permissões atualizadas com sucesso.');
     }
 
-
     // Edita uma permissão existente
     public function editPermission($id)
     {
@@ -445,7 +440,6 @@ class AdminController extends Controller
 
         return redirect()->route('admin.permissions.index')->with('success', 'Permissão excluída com sucesso.');
     }
-
 
     //Clientes
     public function getClients()
@@ -726,5 +720,60 @@ class AdminController extends Controller
 
         $users = $query->get();
         return response()->json($users);
+    }
+
+    private function getVariableCommemorativeDates($month)
+    {
+        $dates = collect();
+
+        if ($month == 5) {
+            // Dia das Mães: segundo domingo de maio
+            $dates->push([
+                'name' => 'Dia das Mães',
+                'date' => date('Y-m-d', strtotime('second sunday of may'))
+            ]);
+        }
+
+        if ($month == 8) {
+            // Dia dos Pais: segundo domingo de agosto
+            $dates->push([
+                'name' => 'Dia dos Pais',
+                'date' => date('Y-m-d', strtotime('second sunday of august'))
+            ]);
+        }
+
+        // Adicione outras datas variáveis conforme necessário
+
+        return $dates;
+    }
+
+    public function getCommemorativeDatesThisMonth()
+    {
+        $currentMonth = date('m');
+        $fixedDates = FixedCommemorativeDate::whereMonth('date', $currentMonth)->get(['name', 'date']);
+        $variableDates = $this->getVariableCommemorativeDates($currentMonth);
+        $commemorativeDates = $fixedDates->merge($variableDates);
+
+        return response()->json($commemorativeDates);
+    }
+
+    public function getRamais()
+    {
+        try {
+            $ramais = User::where('status', 'Ativo')
+                ->whereNotNull('ramal')
+                ->get(['name', 'lastname', 'ramal'])
+                ->map(function ($user) {
+                    return [
+                        'name' => $user->name . ' ' . $user->lastname,
+                        'ramal' => $user->ramal,
+                    ];
+                });
+
+            return response()->json($ramais);
+        } catch (\Exception $e) {
+            Log::error('Erro ao carregar dados dos ramais: ' . $e->getMessage());
+            return response()->json(['error' => 'Erro ao carregar dados dos ramais'], 500);
+        }
     }
 }
