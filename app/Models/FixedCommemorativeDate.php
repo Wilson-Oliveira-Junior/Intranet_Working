@@ -10,8 +10,13 @@ class FixedCommemorativeDate extends Model
 
     protected $fillable = ['name', 'date'];
 
+    protected $casts = [
+        'date' => 'date:Y-m-d',
+    ];
+
     public function getDateAttribute($value)
     {
-        return date('m-d', strtotime($value));
+        // Retorna a data sem o ano
+        return substr($value, 5);
     }
 }

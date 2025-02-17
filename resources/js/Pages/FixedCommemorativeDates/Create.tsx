@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import '../../../css/components/fixedcommemorativesdates.css';
 
 const Create: React.FC = () => {
   const { data, setData, post, errors } = useForm({
@@ -32,9 +33,10 @@ const Create: React.FC = () => {
           <div className="form-group">
             <label htmlFor="date">Data</label>
             <input
-              type="date"
+              type="text"
               id="date"
               className="form-control"
+              placeholder="MM-DD"
               value={data.date}
               onChange={e => setData('date', e.target.value)}
             />

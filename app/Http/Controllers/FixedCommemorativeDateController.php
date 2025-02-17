@@ -22,10 +22,15 @@ class FixedCommemorativeDateController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'date' => 'required|date',
+            'date' => 'required|date_format:m-d', // Valida apenas mês e dia
         ]);
 
-        FixedCommemorativeDate::create($request->all());
+        // Adiciona um ano fictício para armazenar no banco de dados
+        $date = '2025-' . $request->date;
+        FixedCommemorativeDate::create([
+            'name' => $request->name,
+            'date' => $date,
+        ]);
 
         return redirect()->route('fixed-commemorative-dates.index')->with('successMessage', 'Data comemorativa fixa adicionada com sucesso!');
     }
@@ -40,11 +45,16 @@ class FixedCommemorativeDateController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'date' => 'required|date',
+            'date' => 'required|date_format:m-d', // Valida apenas mês e dia
         ]);
 
         $fixedCommemorativeDate = FixedCommemorativeDate::findOrFail($id);
-        $fixedCommemorativeDate->update($request->all());
+        // Adiciona um ano fictício para armazenar no banco de dados
+        $date = '2025-' . $request->date;
+        $fixedCommemorativeDate->update([
+            'name' => $request->name,
+            'date' => $date,
+        ]);
 
         return redirect()->route('fixed-commemorative-dates.index')->with('successMessage', 'Data comemorativa fixa atualizada com sucesso!');
     }

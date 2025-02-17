@@ -1,9 +1,19 @@
 import React from 'react';
 import { usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import '../../../css/components/fixedcommemorativesdates.css';
 
 const Index: React.FC = () => {
   const { fixedCommemorativeDates, auth } = usePage().props;
+
+  const formatDate = (dateString: string) => {
+    const [year, month, day] = dateString.split('-');
+    const date = new Date(`2025-${month}-${day}`); // Usar um ano fictício para formatação
+    if (isNaN(date.getTime())) {
+      return 'Data Inválida';
+    }
+    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
+  };
 
   return (
     <AuthenticatedLayout user={auth.user}>
@@ -22,7 +32,7 @@ const Index: React.FC = () => {
             {fixedCommemorativeDates.map((date, index) => (
               <tr key={index}>
                 <td>{date.name}</td>
-                <td>{new Date(date.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}</td>
+                <td>{formatDate(date.date)}</td>
                 <td>
                   <a href={route('fixed-commemorative-dates.edit', date.id)} className="btn btn-warning">Editar</a>
                   <form action={route('fixed-commemorative-dates.destroy', date.id)} method="POST" style={{ display: 'inline' }}>

@@ -1,0 +1,546 @@
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table tbody + tbody {
+    border-top: 2px solid #dee2e6;
+}
+
+.table .table {
+    background-color: #fff;
+}
+
+.table th {
+    background-color: #f2f2f2;
+    color: #333;
+    font-weight: bold;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}
+
+.badge-success {
+    color: #fff;
+    background-color: #28a745;
+}
+
+.badge-secondary {
+    color: #fff;
+    background-color: #6c757d;
+}
+
+.btn {
+    display: inline-block;
+    font-weight: 400;
+    color: #212529;
+    text-align: center;
+    vertical-align: middle;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    padding: 8px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    border-radius: 4px;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    margin: 0 4px;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-warning {
+    color: #212529;
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+.btn-danger {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+/* Estilo geral do container */
+.container {
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: fit-content;
+    min-width: 90%;
+    width: 100%;
+}
+
+/* Estilo do título */
+h1 {
+    text-align: center;
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Estilo dos filtros */
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+    justify-content: space-between;
+}
+
+.filters label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.filters input,
+.filters select {
+    padding: 8px;
+    font-size: 14px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Estilo da tabela */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+/* Estilo dos botões */
+.btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 0 4px;
+}
+
+/* Estilo do texto centralizado */
+.text-center {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+/* Estilo do botão "Novo" */
+.btn.novo {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    width: auto;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.btn.novo:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo da paginação */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 8px 12px;
+    margin: 0 4px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    color: #000; /* Ensure pagination numbers are visible */
+}
+
+.pagination button.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.pagination button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Estilo do modal */
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    color: #333;
+}
+
+.modal input,
+.modal select {
+    padding: 10px;
+    font-size: 14px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.modal button[type="submit"] {
+    padding: 10px 15px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.modal button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo do switch */
+.switch-list {
+    --false: #E81B1B;
+    --true: #009068;
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    height: 2rem;
+    width: 3.5rem;
+    background-color: #fff;
+    position: relative;
+    border-radius: .2em;
+    cursor: pointer;
+    border: 2px solid #000000;
+    transition: .3s ease;
+}
+
+input[type="checkbox"]::before {
+    content: '';
+    display: block;
+    height: 1.9em;
+    width: 1.9em;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: calc(1.9em/2 + .3em);
+    background-color: #fff;
+    border-radius: .2em;
+    transition: .3s ease;
+}
+
+input[type="checkbox"]:checked::before {
+    background-color: #fff;
+    left: calc(100% - (1.9em/2 + .3em));
+}
+
+input[type="checkbox"]:checked {
+    background-color: var(--true);
+}
+
+input[type="checkbox"]:not(:checked) {
+    background-color: var(--false);
+}
+
+/* Remover o estilo de background-image */
+input[type="checkbox"]:checked {
+    background-image: none;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #28a745;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* Modo escuro */
+body.dark-mode .container {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+}
+
+body.dark-mode h1 {
+    color: #e0e0e0;
+}
+
+body.dark-mode .filters label {
+    color: #e0e0e0;
+}
+
+body.dark-mode .filters input,
+body.dark-mode .filters select {
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
+body.dark-mode .table th {
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+}
+
+body.dark-mode .table td {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
+body.dark-mode .table tbody tr:nth-child(even) {
+    background-color: #2c2c2c;
+}
+
+body.dark-mode .table tr:hover {
+    background-color: #333;
+}
+
+body.dark-mode .btn {
+    background-color: #007bff;
+    color: #fff;
+}
+
+body.dark-mode .btn:hover {
+    background-color: #0056b3;
+}
+
+body.dark-mode .btn-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+body.dark-mode .btn-warning:hover {
+    background-color: #e0a800;
+}
+
+body.dark-mode .btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+body.dark-mode .btn-danger:hover {
+    background-color: #c82333;
+}
+
+body.dark-mode .pagination button {
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
+body.dark-mode .pagination button.active {
+    background-color: #4a5568;
+}
+
+body.dark-mode .modal-content {
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
+body.dark-mode .modal input,
+body.dark-mode .modal select {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
+body.dark-mode .modal button[type="submit"] {
+    background-color: #4a5568;
+    color: #e0e0e0;
+}
+
+body.dark-mode .modal button[type="submit"]:hover {
+    background-color: #2d3748;
+}

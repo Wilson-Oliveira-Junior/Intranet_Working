@@ -93,6 +93,16 @@ const HomeAdm: React.FC = () => {
       });
   }, []);
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      // Handle dates with year 0000
+      const [year, month, day] = dateString.split('-');
+      return new Date(`2025-${month}-${day}`).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
+    }
+    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
+  };
+
   const colors = ['#00c851', '#33b5e5', '#ff4444', '#aa66cc', '#ffbb33'];
 
   return (
@@ -182,7 +192,7 @@ const HomeAdm: React.FC = () => {
                   {commemorativeDates.map((date, index) => (
                     <div key={index} className="commemorative-date-item">
                       <p>{date.name}</p>
-                      <p>{new Date(date.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}</p>
+                      <p>{formatDate(date.date)}</p>
                     </div>
                   ))}
                 </div>

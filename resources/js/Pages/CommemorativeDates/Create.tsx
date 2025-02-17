@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import '../../../css/components/fixedcommemorativesdates.css';
 
 const Create: React.FC = () => {
   const { data, setData, post, errors } = useForm({

@@ -17,6 +17,7 @@ use App\Models\TipoProjeto;
 use App\Models\Segmento;
 use App\Models\Schedule;
 use App\Models\FixedCommemorativeDate;
+use App\Models\CommemorativeDate;
 
 class AdminController extends Controller
 {
@@ -722,6 +723,13 @@ class AdminController extends Controller
         return response()->json($users);
     }
 
+    public function getCommemorativeDatesThisMonth()
+    {
+        $currentMonth = date('m');
+        $commemorativeDates = CommemorativeDate::whereMonth('date', $currentMonth)->get(['name', 'date']);
+        return response()->json($commemorativeDates);
+    }
+
     private function getVariableCommemorativeDates($month)
     {
         $dates = collect();
@@ -745,16 +753,6 @@ class AdminController extends Controller
         // Adicione outras datas variáveis conforme necessário
 
         return $dates;
-    }
-
-    public function getCommemorativeDatesThisMonth()
-    {
-        $currentMonth = date('m');
-        $fixedDates = FixedCommemorativeDate::whereMonth('date', $currentMonth)->get(['name', 'date']);
-        $variableDates = $this->getVariableCommemorativeDates($currentMonth);
-        $commemorativeDates = $fixedDates->merge($variableDates);
-
-        return response()->json($commemorativeDates);
     }
 
     public function getRamais()
