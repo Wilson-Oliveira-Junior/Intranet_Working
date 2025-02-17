@@ -13,5 +13,6 @@ class TipoProjeto extends Model
     protected $fillable = [
         'nome',
         'descricao',
+        'status',
     ];
 }

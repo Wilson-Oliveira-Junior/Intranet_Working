@@ -194,6 +194,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/status/{id}/edit', [StatusController::class, 'edit'])->name('status.edit');
         Route::put('/status/{id}', [StatusController::class, 'update'])->name('status.update');
         Route::delete('/status/{id}', [StatusController::class, 'destroy'])->name('status.destroy');
+        Route::put('/status/{id}/status', [StatusController::class, 'updateStatus']);
+        Route::put('/tipo-tarefa/{id}/status', [StatusController::class, 'updateTipoTarefaStatus']);
+        Route::put('/segmentos/{id}/status', [StatusController::class, 'updateSegmentoStatus']);
+        Route::put('/tipo-projeto/{id}/status', [StatusController::class, 'updateTipoProjetoStatus']);
     });
 
     Route::get('/segmentos-clientes', [StatusController::class, 'showSegmentosClientes'])->name('segmentos.clientes');
@@ -202,6 +206,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/segmentos/{id}/edit', [StatusController::class, 'editSegmento'])->name('segmentos.edit');
     Route::put('/segmentos/{id}', [StatusController::class, 'updateSegmento'])->name('segmentos.update');
     Route::delete('/segmentos/{id}', [StatusController::class, 'destroySegmento'])->name('segmentos.destroy');
+
+    // Tipos de Projeto
+    Route::get('/tipo-projeto', [StatusController::class, 'indexTipoProjeto'])->name('tipo-projeto.index');
+    Route::get('/tipo-projeto/create', [StatusController::class, 'createTipoProjeto'])->name('tipo-projeto.create');
+    Route::post('/tipo-projeto', [StatusController::class, 'storeTipoProjeto'])->name('tipo-projeto.store');
+    Route::get('/tipo-projeto/{id}/edit', [StatusController::class, 'editTipoProjeto'])->name('tipo-projeto.edit');
+    Route::put('/tipo-projeto/{id}', [StatusController::class, 'updateTipoProjeto'])->name('tipo-projeto.update');
+    Route::delete('/tipo-projeto/{id}', [StatusController::class, 'destroyTipoProjeto'])->name('tipo-projeto.destroy');
 });
 
 // API Routes

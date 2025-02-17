@@ -13,7 +13,7 @@ const StatusIndex = ({ auth, statuses: initialStatuses, links: initialLinks }) =
         const newStatus = currentStatus === 'Ativo' ? 'Inativo' : 'Ativo';
 
         try {
-            await axios.put(`/status/${id}`, { status: newStatus }, {
+            await axios.put(`/status/${id}/status`, { status: newStatus }, {
                 headers: {
                     'X-CSRF-TOKEN': csrf_token,
                 },

@@ -5,7 +5,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import '../../../../css/pages/tipoTarefa.css';
 
 const Index = () => {
-    const { tiposTarefa: initialTiposTarefa, links: initialLinks } = usePage().props;
+    const { tiposTarefa: initialTiposTarefa, links: initialLinks, csrf_token } = usePage().props;
     const [tiposTarefa, setTiposTarefa] = useState(initialTiposTarefa);
     const [links, setLinks] = useState(initialLinks);
 
@@ -15,7 +15,11 @@ const Index = () => {
 
         // Envia a requisição para o backend
         try {
-            await axios.put(`/tipo-tarefa/${id}/status`, { status: newStatus })
+            await axios.put(`/tipo-tarefa/${id}/status`, { status: newStatus }, {
+                headers: {
+                    'X-CSRF-TOKEN': csrf_token,
+                },
+            })
                 .then(() => {
                     // Atualiza o estado local após a resposta do servidor
                     const updatedTiposTarefa = tiposTarefa.data.map((tipo) => {
@@ -38,7 +42,11 @@ const Index = () => {
     const handleDelete = async (id) => {
         if (confirm('Tem certeza que deseja deletar este tipo de tarefa?')) {
             try {
-                await axios.delete(`/tipo-tarefa/${id}`)
+                await axios.delete(`/tipo-tarefa/${id}`, {
+                    headers: {
+                        'X-CSRF-TOKEN': csrf_token,
+                    },
+                })
                     .then(() => {
                         console.log('Tipo de tarefa deletado com sucesso');
                         // Atualiza o estado local removendo o item deletado

@@ -177,12 +177,10 @@ class TaskController extends Controller
     {
         $tipoTarefa = TipoTarefa::findOrFail($id);
 
-        // Validação do status
         $request->validate([
-            'status' => 'required|in:Ativo,Inativo',
+            'status' => 'required|string|in:Ativo,Inativo',
         ]);
 
-        // Atualiza o status
         $tipoTarefa->status = $request->input('status');
         $tipoTarefa->save();
 
