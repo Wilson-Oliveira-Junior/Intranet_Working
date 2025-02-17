@@ -9,10 +9,9 @@ class Segmento extends Model
 {
     use HasFactory;
 
-    protected $table = 'segmento'; // Ensure this matches your database table name
+    protected $table = 'segmento';
 
     protected $fillable = [
         'nome',
-        // Add other columns as needed
     ];
 }

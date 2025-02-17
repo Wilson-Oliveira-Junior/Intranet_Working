@@ -195,6 +195,13 @@ Route::middleware('auth')->group(function () {
         Route::put('/status/{id}', [StatusController::class, 'update'])->name('status.update');
         Route::delete('/status/{id}', [StatusController::class, 'destroy'])->name('status.destroy');
     });
+
+    Route::get('/segmentos-clientes', [StatusController::class, 'showSegmentosClientes'])->name('segmentos.clientes');
+    Route::get('/segmentos/create', [StatusController::class, 'createSegmento'])->name('segmentos.create');
+    Route::post('/segmentos', [StatusController::class, 'storeSegmento'])->name('segmentos.store');
+    Route::get('/segmentos/{id}/edit', [StatusController::class, 'editSegmento'])->name('segmentos.edit');
+    Route::put('/segmentos/{id}', [StatusController::class, 'updateSegmento'])->name('segmentos.update');
+    Route::delete('/segmentos/{id}', [StatusController::class, 'destroySegmento'])->name('segmentos.destroy');
 });
 
 // API Routes
@@ -211,6 +218,7 @@ Route::post('/api/uploadAttachment', [TeamScheduleController::class, 'uploadAtta
 Route::post('/api/cronograma/{id}/add-follower', [TeamScheduleController::class, 'addFollower'])->name('web.teamSchedule.addFollower');
 Route::post('/api/cronograma/{id}/remove-follower', [TeamScheduleController::class, 'removeFollower'])->name('web.teamSchedule.removeFollower');
 Route::post('/api/uploadAttachment', [TeamScheduleController::class, 'uploadAttachment'])->name('web.teamSchedule.uploadAttachment');
+Route::get('/api/segmentos', [StatusController::class, 'getSegmentos']);
 
 // Rota para o CSS
 Route::get('/css/app.css', function () {

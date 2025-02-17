@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Status;
 use Inertia\Inertia;
+use App\Models\Segmento;
 
 class StatusController extends Controller
 {
@@ -68,5 +69,63 @@ class StatusController extends Controller
         $status->delete();
 
         return response()->json(['message' => 'Status deleted successfully']);
+    }
+
+    public function showSegmentosClientes()
+    {
+        return Inertia::render('Tasks/Segmentos/segmento-cliente');
+    }
+
+    public function createSegmento()
+    {
+        return Inertia::render('Tasks/Segmentos/Create');
+    }
+
+    public function storeSegmento(Request $request)
+    {
+        $request->validate([
+            'nome' => 'required|string|max:255',
+        ]);
+
+        Segmento::create($request->all());
+
+        return redirect()->route('segmentos.clientes')->with('success', 'Segmento criado com sucesso.');
+    }
+
+    public function editSegmento($id)
+    {
+        $segmento = Segmento::findOrFail($id);
+        return Inertia::render('Tasks/Segmentos/Edit', [
+            'segmento' => $segmento,
+        ]);
+    }
+
+    public function updateSegmento(Request $request, $id)
+    {
+        $request->validate([
+            'nome' => 'required|string|max:255',
+        ]);
+
+        $segmento = Segmento::findOrFail($id);
+        $segmento->update($request->all());
+
+        return redirect()->route('segmentos.clientes')->with('success', 'Segmento atualizado com sucesso.');
+    }
+
+    public function getSegmentos()
+    {
+        $segmentos = Segmento::paginate(10);
+        return response()->json([
+            'data' => $segmentos->items(),
+            'links' => $segmentos->toArray()['links'],
+        ]);
+    }
+
+    public function destroySegmento($id)
+    {
+        $segmento = Segmento::findOrFail($id);
+        $segmento->delete();
+
+        return response()->json(['message' => 'Segmento deletado com sucesso']);
     }
 }

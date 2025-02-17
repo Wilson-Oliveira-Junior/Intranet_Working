@@ -676,6 +676,10 @@ class AdminController extends Controller
         }
     }
 
+    public function showSegmentosClientes()
+    {
+        return Inertia::render('Segmentos/Clientes');
+    }
 
     //Senhas
     public function showPasswordRegistration()
