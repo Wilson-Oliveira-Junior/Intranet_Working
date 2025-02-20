@@ -4,6 +4,9 @@ import NavLink from '@/Components/NavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState, useEffect } from 'react';
 import SidebarADM from '@/Pages/Admin/AdminSidebar';
+import '../../../resources/css/app.css'; // Importando o CSS global
+import { route } from 'ziggy-js'; // Importar a função route para navegação
+import axios from 'axios'; // Importar axios para fazer requisições HTTP
 
 const Menu = ({ title, icon, children, isOpen, toggle }: { title: string; icon: string; children: ReactNode; isOpen: boolean; toggle: () => void }) => (
     <div className="flex flex-col">
@@ -15,13 +18,13 @@ const Menu = ({ title, icon, children, isOpen, toggle }: { title: string; icon: 
     </div>
 );
 
-export default function Authenticated({
-    header,
-    children,
-}: PropsWithChildren<{ header?: ReactNode }>) {
+const Authenticated = ({ header, children }: PropsWithChildren<{ header?: ReactNode }>) => {
     const { auth } = usePage().props;
-    const user = (auth as { user?: { name: string } })?.user; // Ensure user is defined
+    const user = (auth as { user?: { name: string } })?.user;
     const [darkMode, setDarkMode] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [notificationsOpen, setNotificationsOpen] = useState(false);
+    const [notifications, setNotifications] = useState<{ id: number; message: string; read: boolean }[]>([]);
 
     useEffect(() => {
         if (!user) {
@@ -46,6 +49,22 @@ export default function Authenticated({
         });
     };
 
+    const toggleDropdown = () => {
+        setDropdownOpen(!dropdownOpen);
+    };
+
+    const toggleNotifications = () => {
+        setNotificationsOpen(!notificationsOpen);
+    };
+
+    const markAsRead = (id: number) => {
+        setNotifications(notifications.map(notification =>
+            notification.id === id ? { ...notification, read: true } : notification
+        ));
+        // Atualizar o status da notificação no servidor
+        axios.post(`/notifications/${id}/mark-as-read`);
+    };
+
     useEffect(() => {
         const toggle = document.querySelector('.toggle[type="checkbox"]');
         const curtain = document.querySelector('.curtain');
@@ -63,7 +82,11 @@ export default function Authenticated({
             }
         };
 
-        if (toggle) toggle.addEventListener('change', handleToggle);
+        if (toggle) {
+            toggle.addEventListener('change', handleToggle);
+        } else {
+            console.error('Toggle Dark Mode button not found');
+        }
 
         // Set initial text color based on the current mode
         if (toggle && modeText) {
@@ -78,6 +101,25 @@ export default function Authenticated({
             if (toggle) toggle.removeEventListener('change', handleToggle);
         };
     }, []);
+
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                const response = await axios.get('/notifications');
+                if (Array.isArray(response.data)) {
+                    setNotifications(response.data);
+                } else {
+                    console.error('Notificações não são um array:', response.data);
+                }
+            } catch (error) {
+                console.error('Erro ao buscar notificações:', error);
+            }
+        };
+
+        fetchNotifications();
+    }, []);
+
+    const hasUnreadNotifications = Array.isArray(notifications) && notifications.some(notification => !notification.read);
 
     if (!user) {
         return <div>Redirecting...</div>;
@@ -103,22 +145,37 @@ export default function Authenticated({
                             <span id="mode-text" className={`ml-2 ${darkMode ? 'text-white' : 'text-black'}`}>{darkMode ? 'Modo Claro' : 'Modo Escuro'}</span>
                         </form>
                         <div className="relative ms-3">
-                            <Dropdown>
-                                <Dropdown.Trigger>
-                                    <span className="inline-flex rounded-md">
-                                        <button type="button" className="dropdown-button">
-                                            {user.name}
-                                            <svg className="dropdown-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M5.293 7.293a1 1 011.414 0L10 10.586l3.293-3.293a1 1 011.414 1.414l-4 4a 1 1 010-1.414z" clipRule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                    </span>
-                                </Dropdown.Trigger>
-                                <Dropdown.Content>
-                                    <Dropdown.Link href={(window as any).route('profile.edit')}>Profile</Dropdown.Link>
-                                    <Dropdown.Link href={(window as any).route('logout')} method="post" as="button">Log Out</Dropdown.Link>
-                                </Dropdown.Content>
-                            </Dropdown>
+                            <button type="button" className={`notification-button ${hasUnreadNotifications ? 'has-unread' : ''}`} onClick={toggleNotifications}>
+                                <i className={`bi ${hasUnreadNotifications ? 'bi-bell-fill' : 'bi-bell'}`}></i>
+                            </button>
+                            <div className={`notification-content ${notificationsOpen ? 'show' : ''}`}>
+                                {notifications.length > 0 ? (
+                                    notifications.map(notification => (
+                                        <div key={notification.id} className="notification-item" onClick={() => markAsRead(notification.id)}>
+                                            {notification.message}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="notification-item">Nenhuma notificação</div>
+                                )}
+                                <Link href={route('notifications')} className="notification-item">Ver todas as notificações</Link>
+                            </div>
+                        </div>
+                        <div className="relative ms-3">
+                            <button type="button" className="dropdown-button" onClick={toggleDropdown}>
+                                <i className="bi bi-person-circle"></i>
+                                <span className="ml-2">{user.name}</span>
+                                <svg className="dropdown-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M5.293 7.293a1 1 011.414 0L10 10.586l3.293-3.293a1 1 011.414 1.414l-4 4a 1 1 010-1.414z" clipRule="evenodd"/>
+                                </svg>
+                            </button>
+                            <div className={`dropdown-content ${dropdownOpen ? 'show' : ''}`}>
+                                <Link href={route('profile.show')} className="dropdown-item">Perfil</Link>
+                                <Link href={route('settings')} className="dropdown-item">Configurações</Link>
+                                <Link href={route('notifications')} className="dropdown-item">Notificações</Link>
+                                <Link href={route('help')} className="dropdown-item">Ajuda</Link>
+                                <button onClick={() => route('logout')} className="dropdown-item">Sair</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -144,4 +201,6 @@ export default function Authenticated({
             </div>
         </div>
     );
-}
+};
+
+export default Authenticated;

@@ -51,6 +51,21 @@ Route::get('/status', function () {
     return Inertia::render('Tarefas/Status');
 })->middleware(['auth', 'verified'])->name('status');
 
+// Rota para a página de configurações
+Route::get('/settings', function () {
+    return Inertia::render('Settings');
+})->middleware(['auth', 'verified'])->name('settings');
+
+// Rota para a página de notificações
+Route::get('/notifications', function () {
+    return Inertia::render('Notifications');
+})->middleware(['auth', 'verified'])->name('notifications');
+
+// Rota para a página de ajuda
+Route::get('/help', function () {
+    return Inertia::render('Help');
+})->middleware(['auth', 'verified'])->name('help');
+
 // Rotas para convidados
 Route::middleware('guest')->group(function () {
     Route::get('/login', function () {
@@ -155,10 +170,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/clients/{id}', [ClientController::class, 'destroy'])->name('clients.destroy');
 
     // Perfil
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::middleware('auth')->group(function () {
+        Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+        Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    });
 
     // Tarefas do usuário
     Route::get('/user-tasks', function () {

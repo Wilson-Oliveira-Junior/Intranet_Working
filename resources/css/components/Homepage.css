@@ -130,6 +130,71 @@ button:hover {
     background-color: #0056b3;
 }
 
+/* Estilos para o dropdown */
+.dropdown-button {
+    background-color: #963bd2; /* Cor de fundo ajustada */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-button:hover {
+    background-color: #7a2ea8; /* Cor de fundo ajustada para o hover */
+}
+
+.dropdown-icon {
+    margin-left: 8px;
+    width: 16px;
+    height: 16px;
+}
+
+.dropdown-content {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: white;
+    border: 1px solid #963bd2; /* Adiciona uma borda */
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 200px;
+    display: none;
+    flex-direction: column;
+}
+
+.dropdown-content.show {
+    display: flex;
+}
+
+.dropdown-content a,
+.dropdown-content button {
+    padding: 10px 15px;
+    text-align: left;
+    color: #963bd2; /* Ajusta a cor do texto */
+    text-decoration: none;
+    background: none;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.dropdown-content a:hover,
+.dropdown-content button:hover {
+    background-color: #e9ecef;
+}
+
+.dropdown-content a:focus,
+.dropdown-content button:focus {
+    outline: none;
+    background-color: #e9ecef;
+}
+
 /* Lista de aniversariantes */
 .birthday-list {
     display: flex;
@@ -195,4 +260,57 @@ button:hover {
 .card-documents p {
     text-align: center;
     margin-bottom: 20px;
+}
+
+/* Modo claro */
+body {
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.header h1 {
+    color: #333;
+}
+
+.card {
+    background-color: white;
+    color: #333;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.dropdown-button {
+    background-color: #963bd2; /* Cor de fundo ajustada */
+    color: white;
+}
+
+.dropdown-button:hover {
+    background-color: #7a2ea8; /* Cor de fundo ajustada para o hover */
+}
+
+.dropdown-content {
+    background-color: white;
+    border: 1px solid #963bd2; /* Adiciona uma borda */
+}
+
+.dropdown-content a,
+.dropdown-content button {
+    color: #963bd2; /* Ajusta a cor do texto */
+}
+
+.dropdown-content a:hover,
+.dropdown-content button:hover {
+    background-color: #e9ecef;
+}
+
+.dropdown-content a:focus,
+.dropdown-content button:focus {
+    background-color: #e9ecef;
 }
