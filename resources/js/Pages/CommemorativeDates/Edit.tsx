@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import '../../../css/components/commemorativesdates.css';
 
 const Edit: React.FC = () => {
   const { commemorativeDate } = usePage().props;

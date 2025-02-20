@@ -727,7 +727,23 @@ class AdminController extends Controller
     {
         $currentMonth = date('m');
         $commemorativeDates = CommemorativeDate::whereMonth('date', $currentMonth)->get(['name', 'date']);
-        return response()->json($commemorativeDates);
+        $fixedCommemorativeDates = FixedCommemorativeDate::whereMonth('date', $currentMonth)->get(['name', 'date']);
+        $variableCommemorativeDates = $this->getVariableCommemorativeDates($currentMonth);
+
+        Log::info('Commemorative Dates:', $commemorativeDates->toArray());
+        Log::info('Fixed Commemorative Dates:', $fixedCommemorativeDates->toArray());
+        Log::info('Variable Commemorative Dates:', $variableCommemorativeDates->toArray());
+
+        $allCommemorativeDates = $commemorativeDates->merge($fixedCommemorativeDates)->merge($variableCommemorativeDates)->map(function ($date) {
+            return [
+                'name' => $date['name'],
+                'date' => $date['date'] instanceof \DateTime ? $date['date']->format('Y-m-d') : $date['date']
+            ];
+        })->values()->all();
+
+        Log::info('All Commemorative Dates:', $allCommemorativeDates);
+
+        return response()->json($allCommemorativeDates);
     }
 
     private function getVariableCommemorativeDates($month)

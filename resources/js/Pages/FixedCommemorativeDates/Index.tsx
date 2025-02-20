@@ -7,7 +7,7 @@ const Index: React.FC = () => {
   const { fixedCommemorativeDates, auth } = usePage().props;
 
   const formatDate = (dateString: string) => {
-    const [year, month, day] = dateString.split('-');
+    const [month, day] = dateString.split('-');
     const date = new Date(`2025-${month}-${day}`); // Usar um ano fictício para formatação
     if (isNaN(date.getTime())) {
       return 'Data Inválida';

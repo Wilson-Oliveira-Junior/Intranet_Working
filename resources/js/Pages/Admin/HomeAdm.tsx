@@ -5,6 +5,7 @@ import { usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import axios from 'axios';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import { Carousel } from 'react-bootstrap';
 
 interface User {
     name: string;
@@ -94,11 +95,15 @@ const HomeAdm: React.FC = () => {
   }, []);
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const [year, month, day] = dateString.split('-');
+    const date = new Date(Number(year), Number(month) - 1, Number(day));
     if (isNaN(date.getTime())) {
-      // Handle dates with year 0000
-      const [year, month, day] = dateString.split('-');
-      return new Date(`2025-${month}-${day}`).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
+      const [month, day] = dateString.split('-');
+      const fixedDate = new Date(`2025-${month}-${day}`);
+      if (isNaN(fixedDate.getTime())) {
+        return 'Data Inválida';
+      }
+      return fixedDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
     }
     return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
   };
@@ -177,7 +182,7 @@ const HomeAdm: React.FC = () => {
 
         <div className="row">
           <div className="col-md-6 mb-4">
-            <div className="card">
+            <div className="card card-documents">
               <h2>Documentos da Área</h2>
               <p>Acesse os documentos da sua área de trabalho.</p>
               <button onClick={() => alert('Funcionalidade em desenvolvimento')}>Acessar Documentos</button>
@@ -188,14 +193,16 @@ const HomeAdm: React.FC = () => {
             <div className="card">
               <h2>Datas Comemorativas do Mês</h2>
               {Array.isArray(commemorativeDates) && commemorativeDates.length > 0 ? (
-                <div className="commemorative-dates-list">
+                <Carousel className="commemorative-carousel">
                   {commemorativeDates.map((date, index) => (
-                    <div key={index} className="commemorative-date-item">
-                      <p>{date.name}</p>
-                      <p>{formatDate(date.date)}</p>
-                    </div>
+                    <Carousel.Item key={index}>
+                      <div className="commemorative-date-item">
+                        <p>{date.name}</p>
+                        <p>{formatDate(date.date)}</p>
+                      </div>
+                    </Carousel.Item>
                   ))}
-                </div>
+                </Carousel>
               ) : (
                 <p>Nenhuma data comemorativa este mês.</p>
               )}

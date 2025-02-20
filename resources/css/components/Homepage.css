@@ -101,7 +101,6 @@
     text-overflow: ellipsis;
 }
 
-
 /* Perfil e fotos */
 .profile {
     display: flex;
@@ -156,4 +155,44 @@ button:hover {
 .birthday-item div {
     display: flex;
     flex-direction: column;
+}
+
+/* Carrossel comemorativo */
+.commemorative-carousel {
+    height: 100px;
+}
+
+.commemorative-date-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    filter: invert(1); /* Torna as setas visíveis no modo claro */
+}
+
+/* Documentos */
+.card-documents {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+
+}
+
+.card-documents h2 {
+    margin-top: 0;
+    color: #333;
+    font-size: 20px;
+}
+
+.card-documents p {
+    text-align: center;
+    margin-bottom: 20px;
 }
