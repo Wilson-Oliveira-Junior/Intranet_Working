@@ -734,6 +734,11 @@ class AdminController extends Controller
         Log::info('Fixed Commemorative Dates:', $fixedCommemorativeDates->toArray());
         Log::info('Variable Commemorative Dates:', $variableCommemorativeDates->toArray());
 
+        // Certifique-se de que todas as coleções sejam instâncias de Collection
+        $commemorativeDates = collect($commemorativeDates);
+        $fixedCommemorativeDates = collect($fixedCommemorativeDates);
+        $variableCommemorativeDates = collect($variableCommemorativeDates);
+
         $allCommemorativeDates = $commemorativeDates->merge($fixedCommemorativeDates)->merge($variableCommemorativeDates)->map(function ($date) {
             return [
                 'name' => $date['name'],
@@ -749,6 +754,14 @@ class AdminController extends Controller
     private function getVariableCommemorativeDates($month)
     {
         $dates = collect();
+
+        if ($month == 2) {
+            // Exemplo de data variável para fevereiro
+            $dates->push([
+                'name' => 'Carnaval',
+                'date' => date('Y-m-d', strtotime('last tuesday of february'))
+            ]);
+        }
 
         if ($month == 5) {
             // Dia das Mães: segundo domingo de maio
@@ -768,10 +781,11 @@ class AdminController extends Controller
 
         // Adicione outras datas variáveis conforme necessário
 
+        Log::info('Variable Dates for Month ' . $month . ':', $dates->toArray());
+
         return $dates;
     }
-
-    public function getRamais()
+        public function getRamais()
     {
         try {
             $ramais = User::where('status', 'Ativo')
