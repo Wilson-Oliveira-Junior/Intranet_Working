@@ -56,22 +56,12 @@ const HomeAdm: React.FC = () => {
 
   useEffect(() => {
     axios.get('/tasks-to-do-count')
-      .then(response => {
-        setTasksToDoCount(response.data.count);
-      })
-      .catch(error => {
-        console.error('Erro ao carregar dados de tarefas a fazer', error);
-      });
-  }, []);
+      .then(response => setTasksToDoCount(response.data.count))
+      .catch(error => console.error('Erro ao carregar dados de tarefas a fazer', error));
 
-  useEffect(() => {
     axios.get('/tasks-delivered-count')
-      .then(response => {
-        setTasksDeliveredCount(response.data.count);
-      })
-      .catch(error => {
-        console.error('Erro ao carregar dados de tarefas entregues', error);
-      });
+      .then(response => setTasksDeliveredCount(response.data.count))
+      .catch(error => console.error('Erro ao carregar dados de tarefas entregues', error));
   }, []);
 
   useEffect(() => {

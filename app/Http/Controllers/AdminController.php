@@ -730,10 +730,6 @@ class AdminController extends Controller
         $fixedCommemorativeDates = FixedCommemorativeDate::whereMonth('date', $currentMonth)->get(['name', 'date']);
         $variableCommemorativeDates = $this->getVariableCommemorativeDates($currentMonth);
 
-        Log::info('Commemorative Dates:', $commemorativeDates->toArray());
-        Log::info('Fixed Commemorative Dates:', $fixedCommemorativeDates->toArray());
-        Log::info('Variable Commemorative Dates:', $variableCommemorativeDates->toArray());
-
         // Certifique-se de que todas as coleções sejam instâncias de Collection
         $commemorativeDates = collect($commemorativeDates);
         $fixedCommemorativeDates = collect($fixedCommemorativeDates);
@@ -745,8 +741,6 @@ class AdminController extends Controller
                 'date' => $date['date'] instanceof \DateTime ? $date['date']->format('Y-m-d') : $date['date']
             ];
         })->values()->all();
-
-        Log::info('All Commemorative Dates:', $allCommemorativeDates);
 
         return response()->json($allCommemorativeDates);
     }
@@ -778,10 +772,6 @@ class AdminController extends Controller
                 'date' => date('Y-m-d', strtotime('second sunday of august'))
             ]);
         }
-
-        // Adicione outras datas variáveis conforme necessário
-
-        Log::info('Variable Dates for Month ' . $month . ':', $dates->toArray());
 
         return $dates;
     }

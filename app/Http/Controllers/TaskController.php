@@ -35,7 +35,7 @@ class TaskController extends Controller
                 } else if ($task->status === Schedule::STATUS_WORKING) {
                     $task->status = 'trabalhando';
                 } else {
-                    $task->status = 'fechadas';
+                    $task->status = 'fechado';
                 }
                 $task->client_name = $task->client ? $task->client->name : 'N/A';
                 $task->tipo_tarefa = $task->tipoTarefa ? $task->tipoTarefa : null;
@@ -44,7 +44,7 @@ class TaskController extends Controller
                 return $task;
             });
 
-        return response()->json([
+        return Inertia::render('Tasks/Index', [
             'user' => $user,
             'teams' => $teams,
             'tasks' => $tasks,
