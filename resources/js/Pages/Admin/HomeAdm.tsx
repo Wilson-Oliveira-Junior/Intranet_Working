@@ -13,6 +13,11 @@ interface User {
     birth_date: string;
 }
 
+interface Pauta {
+    id: number;
+    titulo: string;
+}
+
 const HomeAdm: React.FC = () => {
   const { user, activeUsersCount: activeUsersCountFromProps } = usePage().props as { user: User, activeUsersCount: number };
 
@@ -23,6 +28,8 @@ const HomeAdm: React.FC = () => {
   const [tasksDeliveredCount, setTasksDeliveredCount] = useState<number>(0);
   const [ramais, setRamais] = useState<{ name: string, ramal: string }[]>([]);
   const [commemorativeDates, setCommemorativeDates] = useState<{ name: string, date: string }[]>([]);
+  const [pautasCount, setPautasCount] = useState<number>(0);
+  const [pautas, setPautas] = useState<Pauta[]>([]);
 
   if (!user) {
     return <div>Erro: Usuário não encontrado. Verifique a autenticação.</div>;
@@ -84,6 +91,17 @@ const HomeAdm: React.FC = () => {
       });
   }, []);
 
+  useEffect(() => {
+    axios.get('/pautas')
+      .then(response => {
+        setPautas(response.data.pautas.data);
+        setPautasCount(response.data.total);
+      })
+      .catch(error => {
+        console.error('Erro ao carregar dados de pautas', error);
+      });
+  }, []);
+
   const formatDate = (dateString: string) => {
     const [year, month, day] = dateString.split('-');
     const date = new Date(Number(year), Number(month) - 1, Number(day));
@@ -133,8 +151,18 @@ const HomeAdm: React.FC = () => {
         <div className="row">
           <div className="col-md-4 mb-4">
             <div className="card">
-              <h2>Minhas Pautas (0)</h2>
-              <p>Sem registros.</p>
+              <h2>Minhas Pautas ({pautasCount})</h2>
+              {pautas.length > 0 ? (
+                <ul>
+                  {pautas.map((pauta) => (
+                    <li key={pauta.id}>
+                      <a href={`/pautas/${pauta.id}`}>{pauta.titulo}</a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>Sem registros.</p>
+              )}
             </div>
           </div>
           <div className="col-md-4 mb-4">

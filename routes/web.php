@@ -41,7 +41,8 @@ Route::get('/tasks-to-do-count', [AdminController::class, 'getTasksToDoCount']);
 Route::get('/tasks-delivered-count', [AdminController::class, 'getTasksDeliveredCount']);
 Route::get('/ramais', [AdminController::class, 'getRamais']);
 Route::get('/commemorative-dates-this-month', [AdminController::class, 'getCommemorativeDatesThisMonth']);
-
+Route::get('/pautas', [PautasController::class, 'index'])->middleware(['auth', 'verified'])->name('admin.pautas');
+Route::get('/pautas/{id}', [PautasController::class, 'show'])->middleware(['auth', 'verified'])->name('pautas.show');
 // Error boundary route
 Route::get('/error-boundary', function () {
     return Inertia::render('ErrorBoundary');
@@ -125,6 +126,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/gatilhos/editar/{id}', [AdminController::class, 'editarGatilho'])->name('gatilhos.editar');
         Route::put('/gatilhos/atualizar/{id}', [AdminController::class, 'atualizarGatilho'])->name('gatilhos.atualizar');
         Route::delete('/gatilhos/deletar/{id}', [AdminController::class, 'deletarGatilho'])->name('gatilhos.deletar');
+
+
     });
 
     // Senhas
@@ -242,6 +245,8 @@ Route::middleware('auth')->group(function () {
 
     // Rotas para Pautas
     Route::resource('pautas', PautasController::class);
+    Route::post('/pautas/{id}/finalizar', [PautasController::class, 'finalizar'])->name('pautas.finalizar');
+    Route::get('/pautas/{id}', [PautasController::class, 'show'])->middleware(['auth', 'verified'])->name('pautas.show');
 });
 
 // API Routes

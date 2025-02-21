@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Pauta;
+use App\Models\Client;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class PautasController extends Controller
@@ -49,14 +51,21 @@ class PautasController extends Controller
             ->orderBy($orderby_2, $order_2)
             ->paginate($this->intPaginacao);
 
-        return Inertia::render('Pautas/Index', [
+        return response()->json([
             'pautas' => $vPautas,
+            'total' => $vPautas->total(),
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Pautas/Create');
+        $clientes = Client::where('status', 0)->get(); // Assuming 0 is for active clients
+        $usuarios = User::where('status', 'Ativo')->get();
+
+        return Inertia::render('Pautas/Create', [
+            'clientes' => $clientes,
+            'usuarios' => $usuarios,
+        ]);
     }
 
     public function store(Request $request)
@@ -84,9 +93,13 @@ class PautasController extends Controller
     public function edit($id)
     {
         $pauta = Pauta::findOrFail($id);
+        $clientes = Client::where('status', 0)->get(); // Assuming 0 is for active clients
+        $usuarios = User::where('status', 'Ativo')->get();
 
         return Inertia::render('Pautas/Edit', [
             'pauta' => $pauta,
+            'clientes' => $clientes,
+            'usuarios' => $usuarios,
         ]);
     }
 
@@ -129,5 +142,13 @@ class PautasController extends Controller
         $pauta->update();
 
         return response()->json($pauta);
+    }
+
+    public function show($id)
+    {
+        $pauta = Pauta::findOrFail($id);
+        return Inertia::render('Pautas/Show', [
+            'pauta' => $pauta,
+        ]);
     }
 }

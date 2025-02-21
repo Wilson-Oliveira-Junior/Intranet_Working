@@ -51,10 +51,6 @@ const AdminSidebar = ({ setActivePage }) => {
                     <i className="fas fa-list-alt" aria-label="Pautas"></i>
                     Pautas
                 </Link>
-                <Link href="/pautas" className="sidebar-link">
-                    <i className="fas fa-list-alt" aria-label="Pautas"></i>
-                    Pautas
-                </Link>
 
                 <Menu
                     title="Meu Espaço"

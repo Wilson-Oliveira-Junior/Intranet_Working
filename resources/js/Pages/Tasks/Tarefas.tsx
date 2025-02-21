@@ -42,24 +42,18 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
 
     useEffect(() => {
         const newFilteredTasks = tasks.filter(task => {
-            console.log('Filtering task:', task); // Debug log
             let matches = false;
             if (activeTab === 'paraMim') {
                 matches = task.user_id === user.id && (taskStatus === 'aberto' ? (task.status === 'aberto' || task.status === 'trabalhando') : task.status === 'fechado');
-                console.log(`Task ${task.id} paraMim matches:`, matches); // Debug log
             } else if (activeTab === 'queCriei') {
                 matches = task.creator_id === user.id && (taskStatus === 'aberto' ? (task.status === 'aberto' || task.status === 'trabalhando') : task.status === 'fechado');
-                console.log(`Task ${task.id} queCriei matches:`, matches); // Debug log
             } else if (activeTab === 'queEuSigo') {
                 matches = task.followers && task.followers.some(follower => follower.id === user.id) && (taskStatus === 'aberto' ? (task.status === 'aberto' || task.status === 'trabalhando') : task.status === 'fechado');
-                console.log(`Task ${task.id} queEuSigo matches:`, matches); // Debug log
             } else if (activeTab === 'backlog') {
                 matches = task.sector_id === parseInt(selectedTeam);
-                console.log(`Task ${task.id} backlog matches:`, matches); // Debug log
             }
             return matches;
         });
-        console.log('Filtered tasks:', newFilteredTasks); // Debug log
         setFilteredTasks(newFilteredTasks);
     }, [tasks, activeTab, taskStatus, user.id, selectedTeam]);
 

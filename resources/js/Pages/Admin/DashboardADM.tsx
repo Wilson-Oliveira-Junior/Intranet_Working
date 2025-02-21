@@ -4,6 +4,7 @@ import { usePage } from '@inertiajs/react';
 // Carregar as páginas dinamicamente
 const DynamicHomeAdm = lazy(() => import('@/Pages/Admin/HomeAdm'));
 const DynamicUserTypes = lazy(() => import('@/Pages/Admin/UserTypes'));
+const DynamicPautas = lazy(() => import('@/Pages/Admin/Pautas'));
 
 export default function DashboardADM() {
     const { auth } = usePage().props;
@@ -25,6 +26,8 @@ export default function DashboardADM() {
         switch (activePage) {
             case "userTypes":
                 return <DynamicUserTypes />;
+            case "pautas":
+                return <DynamicPautas />;
             default:
                 return <DynamicHomeAdm />;
         }
