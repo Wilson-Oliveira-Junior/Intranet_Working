@@ -42,17 +42,24 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
 
     useEffect(() => {
         const newFilteredTasks = tasks.filter(task => {
+            console.log('Filtering task:', task); // Debug log
+            let matches = false;
             if (activeTab === 'paraMim') {
-                return task.user_id === user.id && (taskStatus === 'abertas' ? (task.status === 'abertas' || task.status === 'trabalhando') : task.status === 'fechadas');
+                matches = task.user_id === user.id && (taskStatus === 'aberto' ? (task.status === 'aberto' || task.status === 'trabalhando') : task.status === 'fechado');
+                console.log(`Task ${task.id} paraMim matches:`, matches); // Debug log
             } else if (activeTab === 'queCriei') {
-                return task.creator_id === user.id && (taskStatus === 'abertas' ? (task.status === 'abertas' || task.status === 'trabalhando') : task.status === 'fechadas');
+                matches = task.creator_id === user.id && (taskStatus === 'aberto' ? (task.status === 'aberto' || task.status === 'trabalhando') : task.status === 'fechado');
+                console.log(`Task ${task.id} queCriei matches:`, matches); // Debug log
             } else if (activeTab === 'queEuSigo') {
-                return task.followers && task.followers.some(follower => follower.id === user.id) && (taskStatus === 'abertas' ? (task.status === 'abertas' || task.status === 'trabalhando') : task.status === 'fechadas');
+                matches = task.followers && task.followers.some(follower => follower.id === user.id) && (taskStatus === 'aberto' ? (task.status === 'aberto' || task.status === 'trabalhando') : task.status === 'fechado');
+                console.log(`Task ${task.id} queEuSigo matches:`, matches); // Debug log
             } else if (activeTab === 'backlog') {
-                return task.sector_id === parseInt(selectedTeam);
+                matches = task.sector_id === parseInt(selectedTeam);
+                console.log(`Task ${task.id} backlog matches:`, matches); // Debug log
             }
-            return false;
+            return matches;
         });
+        console.log('Filtered tasks:', newFilteredTasks); // Debug log
         setFilteredTasks(newFilteredTasks);
     }, [tasks, activeTab, taskStatus, user.id, selectedTeam]);
 
@@ -106,8 +113,8 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
             });
 
             if (response.ok) {
-                task.status = 'abertas';
-                setTaskStatus('abertas');
+                task.status = 'aberto';
+                setTaskStatus('aberto');
                 console.log('Task reopened successfully');
             } else {
                 console.error('Failed to reopen task:', await response.json());
@@ -241,7 +248,7 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
                                                 ) : (
                                                     <button className="btn btn-primary" onClick={() => openModal(task)}>Ver Detalhes</button>
                                                 )}
-                                                {task.status === 'abertas' && (
+                                                {task.status === 'aberto' && (
                                                     <button className="btn btn-secondary" onClick={() => handleStartTask(task)}>Iniciar</button>
                                                 )}
                                                 {task.status === 'trabalhando' && (

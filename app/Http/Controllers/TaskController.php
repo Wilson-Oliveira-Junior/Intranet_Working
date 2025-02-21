@@ -44,7 +44,7 @@ class TaskController extends Controller
                 return $task;
             });
 
-        return Inertia::render('Tasks/Index', [
+        return Inertia::render('Tasks/Tarefas', [
             'user' => $user,
             'teams' => $teams,
             'tasks' => $tasks,

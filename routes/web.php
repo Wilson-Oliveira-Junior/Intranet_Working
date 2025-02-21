@@ -15,6 +15,7 @@ use App\Http\Controllers\GUTController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\CommemorativeDateController;
 use App\Http\Controllers\FixedCommemorativeDateController;
+use App\Http\Controllers\PautasController;
 
 // Página inicial
 Route::get('/', function () {
@@ -238,6 +239,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/tipo-projeto/{id}/edit', [StatusController::class, 'editTipoProjeto'])->name('tipo-projeto.edit');
     Route::put('/tipo-projeto/{id}', [StatusController::class, 'updateTipoProjeto'])->name('tipo-projeto.update');
     Route::delete('/tipo-projeto/{id}', [StatusController::class, 'destroyTipoProjeto'])->name('tipo-projeto.destroy');
+
+    // Rotas para Pautas
+    Route::resource('pautas', PautasController::class);
 });
 
 // API Routes

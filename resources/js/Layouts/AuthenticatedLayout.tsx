@@ -7,6 +7,9 @@ import SidebarADM from '@/Pages/Admin/AdminSidebar';
 import '../../../resources/css/app.css'; // Importando o CSS global
 import { route } from 'ziggy-js'; // Importar a função route para navegação
 import axios from 'axios'; // Importar axios para fazer requisições HTTP
+import PautasIndex from '@/Pages/Pautas/Index';
+import PautasCreate from '@/Pages/Pautas/Create';
+import PautasEdit from '@/Pages/Pautas/Edit';
 
 const Menu = ({ title, icon, children, isOpen, toggle }: { title: string; icon: string; children: ReactNode; isOpen: boolean; toggle: () => void }) => (
     <div className="flex flex-col">

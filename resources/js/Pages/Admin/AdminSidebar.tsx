@@ -47,10 +47,14 @@ const AdminSidebar = ({ setActivePage }) => {
                     <i className="fas fa-sort-amount-up" aria-label="GUT - Priorização"></i>
                     GUT - Priorização
                 </Link>
-                <a href="#" className="sidebar-link">
+                <Link href="/pautas" className="sidebar-link">
                     <i className="fas fa-list-alt" aria-label="Pautas"></i>
                     Pautas
-                </a>
+                </Link>
+                <Link href="/pautas" className="sidebar-link">
+                    <i className="fas fa-list-alt" aria-label="Pautas"></i>
+                    Pautas
+                </Link>
 
                 <Menu
                     title="Meu Espaço"
