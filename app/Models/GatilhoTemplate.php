@@ -22,4 +22,14 @@ class GatilhoTemplate extends Model
         'id_referente',
         'id_grupo_gatilho',
     ];
+
+    public function gatilhoGrupo()
+    {
+        return $this->belongsTo(GatilhoGrupo::class, 'id_grupo_gatilho');
+    }
+
+    public function tipoProjeto()
+    {
+        return $this->belongsTo(TipoProjeto::class, 'id_tipo_projeto');
+    }
 }

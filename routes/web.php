@@ -16,6 +16,7 @@ use App\Http\Controllers\StatusController;
 use App\Http\Controllers\CommemorativeDateController;
 use App\Http\Controllers\FixedCommemorativeDateController;
 use App\Http\Controllers\PautasController;
+use App\Http\Controllers\GatilhoController;
 
 // Página inicial
 Route::get('/', function () {
@@ -119,15 +120,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/project-types', [AdminController::class, 'getProjectTypes'])->name('projectTypes');
 
         // Gatilhos
-        Route::get('/gatilhos', [AdminController::class, 'getGatilhosData'])->name('gatilhos');
-        Route::get('/gatilhos/template/{id}', [AdminController::class, 'templateGatilhos'])->name('gatilhos.template');
-        Route::get('/gatilhos/adicionar', [AdminController::class, 'adicionarGatilho'])->name('gatilhos.adicionar');
-        Route::post('/gatilhos/salvar', [AdminController::class, 'salvarGatilho'])->name('gatilhos.salvar');
-        Route::get('/gatilhos/editar/{id}', [AdminController::class, 'editarGatilho'])->name('gatilhos.editar');
-        Route::put('/gatilhos/atualizar/{id}', [AdminController::class, 'atualizarGatilho'])->name('gatilhos.atualizar');
-        Route::delete('/gatilhos/deletar/{id}', [AdminController::class, 'deletarGatilho'])->name('gatilhos.deletar');
-
-
+        Route::get('/gatilhos', [GatilhoController::class, 'getGatilhosData'])->name('gatilhos');
+        Route::get('/gatilhos/template/{id}', [GatilhoController::class, 'templateGatilhos'])->name('gatilhos.template');
+        Route::get('/gatilhos/adicionar', [GatilhoController::class, 'adicionarGatilho'])->name('gatilhos.adicionar');
+        Route::post('/gatilhos/salvar', [GatilhoController::class, 'salvarGatilho'])->name('gatilhos.salvar');
+        Route::get('/gatilhos/editar/{id}', [GatilhoController::class, 'editarGatilho'])->name('gatilhos.editar');
+        Route::put('/gatilhos/atualizar/{id}', [GatilhoController::class, 'atualizarGatilho'])->name('gatilhos.atualizar');
+        Route::delete('/gatilhos/deletar/{id}', [GatilhoController::class, 'deletarGatilho'])->name('gatilhos.deletar');
     });
 
     // Senhas

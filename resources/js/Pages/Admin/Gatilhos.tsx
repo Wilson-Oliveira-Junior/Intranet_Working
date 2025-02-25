@@ -3,43 +3,61 @@ import { usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import '../../../css/components/gatilhos.css';
 
+interface Client {
+    id: number;
+    name: string;
+}
+
+interface TipoProjeto {
+    id: number;
+    nome: string;
+}
+
+interface User {
+    id: number;
+    name: string;
+}
+
+interface Gatilho {
+    id: number;
+    gatilho: string;
+    nome_tipo_projeto: string;
+    dias_limite_padrao: number;
+    dias_limite_50: number;
+    dias_limite_40: number;
+    dias_limite_30: number;
+    tipo_gatilho: string;
+    client_id: number;
+    id_tipo_projeto: number;
+    status: string;
+}
+
 const Gatilhos: React.FC = () => {
-    const { users, user, userTypes, sectors, clients, arrGatilhos } = usePage().props as {
-        users: User[],
-        user: User,
-        userTypes: UserType[],
-        sectors: Sector[],
+    const { clients, projectTypes, user, arrGatilhos } = usePage().props as {
         clients: Client[],
+        projectTypes: TipoProjeto[],
+        user: User,
         arrGatilhos: Gatilho[]
     };
 
     const [selectedClient, setSelectedClient] = useState('');
     const [selectedProjectType, setSelectedProjectType] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('');
-    const [projectTypes, setProjectTypes] = useState<TipoProjeto[]>([]);
     const [filteredGatilhos, setFilteredGatilhos] = useState<Gatilho[]>(arrGatilhos || []);
-
-    useEffect(() => {
-        fetch('/admin/project-types')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => setProjectTypes(data))
-            .catch(error => console.error('Error fetching project types:', error));
-    }, []);
 
     const handleFilter = () => {
         const filtered = (arrGatilhos || []).filter(gatilho => {
-            const clientMatch = selectedClient ? gatilho.client_id === selectedClient : true;
-            const projectTypeMatch = selectedProjectType ? gatilho.project_type_id === selectedProjectType : true;
+            const clientMatch = selectedClient ? gatilho.client_id === parseInt(selectedClient) : true;
+            const projectTypeMatch = selectedProjectType ? gatilho.id_tipo_projeto === parseInt(selectedProjectType) : true;
             const statusMatch = selectedStatus ? gatilho.status === selectedStatus : true;
             return clientMatch && projectTypeMatch && statusMatch;
         });
         setFilteredGatilhos(filtered);
     };
+
+    if (!clients) {
+        return <div>Loading...</div>;
+    }
 
     if (!user) {
         return <div>Usuário não encontrado ou não autenticado.</div>;
@@ -48,7 +66,7 @@ const Gatilhos: React.FC = () => {
     return (
         <AuthenticatedLayout user={user}>
             <div className="container">
-                <h1>Painel de Controle de Usuários</h1>
+                <h1>Painel de Controle de Gatilhos</h1>
 
                 <div className="filters">
                     <select value={selectedClient} onChange={(e) => setSelectedClient(e.target.value)}>
@@ -90,50 +108,15 @@ const Gatilhos: React.FC = () => {
                         </thead>
                         <tbody>
                             {filteredGatilhos.length > 0 ? (
-                                filteredGatilhos.map(projeto => (
-                                    <tr key={projeto.id}>
-                                        <td id={`status-${projeto.id}`}>
-                                            {!projeto.entraremcontato ? (
-                                                <span className="atendimento-em-dia">ATENDIMENTO EM DIA</span>
-                                            ) : (
-                                                <span className="entrar-em-contato">ENTRAR EM CONTATO</span>
-                                            )}
-                                        </td>
-                                        <td>
-                                            {projeto.nome.length >= 30
-                                                ? `${projeto.nome.substring(0, 30)}...`
-                                                : projeto.nome}
-                                        </td>
-                                        <td>{projeto.tipo_projeto}</td>
-                                        <td>{projeto.finalizados}</td>
-                                        <td>{projeto.gatilhos}</td>
-                                        <td>
-                                            <small>Processo está em: {((projeto.finalizados / projeto.gatilhos) * 100).toFixed(2)}%</small>
-                                            <div className="progress progress-xs my-2">
-                                                <div className="progress-bar bg-success" style={{ width: `${(projeto.finalizados / projeto.gatilhos) * 100}%` }}></div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <a href={`/backend/gatilhos/projeto/${projeto.id}`} className="btn" style={{ backgroundColor: '#00cdf1', color: '#FFF' }} title="Acompanhar Processo">
-                                                <i className="fa fa-tasks" aria-hidden="true"></i>
-                                            </a>
-                                            <button type="button" className="btn btn-comentario" data-id={projeto.id} style={{ color: '#FFF', background: '#5c6ce8' }} title="Comentar">
-                                                <i className="fa fa-comment"></i>
-                                            </button>
-                                            {projeto.status !== 'F' && (
-                                                <button
-                                                    type="button"
-                                                    id={`btnstatus-${projeto.id}`}
-                                                    className={`btn btn-status ${projeto.status === 'P' ? 'btn-play' : 'btn-pause'}`}
-                                                    data-id={projeto.id}
-                                                    data-status={projeto.status}
-                                                    style={{ color: '#FFF' }}
-                                                    title={projeto.status === 'P' ? 'Continuar' : 'Pausar'}
-                                                >
-                                                    <i className={`fa fa-${projeto.status === 'P' ? 'play' : 'pause'}`} id={`icon-${projeto.id}`} aria-hidden="true"></i>
-                                                </button>
-                                            )}
-                                        </td>
+                                filteredGatilhos.map(gatilho => (
+                                    <tr key={gatilho.id}>
+                                        <td>{gatilho.status}</td>
+                                        <td>{gatilho.client_id}</td>
+                                        <td>{gatilho.nome_tipo_projeto}</td>
+                                        <td>{gatilho.dias_limite_padrao}</td>
+                                        <td>{gatilho.dias_limite_50}</td>
+                                        <td>{gatilho.dias_limite_40}</td>
+                                        <td>{gatilho.dias_limite_30}</td>
                                     </tr>
                                 ))
                             ) : (

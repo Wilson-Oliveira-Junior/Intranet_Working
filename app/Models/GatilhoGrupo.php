@@ -16,4 +16,9 @@ class GatilhoGrupo extends Model
         'email',
         'email_adicionais',
     ];
+
+    public function gatilhos()
+    {
+        return $this->hasMany(GatilhoTemplate::class, 'id_grupo_gatilho');
+    }
 }
