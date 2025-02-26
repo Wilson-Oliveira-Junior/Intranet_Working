@@ -127,6 +127,26 @@ Route::middleware('auth')->group(function () {
         Route::get('/gatilhos/editar/{id}', [GatilhoController::class, 'editarGatilho'])->name('gatilhos.editar');
         Route::put('/gatilhos/atualizar/{id}', [GatilhoController::class, 'atualizarGatilho'])->name('gatilhos.atualizar');
         Route::delete('/gatilhos/deletar/{id}', [GatilhoController::class, 'deletarGatilho'])->name('gatilhos.deletar');
+        Route::get('/gatilhos/projeto/{id_projeto}', [GatilhoController::class, 'projeto'])->name('gatilhos.projeto');
+        Route::get('/gatilhos/{id_gatilho}/statusFinalizado/usuario/{id_usuario}', [GatilhoController::class, 'finalizar'])->name('gatilhos.finalizar');
+        Route::get('/gatilhos/{id_gatilho}/statusAberto/usuario/{id_usuario}', [GatilhoController::class, 'aberto'])->name('gatilhos.aberto');
+        Route::get('/gatilhos/tipoprojeto/{id_projeto}/aberto', [GatilhoController::class, 'projetoaberto'])->name('gatilhos.tipoprojeto.aberto');
+        Route::get('/gatilhos/tipoprojeto/{id_projeto}/finalizado', [GatilhoController::class, 'projetofinalizado'])->name('gatilhos.tipoprojeto.finalizado');
+        Route::post('/gatilhos/tipoprojeto/{id_projeto}/comentarios/adicionar', [GatilhoController::class, 'adicionar_comentario'])->name('gatilhos.tipoprojeto.comentario.adicionar');
+        Route::get('/gatilhos/geral', [GatilhoController::class, 'geral'])->name('gatilhos.geral');
+        Route::post('/gatilhos/filtro', [GatilhoController::class, 'filtrarGatilhos'])->name('gatilhos.geral.filtro');
+        Route::get('/gatilhos/ultimo-comentario/{id_projeto}', [GatilhoController::class, 'ultimoComentarioProjeto'])->name('gatilhos.ultimo-comentario');
+        Route::post('/gatilhos/projeto/registrar-comentario', [GatilhoController::class, 'registrarComentarioProjeto'])->name('gatilhos.registrar-comentario');
+        Route::get('/gatilhos/testegatilhocron', [GatilhoController::class, 'dispararEmailGatilhos'])->name('gatilhos.teste');
+        Route::get('/gatilhos/atualizar-status', [GatilhoController::class, 'atualizaStatusGatilhos'])->name('gatilhos.atualizar-status');
+        Route::post('/gatilhos/pausar-projeto', [GatilhoController::class, 'pausarProjeto'])->name('gatilhos.pausar-projeto');
+        Route::get('/gatilhos/grupo', [GatilhoController::class, 'indexgrupo'])->name('gatilhos.grupo');
+        Route::get('/gatilhos/grupo/adicionar', [GatilhoController::class, 'adicionargrupo'])->name('gatilhos.grupo.adicionar');
+        Route::post('/gatilhos/grupo/salvar', [GatilhoController::class, 'salvargrupo'])->name('gatilhos.grupo.salvar');
+        Route::get('/gatilhos/grupo/editar/{id}', [GatilhoController::class, 'editargrupo'])->name('gatilhos.grupo.editar');
+        Route::put('/gatilhos/grupo/atualizar/{id}', [GatilhoController::class, 'atualizargrupo'])->name('gatilhos.grupo.atualizar');
+        Route::get('/gatilhos/grupo/deletar/{id}', [GatilhoController::class, 'deletargrupo'])->name('gatilhos.grupo.deletar');
+        Route::post('/gatilhos/projeto/adiamento/salvar', [GatilhoController::class, 'adiamentosalvar'])->name('gatilhos.projeto.adiamento');
     });
 
     // Senhas

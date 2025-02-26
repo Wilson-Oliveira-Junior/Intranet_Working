@@ -426,4 +426,116 @@ class GatilhoController extends Controller
 
         return redirect()->route('admin.gatilhos')->with('successMessage', 'Gatilho finalizado com sucesso.');
     }
+
+    public function aberto($id_gatilho, $id_usuario)
+    {
+        // Get today's date
+        $hoje = Carbon::today();
+
+        // Update the "gatilho" status to "Aberto"
+        DB::table('tb_gatilhos')->where('tb_gatilhos.id', '=', $id_gatilho)
+            ->update([
+                'status' => 'Aberto',
+                'id_usuario' => $id_usuario,
+                'data_conclusao' => null,
+            ]);
+
+        return redirect()->route('admin.gatilhos')->with('successMessage', 'Gatilho reaberto com sucesso.');
+    }
+
+    public function projetoaberto($id_projeto)
+    {
+        // Get today's date
+        $hoje = Carbon::today();
+
+        // Update the project status to "Aberto"
+        DB::table('tb_projetos')->where('tb_projetos.id', '=', $id_projeto)
+            ->update([
+                'status' => 'Aberto',
+                'data_conclusao' => null,
+            ]);
+
+        return redirect()->route('admin.gatilhos')->with('successMessage', 'Projeto reaberto com sucesso.');
+    }
+
+    public function projetofinalizado($id_projeto)
+    {
+        // Get today's date
+        $hoje = Carbon::today();
+
+        // Update the project status to "Finalizado"
+        DB::table('tb_projetos')->where('tb_projetos.id', '=', $id_projeto)
+            ->update([
+                'status' => 'Finalizado',
+                'data_conclusao' => $hoje,
+            ]);
+
+        return redirect()->route('admin.gatilhos')->with('successMessage', 'Projeto finalizado com sucesso.');
+    }
+
+    public function indexgrupo()
+    {
+        $grupos = GatilhoGrupo::all();
+        return Inertia::render('Admin/Grupos', compact('grupos'));
+    }
+
+    public function adicionargrupo()
+    {
+        return Inertia::render('Admin/AdicionarGrupo');
+    }
+
+    public function salvargrupo(Request $request)
+    {
+        $dados = $request->all();
+
+        $grupo = new GatilhoGrupo();
+        $grupo->nome = $dados['nome'];
+        $grupo->email = $dados['email'];
+        $grupo->email_adicionais = $dados['email_adicionais'];
+        $grupo->save();
+
+        return redirect()->route('admin.grupos')->with('successMessage', 'Grupo adicionado com sucesso.');
+    }
+
+    public function editargrupo($id)
+    {
+        $grupo = GatilhoGrupo::find($id);
+        return Inertia::render('Admin/EditarGrupo', compact('grupo'));
+    }
+
+    public function atualizargrupo(Request $request, $id)
+    {
+        $grupo = GatilhoGrupo::find($id);
+        $dados = $request->all();
+
+        $grupo->nome = $dados['nome'];
+        $grupo->email = $dados['email'];
+        $grupo->email_adicionais = $dados['email_adicionais'];
+        $grupo->update();
+
+        return redirect()->route('admin.grupos')->with('successMessage', 'Grupo editado com sucesso.');
+    }
+
+    public function deletargrupo($id)
+    {
+        GatilhoGrupo::find($id)->delete();
+        return redirect()->route('admin.grupos')->with('successMessage', 'Grupo deletado com sucesso.');
+    }
+
+    public function adiamentosalvar(Request $request)
+    {
+        $dados = $request->all();
+
+        $adiamento = new GatilhoAdiamento();
+        $adiamento->id_projeto = $dados['id_projeto'];
+        $adiamento->id_gatilho = $dados['id_gatilho'];
+        $adiamento->id_usuario = Auth::id();
+        $adiamento->data_adiamento = $dados['data_adiamento'];
+        $adiamento->motivo = $dados['motivo'];
+        $adiamento->save();
+
+        return redirect()->route('admin.gatilhos')->with('successMessage', 'Adiamento salvo com sucesso.');
+    }
+
+
 }
