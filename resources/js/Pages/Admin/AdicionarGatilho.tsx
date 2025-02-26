@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import '../../../css/components/gatilhos.css';
 
 const AdicionarGatilho: React.FC = () => {
     const { data, setData, post, errors } = useForm({

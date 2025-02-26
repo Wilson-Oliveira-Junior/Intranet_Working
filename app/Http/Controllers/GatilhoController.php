@@ -87,7 +87,7 @@ class GatilhoController extends Controller
     {
         $gatilhos = DB::table('tb_gatilhos_templates')
             ->where('tb_gatilhos_templates.id_tipo_projeto', '=', $id)
-            ->leftJoin('tb_tipo_projetos', 'tb_gatilhos_templates.id_tipo_projeto', '=', 'tb_tipo_projetos.id')
+            ->leftJoin('tipo_projetos', 'tb_gatilhos_templates.id_tipo_projeto', '=', 'tipo_projetos.id')
             ->select(
                 'tb_gatilhos_templates.id',
                 'tb_gatilhos_templates.gatilho',
@@ -96,8 +96,8 @@ class GatilhoController extends Controller
                 'tb_gatilhos_templates.dias_limite_40',
                 'tb_gatilhos_templates.dias_limite_30',
                 'tb_gatilhos_templates.tipo_gatilho',
-                'tb_tipo_projetos.id as id_tipo_projeto',
-                'tb_tipo_projetos.nome as nome_tipo_projeto'
+                'tipo_projetos.id as id_tipo_projeto',
+                'tipo_projetos.nome as nome_tipo_projeto'
             )
             ->paginate(20);
 
@@ -107,11 +107,11 @@ class GatilhoController extends Controller
     public function adicionarGatilho()
     {
         $gatilhos = GatilhoTemplate::all();
-        $id_ref = GatilhoTemplate::leftJoin('tb_tipo_projetos', 'tb_gatilhos_templates.id_tipo_projeto', '=', 'tb_tipo_projetos.id')
+        $id_ref = GatilhoTemplate::leftJoin('tipo_projetos', 'tb_gatilhos_templates.id_tipo_projeto', '=', 'tipo_projetos.id')
             ->select(
                 'tb_gatilhos_templates.id as id_gatilho_template',
                 'tb_gatilhos_templates.gatilho as nome_gatilho',
-                'tb_tipo_projetos.nome as nome_projeto'
+                'tipo_projetos.nome as nome_projeto'
             )
             ->get();
 
@@ -143,11 +143,11 @@ class GatilhoController extends Controller
     public function editarGatilho($id)
     {
         $gatilhos = GatilhoTemplate::find($id);
-        $id_ref = GatilhoTemplate::leftJoin('tb_tipo_projetos', 'tb_gatilhos_templates.id_tipo_projeto', '=', 'tb_tipo_projetos.id')
+        $id_ref = GatilhoTemplate::leftJoin('tipo_projetos', 'tb_gatilhos_templates.id_tipo_projeto', '=', 'tipo_projetos.id')
             ->select(
                 'tb_gatilhos_templates.id as id_gatilho_template',
                 'tb_gatilhos_templates.gatilho as nome_gatilho',
-                'tb_tipo_projetos.nome as nome_projeto'
+                'tipo_projetos.nome as nome_projeto'
             )
             ->get();
         $gatilhos_grupos = GatilhoGrupo::all();
@@ -325,9 +325,9 @@ class GatilhoController extends Controller
         $id_projeto_oficial = $id_projeto;
 
         $id_tipo_projeto = DB::table('tb_projetos')->where('tb_projetos.id', '=', $id_projeto_oficial)
-            ->join('tb_tipo_projetos', 'tb_projetos.projeto', '=', 'tb_tipo_projetos.nome')
+            ->join('tipo_projetos', 'tb_projetos.projeto', '=', 'tipo_projetos.nome')
             ->select(
-                'tb_tipo_projetos.id'
+                'tipo_projetos.id'
             )
             ->first();
 

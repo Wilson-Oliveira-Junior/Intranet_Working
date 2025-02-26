@@ -28,7 +28,6 @@ interface Gatilho {
     dias_limite_30: number;
     tipo_gatilho: string;
     client_id: number;
-    id_tipo_projeto: number;
     status: string;
 }
 
@@ -54,6 +53,10 @@ const Gatilhos: React.FC = () => {
         });
         setFilteredGatilhos(filtered);
     };
+
+    useEffect(() => {
+        handleFilter();
+    }, [selectedClient, selectedProjectType, selectedStatus]);
 
     if (!clients) {
         return <div>Loading...</div>;
@@ -115,13 +118,34 @@ const Gatilhos: React.FC = () => {
                                         <td>{gatilho.nome_tipo_projeto}</td>
                                         <td>{gatilho.dias_limite_padrao}</td>
                                         <td>{gatilho.dias_limite_50}</td>
-                                        <td>{gatilho.dias_limite_40}</td>
-                                        <td>{gatilho.dias_limite_30}</td>
+                                        <td>
+                                            <div className="progress">
+                                                <div className="progress-bar" role="progressbar" style={{ width: `${gatilho.dias_limite_40}%` }} aria-valuenow={gatilho.dias_limite_40} aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href={`gatilhos/acompanhar/${gatilho.id}`} className="btn btn-primary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-tasks" viewBox="0 0 16 16">
+                                                    <path d="M1 9.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5zm0 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z" />
+                                                    <path d="M2 5.5a.5.5 0 0 1 .5-.5h.5a.5.5 0 0 1 0 1h-.5a.5.5 0 0 1-.5-.5zm0 4a.5.5 0 0 1 .5-.5h.5a.5.5 0 0 1 0 1h-.5a.5.5 0 0 1-.5-.5zm0 4a.5.5 0 0 1 .5-.5h.5a.5.5 0 0 1 0 1h-.5a.5.5 0 0 1-.5-.5z" />
+                                                </svg>
+                                            </a>
+                                            <a href={`gatilhos/comentar/${gatilho.id}`} className="btn btn-secondary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-chat-square-dots-fill" viewBox="0 0 16 16">
+                                                    <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.5a1 1 0 0 0-.8.4l-1.9 2.533a1 1 0 0 1-1.6 0L5.3 12.4a1 1 0 0 0-.8-.4H2a2 2 0 0 1-2-2zm5 4a1 1 0 1 0-2 0 1 1 0 0 0 2 0m4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
+                                                </svg>
+                                            </a>
+                                            <a href={`gatilhos/pausar/${gatilho.id}`} className="btn btn-warning btn-pause">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pause" viewBox="0 0 16 16">
+                                                    <path d="M5.5 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0v-8a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0v-8a.5.5 0 0 1 .5-.5z" />
+                                                </svg>
+                                            </a>
+                                        </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={7} className="text-center">Nenhum gatilho encontrado.</td>
+                                    <td colSpan={8} className="text-center">Nenhum gatilho encontrado.</td>
                                 </tr>
                             )}
                         </tbody>

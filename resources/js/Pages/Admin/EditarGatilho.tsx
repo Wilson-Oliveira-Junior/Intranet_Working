@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import '../../../css/components/gatilhos.css';
 
 const EditarGatilho: React.FC<{ gatilho: any }> = ({ gatilho }) => {
     const { data, setData, put, errors } = useForm({
