@@ -27,8 +27,8 @@ interface Gatilho {
     dias_limite_40: number;
     dias_limite_30: number;
     tipo_gatilho: string;
-    client_id: number;
     status: string;
+    cliente: string; // Incluindo a coluna cliente
 }
 
 const Gatilhos: React.FC = () => {
@@ -45,12 +45,19 @@ const Gatilhos: React.FC = () => {
     const [filteredGatilhos, setFilteredGatilhos] = useState<Gatilho[]>(arrGatilhos || []);
 
     const handleFilter = () => {
+        console.log('Selected Client:', selectedClient);
+        console.log('Selected Project Type:', selectedProjectType);
+        console.log('Selected Status:', selectedStatus);
+        console.log('arrGatilhos:', arrGatilhos);
+
         const filtered = (arrGatilhos || []).filter(gatilho => {
-            const clientMatch = selectedClient ? gatilho.client_id === parseInt(selectedClient) : true;
+            const clientMatch = selectedClient ? gatilho.cliente === selectedClient : true;
             const projectTypeMatch = selectedProjectType ? gatilho.id_tipo_projeto === parseInt(selectedProjectType) : true;
             const statusMatch = selectedStatus ? gatilho.status === selectedStatus : true;
             return clientMatch && projectTypeMatch && statusMatch;
         });
+
+        console.log('Filtered Gatilhos:', filtered);
         setFilteredGatilhos(filtered);
     };
 
@@ -58,9 +65,12 @@ const Gatilhos: React.FC = () => {
         handleFilter();
     }, [selectedClient, selectedProjectType, selectedStatus]);
 
-    if (!clients) {
-        return <div>Loading...</div>;
-    }
+    useEffect(() => {
+        console.log('Clients:', clients);
+        console.log('Project Types:', projectTypes);
+        console.log('User:', user);
+        console.log('arrGatilhos:', arrGatilhos);
+    }, [clients, projectTypes, user, arrGatilhos]);
 
     if (!user) {
         return <div>Usuário não encontrado ou não autenticado.</div>;
@@ -75,7 +85,7 @@ const Gatilhos: React.FC = () => {
                     <select value={selectedClient} onChange={(e) => setSelectedClient(e.target.value)}>
                         <option value="">Selecione um Cliente</option>
                         {clients.map(client => (
-                            <option key={client.id} value={client.id}>{client.name}</option>
+                            <option key={client.id} value={client.name}>{client.name}</option>
                         ))}
                     </select>
 
@@ -105,7 +115,7 @@ const Gatilhos: React.FC = () => {
                                 <th>Tipo de Projeto</th>
                                 <th>Finalizados</th>
                                 <th>Total</th>
-                                <th>Processo</th>
+                                <th>Progresso</th>
                                 <th>Ação</th>
                             </tr>
                         </thead>
@@ -114,7 +124,7 @@ const Gatilhos: React.FC = () => {
                                 filteredGatilhos.map(gatilho => (
                                     <tr key={gatilho.id}>
                                         <td>{gatilho.status}</td>
-                                        <td>{gatilho.client_id}</td>
+                                        <td>{gatilho.cliente}</td>
                                         <td>{gatilho.nome_tipo_projeto}</td>
                                         <td>{gatilho.dias_limite_padrao}</td>
                                         <td>{gatilho.dias_limite_50}</td>

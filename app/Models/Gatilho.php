@@ -12,6 +12,8 @@ class Gatilho extends Model
     protected $table = 'tb_gatilhos';
 
     protected $fillable = [
+        'gatilho', // Adicionar gatilho aos campos preenchíveis
+        'id_projeto',
         'id_tipo_projeto',
         'id_gatilho_template',
         'status',
@@ -35,5 +37,10 @@ class Gatilho extends Model
     public function usuario()
     {
         return $this->belongsTo(User::class, 'id_usuario');
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id'); // Adicionar relação com Client
     }
 }

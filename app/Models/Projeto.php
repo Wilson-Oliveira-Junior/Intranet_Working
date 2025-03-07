@@ -3,13 +3,31 @@
 namespace App\Models;
 
 use DateTime;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Projeto extends Model
 {
+    use HasFactory;
+
     protected $table = "tb_projetos";
 
-    protected $fillable = ['projeto', 'cliente_id', 'status'];
+    protected $fillable = [
+        'projeto',
+        'cliente_id',
+        'status',
+        'created_at',
+        'updated_at',
+        'id_tipo_projeto',
+        'id_dominio',
+        'prazo',
+        'data_referencia',
+    ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'cliente_id'); // Adicionar relação com Client
+    }
 
     public function cliente()
     {
@@ -34,6 +52,11 @@ class Projeto extends Model
             return false;
         }
         return true;
+    }
+
+    public function tipoProjeto()
+    {
+        return $this->belongsTo(TipoProjeto::class, 'id_tipo_projeto');
     }
 
     public function tipo_projeto()

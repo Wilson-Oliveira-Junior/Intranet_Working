@@ -35,20 +35,24 @@ class GatilhoController extends Controller
         $clients = Client::where('status', 'Ativo')->get();
         $projectTypes = TipoProjeto::all();
         $user = Auth::user();
-        $arrGatilhos = DB::table('tb_gatilhos_templates')
-            ->leftJoin('tipo_projetos', 'tb_gatilhos_templates.id_tipo_projeto', '=', 'tipo_projetos.id')
+        $arrGatilhos = DB::table('tb_gatilhos')
+            ->leftJoin('tipo_projetos', 'tb_gatilhos.id_tipo_projeto', '=', 'tipo_projetos.id')
+            ->leftJoin('tb_projetos', 'tb_gatilhos.id_projeto', '=', 'tb_projetos.id')
+            ->leftJoin('clients', 'tb_projetos.cliente_id', '=', 'clients.id')
             ->select(
-                'tb_gatilhos_templates.id',
-                'tb_gatilhos_templates.gatilho',
-                'tb_gatilhos_templates.dias_limite_padrao',
-                'tb_gatilhos_templates.dias_limite_50',
-                'tb_gatilhos_templates.dias_limite_40',
-                'tb_gatilhos_templates.dias_limite_30',
-                'tb_gatilhos_templates.tipo_gatilho',
+                'tb_gatilhos.id',
+                'tb_gatilhos.dias_limite_30',
+                'tb_gatilhos.tipo_gatilho',
                 'tipo_projetos.id as id_tipo_projeto',
-                'tipo_projetos.nome as nome_tipo_projeto'
+                'tipo_projetos.nome as nome_tipo_projeto',
+                'clients.nome as cliente' // Incluindo a coluna cliente
             )
             ->get();
+
+        // Adicionar logs para depuração
+        Log::info('Clients:', $clients->toArray());
+        Log::info('Project Types:', $projectTypes->toArray());
+        Log::info('Gatilhos:', $arrGatilhos->toArray());
 
         return Inertia::render('Admin/Gatilhos', [
             'clients' => $clients,
@@ -124,6 +128,9 @@ class GatilhoController extends Controller
     public function salvarGatilho(Request $request)
     {
         $dados = $request->all();
+
+        // Verificar os dados recebidos
+        Log::info('Dados recebidos para salvar gatilho:', $dados);
 
         $gatilhos = new GatilhoTemplate();
         $gatilhos->gatilho = $dados['gatilho'];

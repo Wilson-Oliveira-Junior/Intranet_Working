@@ -53,4 +53,9 @@ class Client extends Model
     {
         return $this->hasMany(Schedule::class, 'client_id');
     }
+
+    public function gatilhos()
+    {
+        return $this->hasMany(Gatilho::class, 'client_id'); // Adicionar relação com Gatilho
+    }
 }
