@@ -38,14 +38,14 @@ class GatilhoController extends Controller
         $arrGatilhos = DB::table('tb_gatilhos')
             ->leftJoin('tipo_projetos', 'tb_gatilhos.id_tipo_projeto', '=', 'tipo_projetos.id')
             ->leftJoin('tb_projetos', 'tb_gatilhos.id_projeto', '=', 'tb_projetos.id')
-            ->leftJoin('clients', 'tb_projetos.cliente_id', '=', 'clients.id')
+            ->leftJoin('clients', 'tb_gatilhos.client_id', '=', 'clients.id') // Use a coluna client_id da tabela tb_gatilhos
             ->select(
                 'tb_gatilhos.id',
                 'tb_gatilhos.dias_limite_30',
                 'tb_gatilhos.tipo_gatilho',
                 'tipo_projetos.id as id_tipo_projeto',
                 'tipo_projetos.nome as nome_tipo_projeto',
-                'clients.nome as cliente' // Incluindo a coluna cliente
+                'clients.nome as cliente'
             )
             ->get();
 
