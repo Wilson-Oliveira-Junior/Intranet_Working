@@ -45,11 +45,6 @@ const Gatilhos: React.FC = () => {
     const [filteredGatilhos, setFilteredGatilhos] = useState<Gatilho[]>(arrGatilhos || []);
 
     const handleFilter = () => {
-        console.log('Selected Client:', selectedClient);
-        console.log('Selected Project Type:', selectedProjectType);
-        console.log('Selected Status:', selectedStatus);
-        console.log('arrGatilhos:', arrGatilhos);
-
         const filtered = (arrGatilhos || []).filter(gatilho => {
             const clientMatch = selectedClient ? gatilho.cliente === selectedClient : true;
             const projectTypeMatch = selectedProjectType ? gatilho.id_tipo_projeto === parseInt(selectedProjectType) : true;
@@ -57,20 +52,12 @@ const Gatilhos: React.FC = () => {
             return clientMatch && projectTypeMatch && statusMatch;
         });
 
-        console.log('Filtered Gatilhos:', filtered);
         setFilteredGatilhos(filtered);
     };
 
     useEffect(() => {
         handleFilter();
     }, [selectedClient, selectedProjectType, selectedStatus]);
-
-    useEffect(() => {
-        console.log('Clients:', clients);
-        console.log('Project Types:', projectTypes);
-        console.log('User:', user);
-        console.log('arrGatilhos:', arrGatilhos);
-    }, [clients, projectTypes, user, arrGatilhos]);
 
     if (!user) {
         return <div>Usuário não encontrado ou não autenticado.</div>;

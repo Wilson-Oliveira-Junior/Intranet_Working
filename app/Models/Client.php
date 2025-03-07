@@ -15,6 +15,8 @@ class Client extends Model
     // Definir os campos que podem ser preenchidos
     protected $fillable = [
         'nome',
+        'email',
+        'status',
         'cliente_id',
         'created_at',
         'updated_at',
@@ -34,7 +36,6 @@ class Client extends Model
         'id_segmento',
         'idCustomerAsaas',
         'status_financeiro',
-        'status',
         'complemento',
         'idContaAzul',
     ];

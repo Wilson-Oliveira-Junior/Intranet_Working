@@ -37,6 +37,8 @@ class GatilhoController extends Controller
         $user = Auth::user();
         $arrGatilhos = DB::table('tb_gatilhos_templates')
             ->leftJoin('tipo_projetos', 'tb_gatilhos_templates.id_tipo_projeto', '=', 'tipo_projetos.id')
+            ->leftJoin('tb_gatilhos', 'tb_gatilhos_templates.id', '=', 'tb_gatilhos.id_gatilho_template')
+            ->leftJoin('clients', 'tb_gatilhos.client_id', '=', 'clients.id')
             ->select(
                 'tb_gatilhos_templates.id',
                 'tb_gatilhos_templates.gatilho',
@@ -46,7 +48,8 @@ class GatilhoController extends Controller
                 'tb_gatilhos_templates.dias_limite_30',
                 'tb_gatilhos_templates.tipo_gatilho',
                 'tipo_projetos.id as id_tipo_projeto',
-                'tipo_projetos.nome as nome_tipo_projeto'
+                'tipo_projetos.nome as nome_tipo_projeto',
+                'clients.nome as cliente' // Incluir o nome do cliente
             )
             ->get();
 
@@ -537,5 +540,19 @@ class GatilhoController extends Controller
         return redirect()->route('admin.gatilhos')->with('successMessage', 'Adiamento salvo com sucesso.');
     }
 
+    public function acionarGatilho(Request $request) {
+        // Obter clientes do request
+        $clientes = $request->input('clientes');
+
+        // Verificar se clientes foram passados
+        if (!$clientes) {
+            return response()->json(['error' => 'Clientes não fornecidos'], 400);
+        }
+
+        // Passar clientes para o gatilho
+        $this->gatilhoService->executar($clientes);
+
+        // ...existing code...
+    }
 
 }

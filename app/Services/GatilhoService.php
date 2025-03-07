@@ -44,4 +44,12 @@ class GatilhoService
 
         return $query->get();
     }
+
+    public function executar($clientes) {
+        // Lógica para processar os clientes
+        foreach ($clientes as $cliente) {
+            // Processar cada cliente
+            // ...código de processamento...
+        }
+    }
 }
