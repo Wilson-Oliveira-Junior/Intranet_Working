@@ -571,7 +571,6 @@ const Step3 = ({ data, setData, nextStep, prevStep }) => (
                                     </select>
                                 </div>
                             </div>
-                            {/* Outros campos do Slider... */}
                         </div>
 
                         {/* Perguntas sobre o Domínio */}
