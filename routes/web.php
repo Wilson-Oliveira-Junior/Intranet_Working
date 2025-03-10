@@ -17,6 +17,7 @@ use App\Http\Controllers\CommemorativeDateController;
 use App\Http\Controllers\FixedCommemorativeDateController;
 use App\Http\Controllers\PautasController;
 use App\Http\Controllers\GatilhoController;
+use App\Http\Controllers\FichaController;
 
 // Página inicial
 Route::get('/', function () {
@@ -266,6 +267,14 @@ Route::middleware('auth')->group(function () {
     Route::resource('pautas', PautasController::class);
     Route::post('/pautas/{id}/finalizar', [PautasController::class, 'finalizar'])->name('pautas.finalizar');
     Route::get('/pautas/{id}', [PautasController::class, 'show'])->middleware(['auth', 'verified'])->name('pautas.show');
+
+    // Fichas
+    Route::get('/fichas', [FichaController::class, 'index'])->name('fichas.index');
+    Route::get('/fichas/create', [FichaController::class, 'create'])->name('fichas.create');
+    Route::post('/fichas', [FichaController::class, 'store'])->name('fichas.store');
+    Route::get('/fichas/{id}', [FichaController::class, 'show'])->name('fichas.show');
+    Route::post('/fichas/{id}/approve', [FichaController::class, 'approve'])->name('fichas.approve');
+    Route::post('/fichas/{id}/deny', [FichaController::class, 'deny'])->name('fichas.deny');
 });
 
 // API Routes

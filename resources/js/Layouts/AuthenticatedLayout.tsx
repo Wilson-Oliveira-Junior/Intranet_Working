@@ -174,6 +174,7 @@ const Authenticated = ({ header, children }: PropsWithChildren<{ header?: ReactN
                                 <Link href={route('profile.show')} className="dropdown-item">Perfil</Link>
                                 <Link href={route('settings')} className="dropdown-item">Configurações</Link>
                                 <Link href={route('notifications')} className="dropdown-item">Notificações</Link>
+                                <Link href={route('fichas.index')} className="dropdown-item">Fichas</Link>
                                 <Link href={route('help')} className="dropdown-item">Ajuda</Link>
                                 <button onClick={() => route('logout')} className="dropdown-item">Sair</button>
                             </div>
