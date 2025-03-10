@@ -9,12 +9,21 @@
     width: 100%;
 }
 
+body.dark-mode .container {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+}
+
 /* Título */
 h1 {
     text-align: center;
     color: #333;
     font-size: 24px;
     margin-bottom: 20px;
+}
+
+body.dark-mode h1 {
+    color: #e0e0e0;
 }
 
 /* Alertas de sucesso */
@@ -26,6 +35,12 @@ h1 {
     border-radius: 4px;
     text-align: center;
     margin-bottom: 20px;
+}
+
+body.dark-mode .alert-success {
+    color: #d4edda;
+    background-color: #155724;
+    border: 1px solid #155724;
 }
 
 /* Estilos do formulário */
@@ -43,6 +58,13 @@ form textarea {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 16px;
+}
+
+body.dark-mode form input,
+body.dark-mode form textarea {
+    background-color: #333;
+    color: #e0e0e0;
+    border: 1px solid #555;
 }
 
 form button {
@@ -78,6 +100,12 @@ form button:hover {
     width: 200px;
 }
 
+body.dark-mode .filters select {
+    background-color: #333;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
 .filters button {
     padding: 10px 20px;
     background-color: #007bff;
@@ -110,19 +138,37 @@ table td {
     white-space: nowrap;
 }
 
+body.dark-mode table th,
+body.dark-mode table td {
+    border: 1px solid #555;
+}
+
 table th {
     background-color: #f2f2f2;
     color: #333;
     font-weight: bold;
 }
 
+body.dark-mode table th {
+    background-color: #333;
+    color: #e0e0e0;
+}
+
 table tbody tr:nth-child(even) {
     background-color: #fafafa;
+}
+
+body.dark-mode table tbody tr:nth-child(even) {
+    background-color: #2c2c2c;
 }
 
 table tbody tr:hover {
     background-color: #e9ecef;
     cursor: pointer;
+}
+
+body.dark-mode table tbody tr:hover {
+    background-color: #3c3c3c;
 }
 
 /* Estilos dos botões de ações */
@@ -161,6 +207,10 @@ table tbody tr:hover {
     text-align: center;
     color: #666;
     font-style: italic;
+}
+
+body.dark-mode .text-center {
+    color: #9ca3af;
 }
 
 /* Estilos para o botão "Adicionar Novo Tipo de Usuário" */
@@ -211,16 +261,15 @@ table tbody tr:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-  }
+}
 
-  .modal form {
+.modal form {
     background: white;
     padding: 20px;
     border-radius: 5px;
     max-width: 500px;
     width: 100%;
-  }
-
+}
 
 .modal.show {
     transform: scale(1);
@@ -277,45 +326,49 @@ table tbody tr:hover {
     }
 }
 
-
-.col-lg-4 .card:hover{
+.col-lg-4 .card:hover {
     box-shadow: 0px 7px 30px -5px rgba(0,0,0,0.75);
     transition: all .2s linear;
 }
-.col-lg-4 .list-group{
+
+.col-lg-4 .list-group {
     float: left;
     display: inherit;
     width: 100%;
 }
-.card-body .list-group-item{
+
+.card-body .list-group-item {
     float: left;
     width: 48%;
     margin-right: 2%;
     border: none;
     position: inherit;
 }
-.atendimento-em-dia{
-        background-color: #1bce87;
-        border-radius: 2px;
-        color: #FFF;
-        padding: 5px 10px;
-        font-weight:bold;
-        font-size: 10px;
-    }
-.entrar-em-contato{
+
+.atendimento-em-dia {
+    background-color: #1bce87;
+    border-radius: 2px;
+    color: #FFF;
+    padding: 5px 10px;
+    font-weight: bold;
+    font-size: 10px;
+}
+
+.entrar-em-contato {
     background-color: #da4c2a;
     border-radius: 2px;
     color: #FFF;
-    font-weight:bold;
+    font-weight: bold;
     padding: 5px 10px;
     font-size: 10px;
 }
 
-.btn-play{
+.btn-play {
     background-color: #76c33b;
 }
-.btn-pause{
-    background-color:#f79300;
+
+.btn-pause {
+    background-color: #f79300;
 }
 
 .btn-primary {

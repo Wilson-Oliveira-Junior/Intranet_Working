@@ -23,7 +23,7 @@ export default function Layout({ children }: PropsWithChildren) {
     };
 
     useEffect(() => {
-        const toggle = document.getElementById('dark-mode');
+        const toggle = document.getElementById('dark-mode-toggle');
         const curtain = document.querySelector('.curtain');
         const modeText = document.getElementById('mode-text');
 

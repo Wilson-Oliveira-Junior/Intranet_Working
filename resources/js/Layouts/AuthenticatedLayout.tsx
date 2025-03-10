@@ -7,9 +7,7 @@ import SidebarADM from '@/Pages/Admin/AdminSidebar';
 import '../../../resources/css/app.css'; // Importando o CSS global
 import { route } from 'ziggy-js'; // Importar a função route para navegação
 import axios from 'axios'; // Importar axios para fazer requisições HTTP
-import PautasIndex from '@/Pages/Pautas/Index';
-import PautasCreate from '@/Pages/Pautas/Create';
-import PautasEdit from '@/Pages/Pautas/Edit';
+
 
 const Menu = ({ title, icon, children, isOpen, toggle }: { title: string; icon: string; children: ReactNode; isOpen: boolean; toggle: () => void }) => (
     <div className="flex flex-col">
@@ -69,7 +67,7 @@ const Authenticated = ({ header, children }: PropsWithChildren<{ header?: ReactN
     };
 
     useEffect(() => {
-        const toggle = document.querySelector('.toggle[type="checkbox"]');
+        const toggle = document.getElementById('dark-mode-toggle');
         const curtain = document.querySelector('.curtain');
         const modeText = document.getElementById('mode-text');
 
@@ -140,10 +138,10 @@ const Authenticated = ({ header, children }: PropsWithChildren<{ header?: ReactN
                     <div className="flex items-center">
                         <form id="dark-mode-form" className="flex items-center">
                             <label className="switch-layout">
-                                <input id="dark-mode" className="toggle checkbox-layout" type="checkbox" name="Dark mode" role="switch" value="on" onChange={toggleDarkMode} checked={darkMode} />
+                                <input id="dark-mode-toggle" className="toggle checkbox-layout" type="checkbox" name="Dark mode" role="switch" value="on" onChange={toggleDarkMode} checked={darkMode} />
                                 <span className="slider-layout"></span>
                             </label>
-                            <label htmlFor="dark-mode" className="sr">Dark Mode</label>
+                            <label htmlFor="dark-mode-toggle" className="sr">Dark Mode</label>
                             <div className="curtain"></div>
                             <span id="mode-text" className={`ml-2 ${darkMode ? 'text-white' : 'text-black'}`}>{darkMode ? 'Modo Claro' : 'Modo Escuro'}</span>
                         </form>

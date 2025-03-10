@@ -49,7 +49,7 @@ class GatilhoController extends Controller
                 'tb_gatilhos_templates.tipo_gatilho',
                 'tipo_projetos.id as id_tipo_projeto',
                 'tipo_projetos.nome as nome_tipo_projeto',
-                'clients.nome as cliente' // Incluir o nome do cliente
+                'clients.nome as cliente'
             )
             ->get();
 
