@@ -7,7 +7,6 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 
 const Step1 = ({ data, setData, nextStep }) => (
     <div className="tab-pane active" id="step1">
-        <h3>Step 1</h3>
         <h2 className="h2-titulo"><i className="fas fa-child"></i> <span>Dados da</span> Empresa</h2>
 
         {/* Linha 1 */}
@@ -226,7 +225,6 @@ const Step1 = ({ data, setData, nextStep }) => (
 
 const Step2 = ({ data, setData, nextStep, prevStep }) => (
     <div className="tab-pane active" id="step2">
-        <h3>Step 2</h3>
         <h2 className="h2-titulo"><i className="ni ni-badge"></i> <span>Dados de</span> Contato</h2>
 
         {/* Linha 1 */}
@@ -378,7 +376,6 @@ const Step2 = ({ data, setData, nextStep, prevStep }) => (
 
 const Step3 = ({ data, setData, nextStep, prevStep }) => (
     <div className="tab-pane active" id="step3">
-        <h3>Step 3</h3>
         <h2 className="h2-titulo"><i className="ni ni-paper-diploma"></i> <span>Dados do</span> Projeto</h2>
 
         {/* Botões de Navegação */}
@@ -724,25 +721,29 @@ const FichasCreate = () => {
             <div className="wizard">
                 <div className="wizard-inner">
                     <div className="connecting-line"></div>
-                    <ul className="nav nav-tabs" role="tablist">
-                        <li role="presentation" className={`icone-passo-1 ${currentStep === 1 ? 'active' : ''}`}>
+                    <ul className="nav nav-tabs justify-content-center" role="tablist">
+                        <li role="presentation" className={`icone-passo-1 ${currentStep >= 1 ? 'completed' : ''} ${currentStep === 1 ? 'active' : ''}`}>
                             <a href="#step1" data-toggle="tab" aria-controls="step1" role="tab" title="Step 1">
                                 <span className="round-tab">1</span>
+                                <span className="step-title">Dados da Empresa</span>
                             </a>
                         </li>
-                        <li role="presentation" className={`icone-passo-2 ${currentStep === 2 ? 'active' : 'disabled'}`}>
+                        <li role="presentation" className={`icone-passo-2 ${currentStep >= 2 ? 'completed' : ''} ${currentStep === 2 ? 'active' : 'disabled'}`}>
                             <a href="#step2" data-toggle="tab" aria-controls="step2" role="tab" title="Step 2">
                                 <span className="round-tab">2</span>
+                                <span className="step-title">Dados de Contato</span>
                             </a>
                         </li>
-                        <li role="presentation" className={`icone-passo-3 ${currentStep === 3 ? 'active' : 'disabled'}`}>
+                        <li role="presentation" className={`icone-passo-3 ${currentStep >= 3 ? 'completed' : ''} ${currentStep === 3 ? 'active' : 'disabled'}`}>
                             <a href="#step3" data-toggle="tab" aria-controls="step3" role="tab" title="Step 3">
                                 <span className="round-tab">3</span>
+                                <span className="step-title">Dados do Projeto</span>
                             </a>
                         </li>
                         <li role="presentation" className={`${currentStep === 4 ? 'active' : 'disabled'}`}>
                             <a href="#complete" data-toggle="tab" aria-controls="complete" role="tab" title="Complete">
-                                <span className="round-tab"><i className="ni ni-check-bold"></i></span>
+                                <span className="round-tab">4</span>
+                                <span className="step-title">Completado</span>
                             </a>
                         </li>
                     </ul>
