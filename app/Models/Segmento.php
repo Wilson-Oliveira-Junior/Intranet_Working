@@ -9,6 +9,7 @@ class Segmento extends Model
 {
     use HasFactory;
 
+    // Ensure no pagination settings are applied
     protected $table = 'segmento';
 
     protected $fillable = [

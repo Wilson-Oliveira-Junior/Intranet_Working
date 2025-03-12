@@ -479,3 +479,21 @@ body.dark-mode .nav-tabs > li.active > a .round-tab i {
     background-color: #c82333;
 }
 
+/* Estilo do resumo */
+.resumo {
+    background-color: #f1f1f1;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.resumo h4 {
+    margin-top: 0;
+    color: #333;
+}
+
+.resumo p {
+    margin: 5px 0;
+    color: #555;
+}
+

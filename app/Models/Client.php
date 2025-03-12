@@ -59,4 +59,9 @@ class Client extends Model
     {
         return $this->hasMany(Gatilho::class, 'client_id'); // Adicionar relação com Gatilho
     }
+
+    public function projetos()
+    {
+        return $this->hasMany(Projeto::class, 'cliente_id');
+    }
 }

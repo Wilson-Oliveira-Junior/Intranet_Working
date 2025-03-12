@@ -24,14 +24,14 @@ class Projeto extends Model
         'data_referencia',
     ];
 
-    public function client()
-    {
-        return $this->belongsTo(Client::class, 'cliente_id'); // Adicionar relação com Client
-    }
-
     public function cliente()
     {
-        return $this->hasOne(Client::class, 'cliente_id', 'cliente_id');
+        return $this->belongsTo(Client::class, 'cliente_id');
+    }
+
+    public function ficha()
+    {
+        return $this->belongsTo(Ficha::class, 'ficha_id');
     }
 
     public function gatilhos()

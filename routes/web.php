@@ -275,6 +275,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/fichas/{id}', [FichaController::class, 'show'])->name('fichas.show');
     Route::post('/fichas/{id}/approve', [FichaController::class, 'approve'])->name('fichas.approve');
     Route::post('/fichas/{id}/deny', [FichaController::class, 'deny'])->name('fichas.deny');
+    Route::get('/buscar-dados-empresa/{cnpj}', [FichaController::class, 'buscarDadosEmpresa']);
+    Route::get('/api/segmentos', [FichaController::class, 'getSegmentos']);
+
 });
 
 // API Routes

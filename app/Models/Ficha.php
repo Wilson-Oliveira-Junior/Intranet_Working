@@ -14,4 +14,9 @@ class Ficha extends Model
         'status', // Adicionar o campo status
         // Outros campos necessários
     ];
+
+    public function projetos()
+    {
+        return $this->hasMany(Projeto::class, 'ficha_id');
+    }
 }

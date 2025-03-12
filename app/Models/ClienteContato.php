@@ -28,6 +28,6 @@ class ClienteContato extends Model
      */
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class, 'id_cliente');
+        return $this->belongsTo(Client::class, 'id_cliente');
     }
 }
