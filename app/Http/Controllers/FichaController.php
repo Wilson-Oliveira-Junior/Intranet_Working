@@ -109,11 +109,16 @@ class FichaController extends Controller
         return redirect()->route('fichas.index');
     }
 
-    public function buscarDadosEmpresa($cnpj)
+    public function buscarDadosEmpresa($cpfCnpj)
     {
-        $response = Http::withOptions(['verify' => false])->get("https://www.receitaws.com.br/v1/cnpj/{$cnpj}");
-        if ($response->successful()) {
-            return response()->json($response->json());
+        if (strlen($cpfCnpj) === 14) {
+            $response = Http::withOptions(['verify' => false])->get("https://www.receitaws.com.br/v1/cnpj/{$cpfCnpj}");
+            if ($response->successful()) {
+                return response()->json($response->json());
+            }
+        } else if (strlen($cpfCnpj) === 11) {
+            // Handle CPF validation if needed
+            return response()->json(['status' => 'CPF válido']);
         }
         return response()->json(['error' => 'Erro ao buscar dados da empresa'], 500);
     }

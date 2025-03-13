@@ -234,6 +234,34 @@ textarea {
     resize: vertical;
 }
 
+/* Estilo dos checkboxes */
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: #f9f9f9;
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.checkbox-group input[type="checkbox"] {
+    margin: 0;
+}
+
+.checkbox-group label:hover {
+    background-color: #e0e0e0;
+    border-color: #ccc;
+}
+
 /* Estilo dos botões de navegação */
 .proximo-anterior {
     display: flex;
@@ -309,6 +337,17 @@ body.dark-mode .nav-tabs > li.active > a .round-tab {
 
 body.dark-mode .nav-tabs > li.active > a .round-tab i {
     color: #ffffff;
+}
+
+body.dark-mode .checkbox-group label {
+    background-color: #2c2c2c;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .checkbox-group label:hover {
+    background-color: #3a3a3a;
+    border-color: #666;
 }
 
 /* Estilo da tabela */
