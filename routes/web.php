@@ -294,7 +294,8 @@ Route::post('/api/uploadAttachment', [TeamScheduleController::class, 'uploadAtta
 Route::post('/api/cronograma/{id}/add-follower', [TeamScheduleController::class, 'addFollower'])->name('web.teamSchedule.addFollower');
 Route::post('/api/cronograma/{id}/remove-follower', [TeamScheduleController::class, 'removeFollower'])->name('web.teamSchedule.removeFollower');
 Route::post('/api/uploadAttachment', [TeamScheduleController::class, 'uploadAttachment'])->name('web.teamSchedule.uploadAttachment');
-Route::get('/api/segmentos', [StatusController::class, 'getSegmentos']);
+Route::get('/api/segmentos', [FichaController::class, 'getSegmentos']);
+
 
 // Rota para o CSS
 Route::get('/css/app.css', function () {

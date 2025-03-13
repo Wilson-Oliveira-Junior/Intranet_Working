@@ -121,8 +121,8 @@ class FichaController extends Controller
     public function getSegmentos()
     {
         try {
-            $segmentos = Segmento::paginate(10); // Fetch segments with pagination
-            return response()->json($segmentos); // Return paginated segments
+            $segmentos = Segmento::all(); // Ensure all segments are fetched without pagination
+            return response()->json(['data' => $segmentos]); // Return segments within the 'data' property
         } catch (\Exception $e) {
             return response()->json(['error' => 'Erro ao carregar segmentos'], 500);
         }

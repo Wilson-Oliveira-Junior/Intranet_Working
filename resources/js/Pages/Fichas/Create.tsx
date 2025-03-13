@@ -116,13 +116,13 @@ const Step1 = ({ data, setData, nextStep }) => {
     };
 
     useEffect(() => {
-        // Buscar segmentos da empresa
         const fetchSegmentos = async () => {
             try {
                 const response = await fetch('/api/segmentos');
                 if (response.ok) {
                     const result = await response.json();
-                    setData('segmentos', result.data); // Ensure the data is correctly set from the paginated response
+                    console.log('Segmentos:', result.data); // Verifique os dados no console
+                    setData('segmentos', result.data); // Use result.data
                 } else {
                     console.error('Erro ao carregar segmentos:', response.statusText);
                 }
