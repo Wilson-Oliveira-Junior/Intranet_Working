@@ -885,7 +885,7 @@ const Step3 = ({ data, setData, nextStep, prevStep }: { data: any, setData: any,
                             >
                                 <option value="0">Selecione um projeto</option>
                                 {Array.isArray(data.tipo_projetos) && data.tipo_projetos.map((projeto: any) => (
-                                    <option key={projeto.id} value={projeto.id}>{projeto.nome}</option>
+                                    <option key={projeto.id} value={projeto.nome}>{projeto.nome}</option>
                                 ))}
                             </select>
                         </div>
@@ -989,7 +989,7 @@ const Step3 = ({ data, setData, nextStep, prevStep }: { data: any, setData: any,
                                 <div className="input-group input-group-alternative mb-3" style={{ boxShadow: 'none' }}>
                                     <select
                                         className="form-control select-ficha"
-                                        name="ssl-cdn"
+                                        name="ssl_cdn"
                                         value={data.ssl_cdn}
                                         onChange={e => setData('ssl_cdn', e.target.value)}
                                     >
