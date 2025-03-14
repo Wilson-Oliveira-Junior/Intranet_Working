@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TipoProjeto;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Ficha;
@@ -130,6 +131,16 @@ class FichaController extends Controller
             return response()->json(['data' => $segmentos]); // Return segments within the 'data' property
         } catch (\Exception $e) {
             return response()->json(['error' => 'Erro ao carregar segmentos'], 500);
+        }
+    }
+
+    public function getTiposProjetos()
+    {
+        try {
+            $tiposprojetos = TipoProjeto::all();
+            return response()->json(['data' => $tiposprojetos]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao carregar tipos projetos'], 500);
         }
     }
 }

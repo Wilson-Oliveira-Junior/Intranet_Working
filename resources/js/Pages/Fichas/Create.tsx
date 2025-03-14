@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import InputMask from 'react-input-mask';
 import "../../../css/components/fichas.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
@@ -146,8 +147,8 @@ const Step1 = ({ data, setData, nextStep }: { data: any, setData: any, nextStep:
                         endereco: dadosEmpresa.logradouro,
                         bairro: dadosEmpresa.bairro,
                         cidade: dadosEmpresa.municipio,
-                        estado: dadosEmpresa.uf,
-                        inscricao_estadual: dadosEmpresa.uf, // Log para depuração
+                        estado: dadosEmpresa.uf, // Log para depuração
+                        inscricao_estadual: dadosEmpresa.uf,
                         numero: dadosEmpresa.numero,
                         complemento: dadosEmpresa.complemento,
                         telefone_cliente: dadosEmpresa.telefone,
@@ -530,9 +531,14 @@ const Step1 = ({ data, setData, nextStep }: { data: any, setData: any, nextStep:
         </div>
     );
 };
+
 const Step2 = ({ data, setData, nextStep, prevStep }: { data: any, setData: any, nextStep: any, prevStep: any }) => {
-    const [contacts, setContacts] = useState(data.contacts || [{ nome_cliente: '', cargo_cliente: '', tipo_contato: '', telefone_cliente: '', celular: '', email: '', nascimento: '', perfilcliente: [] }]);
+    const [contacts, setContacts] = useState(data.contacts.length > 0 ? data.contacts : [{ nome_cliente: '', cargo_cliente: '', tipo_contato: '', telefone_cliente: '', celular: '', email: '', nascimento: '', perfilcliente: [] }]);
     const [contactError, setContactError] = useState('');
+
+    useEffect(() => {
+        setContacts(data.contacts.length > 0 ? data.contacts : [{ nome_cliente: '', cargo_cliente: '', tipo_contato: '', telefone_cliente: '', celular: '', email: '', nascimento: '', perfilcliente: [] }]);
+    }, [data.contacts]);
 
     const handleContactChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -719,10 +725,12 @@ const Step2 = ({ data, setData, nextStep, prevStep }: { data: any, setData: any,
                         <div className="form-group col-sm-4 form-ficha-comercial nascimento-cliente">
                             <h4 className="h4-fechamento">Data de Nascimento</h4>
                             <div className="input-group input-group-alternative mb-3">
-                                <input
+                                <InputMask
                                     id={`nascimento-${index}`}
                                     className="form-control"
                                     name="nascimento"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
                                     value={contact.nascimento || ''}
                                     onChange={e => handleContactChange(index, e)}
                                 />
@@ -844,7 +852,7 @@ const Step3 = ({ data, setData, nextStep, prevStep }: { data: any, setData: any,
                 const response = await fetch('/api/tipo-projetos');
                 if (response.ok) {
                     const result = await response.json();
-                    setData('tipo_projetos', result.data); // Use result.data
+                    setData('tipo_projetos', result.data);
                 } else {
                     console.error('Erro ao carregar tipo de projetos:', response.statusText);
                 }
@@ -854,7 +862,7 @@ const Step3 = ({ data, setData, nextStep, prevStep }: { data: any, setData: any,
         };
 
         fetchTipoProjetos();
-    }, []);
+    }, [setData]);
 
     return (
         <div className="tab-pane active" id="step3">
@@ -1229,16 +1237,18 @@ const Complete = ({ data, prevStep }: { data: any, prevStep: any }) => (
             <p><strong>Endereço:</strong> {data.endereco}</p>
             <p><strong>Bairro:</strong> {data.bairro}</p>
             <p><strong>Cidade:</strong> {data.cidade}</p>
-            {/* Adicione outros campos conforme necessário */}
 
             <h4>Dados de Contato</h4>
-            <p><strong>Nome do Cliente:</strong> {data.nome_cliente}</p>
-            <p><strong>Cargo:</strong> {data.cargo_cliente}</p>
-            <p><strong>Tipo de Contato:</strong> {data.tipo_contato}</p>
-            <p><strong>Telefone:</strong> {data.telefone_cliente}</p>
-            <p><strong>Celular:</strong> {data.celular}</p>
-            <p><strong>E-mail:</strong> {data.email}</p>
-            {/* Adicione outros campos conforme necessário */}
+            {data.contacts.map((contact: any, index: number) => (
+                <div key={index}>
+                    <p><strong>Nome do Cliente:</strong> {contact.nome_cliente}</p>
+                    <p><strong>Cargo:</strong> {contact.cargo_cliente}</p>
+                    <p><strong>Tipo de Contato:</strong> {contact.tipo_contato}</p>
+                    <p><strong>Telefone:</strong> {contact.telefone_cliente}</p>
+                    <p><strong>Celular:</strong> {contact.celular}</p>
+                    <p><strong>E-mail:</strong> {contact.email}</p>
+                </div>
+            ))}
 
             {data.tipo_projeto === 'Marketing' && (
                 <>
@@ -1253,7 +1263,6 @@ const Complete = ({ data, prevStep }: { data: any, prevStep: any }) => (
                     <p><strong>Slider na Página Principal:</strong> {data.slider_pp}</p>
                     <p><strong>Domínio do Site:</strong> {data.dominio_principal}</p>
                     <p><strong>Data de Início das Ações:</strong> {data.data_inicio_marketing}</p>
-                    {/* Adicione outros campos conforme necessário */}
                 </>
             )}
         </div>
@@ -1297,13 +1306,19 @@ const FichasCreate = () => {
         email: '',
         nascimento: '',
         perfilcliente: [],
-        tipo_projetos: [], // Adicionar tipo_projetos ao estado inicial
-        segmentos: [], // Adicionar segmentos ao estado inicial
-        contacts: [], // Adicionar contacts ao estado inicial
-        // Outros campos necessários
+        tipo_projetos: [],
+        segmentos: [],
+        contacts: [],
     });
 
     const [currentStep, setCurrentStep] = useState(1);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const handleLoad = () => setLoading(false);
+        window.addEventListener('load', handleLoad);
+        return () => window.removeEventListener('load', handleLoad);
+    }, []);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -1317,6 +1332,10 @@ const FichasCreate = () => {
     const prevStep = () => {
         setCurrentStep((prevStep) => prevStep - 1);
     };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <AuthenticatedLayout>
