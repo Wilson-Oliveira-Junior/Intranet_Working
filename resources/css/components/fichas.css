@@ -536,3 +536,166 @@ body.dark-mode .checkbox-group label:hover {
     color: #555;
 }
 
+/* General styles for slider sections */
+.slider-section {
+    margin-bottom: 20px;
+    border: 1px solid #e1e1e1; /* Restore border */
+    border-radius: 5px;
+    padding: 15px;
+    background-color: #f9f9f9; /* Default background */
+}
+
+.slider-section h5 {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+    cursor: pointer;
+    color: #000 !important; /* Force text to remain black */
+}
+
+/* Form group styles */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group h4 {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+}
+
+.input-group-alternative {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+/* Specific styles for new fields */
+.form-ficha-comercial.redirect,
+.form-ficha-comercial.redirect_para_onde,
+.form-ficha-comercial.redirect_observacao,
+.form-ficha-comercial.data_inicio_acoes,
+.form-ficha-comercial.investimento_mensal,
+.form-ficha-comercial.numero_post_mes {
+    margin-bottom: 15px;
+}
+
+.form-ficha-comercial input,
+.form-ficha-comercial select,
+.form-ficha-comercial textarea {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Adjustments for responsiveness */
+@media (max-width: 768px) {
+    .form-group {
+        margin-bottom: 10px;
+    }
+
+    .form-group h4 {
+        font-size: 13px;
+    }
+
+    .input-group-alternative {
+        padding: 4px;
+    }
+
+    .slider-section {
+        padding: 10px;
+    }
+}
+
+/* Three-column layout */
+#clonar-campos-projeto .row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#clonar-campos-projeto .form-group {
+    flex: 1 1 33%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* Unique background colors for sliders */
+.slider-section-1 {
+    background-color: #007bff; /* Blue for Criação */
+}
+
+.slider-section-2 {
+    background-color: #dc3545; /* Red for Desenvolvimento */
+}
+
+.slider-section-3 {
+    background-color: #28a745; /* Green for Marketing */
+}
+
+.slider-section-4 {
+    background-color: #ffc107; /* Yellow for Comercial */
+}
+
+/* Adjustments for responsiveness */
+@media (max-width: 768px) {
+    #clonar-campos-projeto .form-group {
+        flex: 1 1 100%;
+    }
+}
+
+/* Three-column layout for all fields */
+#clonar-campos-projeto .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Add spacing between columns */
+}
+
+#clonar-campos-projeto .form-group {
+    flex: 1 1 calc(33.333% - 10px); /* Ensure three columns with spacing */
+    box-sizing: border-box;
+}
+
+/* Ensure sliders also follow the three-column layout */
+.slider-section .form-group {
+    flex: 1 1 calc(33.333% - 10px); /* Same as above */
+}
+
+/* Adjustments for responsiveness */
+@media (max-width: 768px) {
+    #clonar-campos-projeto .form-group,
+    .slider-section .form-group {
+        flex: 1 1 100%; /* Stack fields on smaller screens */
+    }
+}
+
+/* Center text and apply colors for slider titles */
+.slider-section h5 {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.slider-section-1 h5 {
+    color: #007bff; /* Blue for Criação */
+}
+
+.slider-section-2 h5 {
+    color: #dc3545; /* Red for Desenvolvimento */
+}
+
+.slider-section-3 h5 {
+    color: #28a745; /* Green for Marketing */
+}
+
+.slider-section-4 h5 {
+    color: #ffc107; /* Yellow for Comercial */
+}
+
