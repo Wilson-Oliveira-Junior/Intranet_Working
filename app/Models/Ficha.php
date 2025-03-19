@@ -10,13 +10,51 @@ class Ficha extends Model
     use HasFactory;
 
     protected $fillable = [
-        'nome',
-        'status', // Adicionar o campo status
-        // Outros campos necessários
+        'nome_empresa',
+        'cnpj',
+        'responsavel',
+        'telefone',
+        'email',
+        'status',
+        'cep',
+        'rua',
+        'numero',
+        'bairro',
+        'cidade',
+        'estado',
+        'limite_credito',
+        'tipo_pagamento',
+        'prazo_pagamento',
+        'observacoes',
+        'user_id',
+        'aprovado_por',
+        'data_aprovacao',
+        'client_id',
+        'observacao_rejeicao',
     ];
 
     public function projetos()
     {
         return $this->hasMany(Projeto::class, 'ficha_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function aprovadoPor()
+    {
+        return $this->belongsTo(User::class, 'aprovado_por');
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id');
+    }
+
+    public function isEditable()
+    {
+        return $this->status !== 'Autorizada';
     }
 }

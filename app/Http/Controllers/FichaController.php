@@ -95,19 +95,54 @@ class FichaController extends Controller
     public function approve($id)
     {
         $ficha = Ficha::findOrFail($id);
-        $ficha->status = 'Aprovada';
+
+        // Atualiza o status da ficha
+        $ficha->status = 'Autorizada';
+        $ficha->aprovado_por = auth()->id();
+        $ficha->data_aprovacao = now();
+        $ficha->observacao_rejeicao = null; // Limpa a observação em caso de aprovação
         $ficha->save();
-        // Lógica para aprovar a ficha e criar o cliente e projeto
-        return redirect()->route('fichas.index');
+
+        // Adiciona o cliente à base de dados
+        $cliente = Client::create([
+            'nome' => $ficha->nome_empresa,
+            'CNPJ' => $ficha->cnpj,
+            'razao_social' => $ficha->nome_empresa,
+            'nome_fantasia' => $ficha->nome_empresa,
+            'cep' => $ficha->cep,
+            'endereco' => $ficha->rua,
+            'bairro' => $ficha->bairro,
+            'cidade' => $ficha->cidade,
+            'estado' => $ficha->estado,
+            'telefone' => $ficha->telefone,
+            'email' => $ficha->email,
+            // Outros campos necessários
+        ]);
+
+        // Cria um gatilho para o cliente (exemplo: notificação ou tarefa)
+        $this->createClientTrigger($cliente);
+
+        return redirect()->route('fichas.index')->with('success', 'Ficha aprovada e cliente adicionado com sucesso.');
     }
 
-    public function deny($id)
+    private function createClientTrigger(Client $cliente)
     {
+        // Exemplo de gatilho: criar uma tarefa ou notificação
+        Log::info("Gatilho criado para o cliente: {$cliente->nome}");
+    }
+
+    public function deny(Request $request, $id)
+    {
+        $request->validate([
+            'observacao_rejeicao' => 'required|string|max:500',
+        ]);
+
         $ficha = Ficha::findOrFail($id);
         $ficha->status = 'Reprovada';
+        $ficha->observacao_rejeicao = $request->observacao_rejeicao;
         $ficha->save();
-        // Lógica para negar a ficha
-        return redirect()->route('fichas.index');
+
+        return redirect()->route('fichas.index')->with('error', 'Ficha reprovada. Observação adicionada.');
     }
 
     public function buscarDadosEmpresa($cpfCnpj)

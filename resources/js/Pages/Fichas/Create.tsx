@@ -189,9 +189,16 @@ const FichasCreate = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const handleLoad = () => setLoading(false);
-        window.addEventListener('load', handleLoad);
-        return () => window.removeEventListener('load', handleLoad);
+        const fetchInitialData = async () => {
+            try {
+                setLoading(false);
+            } catch (error) {
+                console.error('Erro ao carregar dados iniciais:', error);
+                setLoading(false);
+            }
+        };
+
+        fetchInitialData();
     }, []);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -208,7 +215,7 @@ const FichasCreate = () => {
     };
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div>Carregando...</div>; // Certifique-se de que o estado de carregamento seja atualizado corretamente
     }
 
     return (
