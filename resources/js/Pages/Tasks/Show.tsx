@@ -1,94 +1,60 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import '../../../css/components/taskdetails.css';
+import "../../../css/pages/TaskShow.css";
 
-interface Task {
-    id: number;
-    title: string;
-    description: string;
-    date: string;
-    status: string;
-    comments: Comment[];
-    attachments: Attachment[];
-}
+const TaskShow = () => {
+    const { task } = usePage().props;
 
-interface Comment {
-    id: number;
-    text: string;
-    user: {
-        name: string;
-    };
-    created_at: string;
-}
-
-interface Attachment {
-    id: number;
-    file_path: string;
-    file_name: string;
-}
-
-interface TaskDetailsProps {
-    task: Task;
-    auth: {
-        user: {
-            name: string;
-        };
-    };
-}
-
-const TaskDetails: React.FC = () => {
-    const { task: initialTask, auth } = usePage<TaskDetailsProps>().props;
-    const [task, setTask] = useState<Task>({
-        ...initialTask,
-        comments: initialTask.comments || [],
-        attachments: initialTask.attachments || [],
-    });
-
-    useEffect(() => {
-        setTask({
-            ...initialTask,
-            comments: initialTask.comments || [],
-            attachments: initialTask.attachments || [],
-        });
-    }, [initialTask]);
-
-    const formatDate = (dateString: string) => {
+    const formatDate = (dateString) => {
         const date = new Date(dateString);
         return isNaN(date.getTime()) ? 'Data Inválida' : date.toLocaleDateString();
     };
 
     return (
-        <AuthenticatedLayout user={auth.user}>
-            <div className="task-details-container">
-                <h1 className="task-title">{task.title}</h1>
-                <p className="task-description">{task.description}</p>
-                <p className="task-date"><strong>Data Limite:</strong> {formatDate(task.date)}</p>
-                <p className="task-status"><strong>Status:</strong> {task.status}</p>
-                <div className="task-comments">
-                    <h2>Comentários</h2>
-                    <ul>
-                        {task.comments.map(comment => (
-                            <li key={comment.id} className="comment-item">
-                                <p>{comment.text}</p>
-                                <p><strong>{comment.user.name}</strong> em {formatDate(comment.created_at)}</p>
-                            </li>
-                        ))}
-                    </ul>
+        <AuthenticatedLayout>
+            <div className="task-show-container">
+                <h1 className="task-show-title">{task.title}</h1>
+                <div className="task-details">
+                    <p><strong>Descrição:</strong> {task.description}</p>
+                    <p><strong>Data Limite:</strong> {formatDate(task.date)}</p>
+                    <p><strong>Prioridade:</strong> {task.priority}</p>
+                    <p><strong>Status:</strong> {task.status}</p>
                 </div>
-                <div className="task-attachments">
+                <div className="task-section">
+                    <h2>Comentários</h2>
+                    {task.comments.length > 0 ? (
+                        <ul className="task-comments-list">
+                            {task.comments.map((comment) => (
+                                <li key={comment.id} className="task-comment-item">
+                                    <p><strong>{comment.user.name}:</strong> {comment.text}</p>
+                                    <p className="comment-date">{formatDate(comment.created_at)}</p>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="no-comments">Sem comentários.</p>
+                    )}
+                </div>
+                <div className="task-section">
                     <h2>Anexos</h2>
-                    <ul>
-                        {task.attachments.map(attachment => (
-                            <li key={attachment.id} className="attachment-item">
-                                <a href={attachment.file_path} target="_blank" rel="noopener noreferrer">{attachment.file_name}</a>
-                            </li>
-                        ))}
-                    </ul>
+                    {task.attachments.length > 0 ? (
+                        <ul className="task-attachments-list">
+                            {task.attachments.map((attachment) => (
+                                <li key={attachment.id} className="task-attachment-item">
+                                    <a href={attachment.file_path} target="_blank" rel="noopener noreferrer">
+                                        {attachment.file_name}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="no-attachments">Sem anexos.</p>
+                    )}
                 </div>
             </div>
         </AuthenticatedLayout>
     );
 };
 
-export default TaskDetails;
+export default TaskShow;

@@ -38,7 +38,7 @@ const PautasCreate = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post('/pautas'); // Ensure the endpoint matches the route in web.php
+        post('/pautas');
     };
 
     const handleCancel = () => {

@@ -64,11 +64,9 @@ class TaskController extends Controller
 
     public function show($id)
     {
-        $task = Schedule::with(['comments.user', 'attachments'])->findOrFail($id);
-        $task->comments = $task->comments ?? [];
-        $task->attachments = $task->attachments ?? [];
-        $task->date = Carbon::parse($task->date)->format('Y-m-d'); // Certifique-se de que a data é um objeto Carbon
-        return response()->json([
+        $task = \App\Models\Schedule::with(['comments.user', 'attachments'])->findOrFail($id);
+
+        return Inertia::render('Tasks/Show', [
             'task' => $task,
         ]);
     }

@@ -64,7 +64,6 @@ const AdminSidebar = ({ setActivePage }) => {
                 >
                     <Link href="/profile" className="sidebar-link">Meu Perfil</Link>
                     <Link href="/meu-cronograma" className="sidebar-link">Meu Cronograma</Link>
-                    <Link href="/meu-calendario" className="sidebar-link">Meu Calendário</Link>
                 </Menu>
 
                 <Menu

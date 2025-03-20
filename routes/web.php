@@ -21,13 +21,8 @@ use App\Http\Controllers\FichaController;
 
 // Página inicial
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+    return Inertia::render('Auth/Login');
+})->name('login');
 
 // Dashboard principal
 Route::get('/dashboard', function () {
@@ -178,6 +173,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/team/backlog', [TeamScheduleController::class, 'addToTeamBacklog'])->name('team.backlog.add');
     Route::delete('/team/backlog/{id}', [TeamScheduleController::class, 'removeFromTeamBacklog'])->name('team.backlog.remove');
 
+    // Meu Espaço
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/meu-cronograma', [TeamScheduleController::class, 'mySchedule'])->name('meu-cronograma');
+    });
+
     // Employee
     Route::get('/employee/dashboard', [EmployeeController::class, 'index'])->name('employee.dashboard');
 
@@ -214,7 +214,7 @@ Route::middleware('auth')->group(function () {
     // Tarefas
     Route::post('/tasks/{id}/reopen', [TaskController::class, 'reopenTask'])->name('tasks.reopen');
     Route::get('/tarefas', [TaskController::class, 'tarefas'])->name('tasks.index');
-    Route::get('/tasks/{id}', [TaskController::class, 'show'])->name('tasks.show');
+    Route::get('/tasks/{id}', [TaskController::class, 'show'])->middleware(['auth', 'verified'])->name('tasks.show');
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.list');
 
     // Tipos de Tarefas

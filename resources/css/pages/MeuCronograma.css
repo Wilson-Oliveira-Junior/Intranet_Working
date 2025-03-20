@@ -1,0 +1,83 @@
+.meu-cronograma-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+.meu-cronograma-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.meu-cronograma-description {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.meu-cronograma-list {
+    list-style: none;
+    padding: 0;
+}
+
+.meu-cronograma-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.meu-cronograma-item strong {
+    color: #007bff;
+}
+
+.meu-cronograma-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.meu-cronograma-table th,
+.meu-cronograma-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.meu-cronograma-table th {
+    background-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.meu-cronograma-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.meu-cronograma-button {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.meu-cronograma-button:hover {
+    background-color: #0056b3;
+}

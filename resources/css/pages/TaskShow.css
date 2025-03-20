@@ -1,0 +1,119 @@
+.task-show-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.task-show-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.task-details {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.task-details p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: #555;
+}
+
+.task-section {
+    margin-top: 20px;
+}
+
+.task-section h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+    color: #007bff;
+}
+
+.task-comments-list,
+.task-attachments-list {
+    list-style: none;
+    padding: 0;
+}
+
+.task-comment-item,
+.task-attachment-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.task-comment-item p {
+    margin: 5px 0;
+}
+
+.comment-date {
+    font-size: 12px;
+    color: #888;
+}
+
+.task-attachment-item a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.task-attachment-item a:hover {
+    text-decoration: underline;
+}
+
+.no-comments,
+.no-attachments {
+    font-size: 14px;
+    color: #888;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.task-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.task-action-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.task-action-button.start {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.task-action-button.start:hover {
+    background-color: #218838;
+}
+
+.task-action-button.complete {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.task-action-button.complete:hover {
+    background-color: #0056b3;
+}

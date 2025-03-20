@@ -436,5 +436,18 @@ class TeamScheduleController extends Controller
 
         return response()->json(['message' => 'Task reopened successfully']);
     }
+
+    public function mySchedule()
+    {
+        $user = Auth::user();
+        $userSchedules = Schedule::with(['client', 'tipoTarefa', 'comments.user', 'followers'])
+            ->where('user_id', $user->id)
+            ->get();
+
+        return Inertia::render('MeuEspaco/MeuCronograma', [
+            'user' => $user,
+            'schedules' => $userSchedules,
+        ]);
+    }
 }
 
