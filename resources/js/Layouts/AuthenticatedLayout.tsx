@@ -5,7 +5,6 @@ import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState, useEffect } from 'react';
 import SidebarADM from '@/Pages/Admin/AdminSidebar';
 import '../../../resources/css/app.css'; // Importando o CSS global
-import { route } from 'ziggy-js'; // Importar a função route para navegação
 import axios from 'axios'; // Importar axios para fazer requisições HTTP
 
 
@@ -21,7 +20,18 @@ const Menu = ({ title, icon, children, isOpen, toggle }: { title: string; icon: 
 
 const Authenticated = ({ header, children }: PropsWithChildren<{ header?: ReactNode }>) => {
     const { auth } = usePage().props;
-    const user = (auth as { user?: { name: string } })?.user;
+
+    // Verifica se o usuário está autenticado
+    if (!auth || !auth.user) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <p>Erro: Usuário não autenticado. Redirecionando...</p>
+            </div>
+        );
+    }
+
+    const user = auth.user;
+
     const [darkMode, setDarkMode] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -42,12 +52,7 @@ const Authenticated = ({ header, children }: PropsWithChildren<{ header?: ReactN
     }, []);
 
     const toggleDarkMode = () => {
-        setDarkMode(prevMode => {
-            const newMode = !prevMode;
-            localStorage.setItem('dark-mode', newMode.toString());
-            document.body.classList.toggle('dark-mode', newMode);
-            return newMode;
-        });
+        document.documentElement.classList.toggle('dark-mode');
     };
 
     const toggleDropdown = () => {
@@ -114,10 +119,6 @@ const Authenticated = ({ header, children }: PropsWithChildren<{ header?: ReactN
 
     const hasUnreadNotifications = Array.isArray(notifications) && notifications.some(notification => !notification.read);
 
-    if (!user) {
-        return <div>Redirecting...</div>;
-    }
-
     return (
         <div className="min-h-screen">
             <nav className="navbar" id="topbar">
@@ -151,7 +152,7 @@ const Authenticated = ({ header, children }: PropsWithChildren<{ header?: ReactN
                                 ) : (
                                     <div className="notification-item">Nenhuma notificação</div>
                                 )}
-                                <Link href={route('notifications')} className="notification-item">Ver todas as notificações</Link>
+                                <Link href="/notifications" className="notification-item">Ver todas as notificações</Link>
                             </div>
                         </div>
                         <div className="relative ms-3">
@@ -163,10 +164,10 @@ const Authenticated = ({ header, children }: PropsWithChildren<{ header?: ReactN
                                 </svg>
                             </button>
                             <div className={`dropdown-content ${dropdownOpen ? 'show' : ''}`}>
-                                <Link href={route('profile.show')} className="dropdown-item">Perfil</Link>
-                                <Link href={route('notifications')} className="dropdown-item">Notificações</Link>
-                                <Link href={route('fichas.index')} className="dropdown-item">Fichas</Link>
-                                <Link href={route('help')} className="dropdown-item">Ajuda</Link>
+                                <Link href="/profile" className="dropdown-item">Perfil</Link>
+                                <Link href="/notifications" className="dropdown-item">Notificações</Link>
+                                <Link href="/fichas" className="dropdown-item">Fichas</Link>
+                                <Link href="/help" className="dropdown-item">Ajuda</Link>
                                 <button onClick={() => route('logout')} className="dropdown-item">Sair</button>
                             </div>
                         </div>
@@ -174,12 +175,9 @@ const Authenticated = ({ header, children }: PropsWithChildren<{ header?: ReactN
                 </div>
             </nav>
 
-            {/* Renderizar o sidebar fixo para admin */}
             <div className="flex">
-                <SidebarADM user={user} setActivePage={() => {}} /> {/* Sidebar fixo para admin */}
-
+                <SidebarADM user={user} setActivePage={() => {}} />
                 <div className="flex-1 py-2">
-                    {/* Cabeçalho se fornecido */}
                     {header && (
                         <header className="header">
                             <div className="container mx-auto">
@@ -187,8 +185,6 @@ const Authenticated = ({ header, children }: PropsWithChildren<{ header?: ReactN
                             </div>
                         </header>
                     )}
-
-                    {/* Conteúdo principal da página */}
                     <main className="content container mx-auto">{children}</main>
                 </div>
             </div>

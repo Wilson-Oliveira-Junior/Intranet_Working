@@ -30,7 +30,7 @@ const AdminSidebar = ({ setActivePage }) => {
     };
 
     return (
-        <div className="sidebar">
+        <div className="sidebar overflow-y-auto h-screen">
             <div id="teste" className="teste w-64 p-4">
                 <Link href="/admin/dashboard" className="sidebar-link">
                     <i className="fas fa-tv"></i> Dashboard
@@ -125,9 +125,6 @@ const AdminSidebar = ({ setActivePage }) => {
                     </Link>
                     <Link href="/admin/gatilhos" className="sidebar-link">
                         <i className="fas fa-lock" aria-label="Gatilhos"></i> Gatilhos
-                    </Link>
-                    <Link href="/admin/configuracao" className="sidebar-link">
-                        <i className="fas fa-lock" aria-label="Configuração"></i> Configuração
                     </Link>
                 </Menu>
 

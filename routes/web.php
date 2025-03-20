@@ -280,6 +280,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/fichas/{id}/edit', [FichaController::class, 'edit'])->name('fichas.edit');
     Route::put('/fichas/{id}', [FichaController::class, 'update'])->name('fichas.update');
 
+    // Rotas para documentos por área
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/documentos/{area}', function ($area) {
+            return Inertia::render('Admin/DocumentsPage', [
+                'area' => ucfirst($area), // Passa a área com a primeira letra maiúscula
+            ]);
+        })->name('documentos.area');
+    });
+
 });
 
 // API Routes
