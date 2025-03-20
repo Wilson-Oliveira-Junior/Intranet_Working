@@ -14,12 +14,15 @@ use Inertia\Inertia;
 
 class TaskController extends Controller
 {
-    public function tarefas()
+    public function tarefas(Request $request)
     {
         $user = auth()->user();
         $teams = Sector::all();
         $clients = Client::all();
         $tiposTarefa = TipoTarefa::all();
+
+        $statusFilter = $request->input('status', ''); // Get the status filter or default to an empty string
+
         $tasks = Schedule::with(['client', 'tipoTarefa', 'followers', 'comments.user', 'attachments', 'creator'])
             ->where(function ($query) use ($user) {
                 $query->where('user_id', $user->id)
@@ -28,18 +31,23 @@ class TaskController extends Controller
                         $q->where('user_id', $user->id);
                     });
             })
+            ->when($statusFilter, function ($query, $statusFilter) {
+                if ($statusFilter === 'abertas') {
+                    $query->where('status', 'aberto'); // Filtrar apenas tarefas com status "aberto"
+                } elseif ($statusFilter === 'fechadas') {
+                    $query->where('status', 'fechado'); // Filtrar apenas tarefas com status "fechado"
+                }
+            })
             ->get()
             ->map(function ($task) {
-                if ($task->status === Schedule::STATUS_OPEN) {
-                    $task->status = 'abertas';
-                } else if ($task->status === Schedule::STATUS_WORKING) {
-                    $task->status = 'trabalhando';
-                } else {
+                if ($task->status === 'aberto') {
+                    $task->status = 'aberto';
+                } else if ($task->status === 'fechado') {
                     $task->status = 'fechado';
                 }
                 $task->client_name = $task->client ? $task->client->name : 'N/A';
                 $task->tipo_tarefa = $task->tipoTarefa ? $task->tipoTarefa : null;
-                $task->due_date = Carbon::parse($task->date)->format('Y-m-d'); // Certifique-se de que a data é um objeto Carbon
+                $task->due_date = Carbon::parse($task->date)->format('Y-m-d');
                 $task->creator_name = $task->creator ? $task->creator->name : 'Desconhecido';
                 return $task;
             });
@@ -50,6 +58,7 @@ class TaskController extends Controller
             'tasks' => $tasks,
             'clients' => $clients,
             'tiposTarefa' => $tiposTarefa,
+            'statusFilter' => $statusFilter,
         ]);
     }
 
@@ -105,7 +114,7 @@ class TaskController extends Controller
         return Inertia::render('Tasks/TipoTarefa/Index', [
             'tiposTarefa' => $tiposTarefa,
             'links' => $tiposTarefa->links()->render(),
-            'csrf_token' => csrf_token(), // Garanta que o token CSRF está sendo passado
+            'csrf_token' => csrf_token(),
         ]);
     }
 
@@ -120,7 +129,7 @@ class TaskController extends Controller
             'nome' => 'required|string|max:255',
             'descricao' => 'required|string|max:255',
             'status' => 'required|in:Ativo,Inativo',
-            'estimativa' => 'nullable|integer', // Adicionar validação para estimativa
+            'estimativa' => 'nullable|integer',
         ]);
 
         TipoTarefa::create([

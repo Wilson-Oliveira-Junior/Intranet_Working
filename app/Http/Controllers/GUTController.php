@@ -22,8 +22,6 @@ class GUTController extends Controller
         $equipe = Sector::find($sector_id);
         if (!$equipe) {
             Log::error('Equipe not found', ['sector_id' => $sector_id]);
-        } else {
-            Log::info('Equipe found', ['equipe' => $equipe]);
         }
         $setores = Sector::query()->select('id', 'name')->orderBy('name', 'ASC')->get();
 
@@ -46,7 +44,6 @@ class GUTController extends Controller
     private function fetchTarefas($sector_id)
     {
         $usuarios = User::where('status', 'Ativo')->where('sector_id', $sector_id)->pluck('id')->toArray();
-        Log::info('Usuarios:', $usuarios);
 
         if (empty($usuarios)) {
             Log::warning('No active users found for the specified sector.', ['sector_id' => $sector_id]);
@@ -63,8 +60,6 @@ class GUTController extends Controller
             ->orderBy('id', 'ASC')
             ->get();
 
-        Log::info('Tarefas:', $arrTarefas->toArray());
-
         foreach ($arrTarefas as $tarefa) {
             // Inicialize os valores de gravidade, urgência e tendência se estiverem nulos
             $tarefa->gravidade = $tarefa->gravidade ?? 0;
@@ -75,15 +70,6 @@ class GUTController extends Controller
             if (is_null($tarefa->tarefa_ordem)) {
                 $tarefa->tarefa_ordem = $tarefa->gravidade * $tarefa->urgencia * $tarefa->tendencia;
             }
-
-            Log::info('Tarefa detalhes:', [
-                'id' => $tarefa->id,
-                'gravidade' => $tarefa->gravidade,
-                'urgencia' => $tarefa->urgencia,
-                'tendencia' => $tarefa->tendencia,
-                'pontuacao' => $tarefa->tarefa_ordem,
-                'priority' => $tarefa->priority
-            ]);
         }
 
         if ($arrTarefas->isEmpty()) {

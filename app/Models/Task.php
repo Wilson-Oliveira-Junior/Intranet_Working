@@ -17,10 +17,11 @@ class Task extends Model
         'tarefa_ordem',
         'created_at',
         'data_desejada',
-        'status',
+        'status', // Certifique-se de que este campo está correto
         'id_responsavel',
         'id_equipe',
-        'idusuario_gut'
+        'idusuario_gut',
+        'updated_at'
     ];
 
     public function responsavel()

@@ -79,13 +79,26 @@ class AdminController extends Controller
     {
         try {
             $user = Auth::user();
-            $tasksDeliveredCount = Schedule::where('user_id', $user->id)->where('status', Schedule::STATUS_CLOSED)->count();
 
-            return response()->json([
-                'count' => $tasksDeliveredCount
-            ]);
+            // Verifica se os campos necessários existem na tabela schedules
+            if (!\Schema::hasTable('schedules') || !\Schema::hasColumn('schedules', 'status') || !\Schema::hasColumn('schedules', 'user_id')) {
+                throw new \Exception('A tabela schedules ou os campos necessários (status ou user_id) não existem.');
+            }
+
+            $tasksDeliveredCount = \App\Models\Schedule::where('status', 'fechado') // Ajuste o valor conforme necessário
+                ->where('user_id', $user->id) // Filtra pelo usuário logado
+                ->count();
+
+            return response()->json(['count' => $tasksDeliveredCount]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error fetching tasks delivered count'], 500);
+            // Registra o erro no log com mais detalhes
+            \Log::error('Erro ao carregar dados de tarefas entregues: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Retorna uma mensagem de erro detalhada
+            return response()->json(['error' => 'Erro ao carregar dados de tarefas entregues. Verifique os logs para mais detalhes.'], 500);
         }
     }
 

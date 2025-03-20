@@ -14,10 +14,11 @@ class Schedule extends Model
     const STATUS_OPEN = 'aberto';
     const STATUS_WORKING = 'trabalhando';
     const STATUS_CLOSED = 'concluído';
+    const STATUS_DELIVERED = 'fechado';
 
     protected $fillable = [
         'titulo',
-        'title', // Add title to fillable
+        'title',
         'gravidade',
         'urgencia',
         'tendencia',
@@ -28,15 +29,16 @@ class Schedule extends Model
         'id_responsavel',
         'id_equipe',
         'idusuario_gut',
-        'description', // Add description to fillable
-        'date', // Add date to fillable
-        'sector_id', // Add sector_id to fillable
-        'user_id', // Add user_id to fillable
-        'client_id', // Add client_id to fillable
-        'tipo_tarefa_id', // Add tipo_tarefa_id to fillable
-        'hours_worked', // Add hours_worked to fillable
-        'priority', // Add priority to fillable
-        'creator_id', // Add creator_id to fillable
+        'description',
+        'date',
+        'sector_id',
+        'user_id',
+        'client_id',
+        'tipo_tarefa_id',
+        'hours_worked',
+        'priority',
+        'creator_id',
+        'updated_at',
     ];
 
     protected $casts = [

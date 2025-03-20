@@ -65,11 +65,21 @@ const HomeAdm: React.FC = () => {
     axios.get('/tasks-to-do-count')
       .then(response => setTasksToDoCount(response.data.count))
       .catch(error => console.error('Erro ao carregar dados de tarefas a fazer', error));
-
-    axios.get('/tasks-delivered-count')
-      .then(response => setTasksDeliveredCount(response.data.count))
-      .catch(error => console.error('Erro ao carregar dados de tarefas entregues', error));
   }, []);
+
+  useEffect(() => {
+    axios.get('/tasks-delivered-count')
+        .then(response => {
+            if (response.data && typeof response.data.count === 'number') {
+                setTasksDeliveredCount(response.data.count);
+            } else {
+                console.error('Resposta inesperada ao carregar tarefas entregues:', response.data);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar dados de tarefas entregues:', error);
+        });
+}, []);
 
   useEffect(() => {
     axios.get('/ramais')
@@ -92,15 +102,22 @@ const HomeAdm: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    axios.get('/pautas')
-      .then(response => {
-        setPautas(response.data.pautas.data);
-        setPautasCount(response.data.total);
-      })
-      .catch(error => {
-        console.error('Erro ao carregar dados de pautas', error);
-      });
-  }, []);
+    const fetchPautas = async () => {
+        try {
+            const response = await axios.get('/pautas', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            if (response.data && response.data.pautas && Array.isArray(response.data.pautas.data)) {
+                setPautas(response.data.pautas.data); // Use `data` para acessar os itens paginados
+                setPautasCount(response.data.pautas.total); // Total de pautas
+            } else {
+                console.error('Dados de pautas não encontrados ou formato inválido:', response.data);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar dados de pautas:', error);
+        }
+    };
+
+    fetchPautas();
+}, []);
 
   const formatDate = (dateString: string) => {
     const [year, month, day] = dateString.split('-');

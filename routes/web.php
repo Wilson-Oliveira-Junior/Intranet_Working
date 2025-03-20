@@ -40,7 +40,7 @@ Route::get('/ramais', [AdminController::class, 'getRamais']);
 Route::get('/commemorative-dates-this-month', [AdminController::class, 'getCommemorativeDatesThisMonth']);
 Route::get('/pautas', [PautasController::class, 'index'])
     ->middleware(['auth', 'verified'])
-    ->name('admin.pautas');
+    ->name('pautas.index');
 Route::get('/pautas/{id}', [PautasController::class, 'show'])->middleware(['auth', 'verified'])->name('pautas.show');
 Route::post('/pautas', [PautasController::class, 'store'])->middleware(['auth', 'verified'])->name('pautas.store');
 // Error boundary route
@@ -52,11 +52,6 @@ Route::get('/error-boundary', function () {
 Route::get('/status', function () {
     return Inertia::render('Tarefas/Status');
 })->middleware(['auth', 'verified'])->name('status');
-
-// Rota para a página de configurações
-Route::get('/settings', function () {
-    return Inertia::render('Settings');
-})->middleware(['auth', 'verified'])->name('settings');
 
 // Rota para a página de notificações
 Route::get('/notifications', function () {

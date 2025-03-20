@@ -20,7 +20,6 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
         if (!user || !teams) {
             console.error('User or teams data is missing');
         }
-        console.log('Tasks:', tasks);
     }, [user, teams, tasks]);
 
     useEffect(() => {
@@ -44,11 +43,11 @@ const Tarefas = ({ user, teams, tasks, clients, tiposTarefa, users }) => {
         const newFilteredTasks = tasks.filter(task => {
             let matches = false;
             if (activeTab === 'paraMim') {
-                matches = task.user_id === user.id && (taskStatus === 'aberto' ? (task.status === 'aberto' || task.status === 'trabalhando') : task.status === 'fechado');
+                matches = task.user_id === user.id && (taskStatus === 'abertas' ? task.status === 'aberto' : task.status === 'fechado');
             } else if (activeTab === 'queCriei') {
-                matches = task.creator_id === user.id && (taskStatus === 'aberto' ? (task.status === 'aberto' || task.status === 'trabalhando') : task.status === 'fechado');
+                matches = task.creator_id === user.id && (taskStatus === 'abertas' ? task.status === 'aberto' : task.status === 'fechado');
             } else if (activeTab === 'queEuSigo') {
-                matches = task.followers && task.followers.some(follower => follower.id === user.id) && (taskStatus === 'aberto' ? (task.status === 'aberto' || task.status === 'trabalhando') : task.status === 'fechado');
+                matches = task.followers && task.followers.some(follower => follower.id === user.id) && (taskStatus === 'abertas' ? task.status === 'aberto' : task.status === 'fechado');
             } else if (activeTab === 'backlog') {
                 matches = task.sector_id === parseInt(selectedTeam);
             }

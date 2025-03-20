@@ -15,7 +15,8 @@ class PautasController extends Controller
 
     public function index(Request $request)
     {
-        $pautas = \App\Models\Pauta::paginate(20); // Adjust pagination as needed
+        $pautas = Pauta::paginate(20); // Ajuste a paginação conforme necessário
+
         return Inertia::render('Pautas/Index', [
             'pautas' => $pautas,
         ]);

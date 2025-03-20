@@ -24,4 +24,7 @@ export default defineConfig({
             'application/javascript': ['js', 'jsx', 'ts', 'tsx'],
         },
     },
+    build: {
+        sourcemap: false, // Desativa os mapas de código
+    },
 });

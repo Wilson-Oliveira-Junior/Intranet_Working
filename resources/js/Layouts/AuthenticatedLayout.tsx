@@ -71,35 +71,27 @@ const Authenticated = ({ header, children }: PropsWithChildren<{ header?: ReactN
         const curtain = document.querySelector('.curtain');
         const modeText = document.getElementById('mode-text');
 
+        if (!toggle || !curtain || !modeText) {
+            console.warn('Elementos necessários para o modo escuro não foram encontrados.');
+            return;
+        }
+
         const handleToggle = () => {
             if ((toggle as HTMLInputElement).checked) {
                 (curtain as HTMLElement).style.transform = 'scaleX(1)';
-                if (modeText) modeText.textContent = 'Modo Claro';
-                if (modeText) modeText.classList.add('text-white'); // Add class to change text color to white
+                modeText.textContent = 'Modo Claro';
+                modeText.classList.add('text-white');
             } else {
                 (curtain as HTMLElement).style.transform = 'scaleX(0)';
-                if (modeText) modeText.textContent = 'Modo Escuro';
-                if (modeText) modeText.classList.remove('text-white'); // Remove class to reset text color
+                modeText.textContent = 'Modo Escuro';
+                modeText.classList.remove('text-white');
             }
         };
 
-        if (toggle) {
-            toggle.addEventListener('change', handleToggle);
-        } else {
-            console.error('Toggle Dark Mode button not found');
-        }
-
-        // Set initial text color based on the current mode
-        if (toggle && modeText) {
-            if ((toggle as HTMLInputElement).checked) {
-                modeText.classList.add('text-white'); // White for dark mode
-            } else {
-                modeText.classList.remove('text-white'); // Black for light mode
-            }
-        }
+        toggle.addEventListener('change', handleToggle);
 
         return () => {
-            if (toggle) toggle.removeEventListener('change', handleToggle);
+            toggle.removeEventListener('change', handleToggle);
         };
     }, []);
 
@@ -172,7 +164,6 @@ const Authenticated = ({ header, children }: PropsWithChildren<{ header?: ReactN
                             </button>
                             <div className={`dropdown-content ${dropdownOpen ? 'show' : ''}`}>
                                 <Link href={route('profile.show')} className="dropdown-item">Perfil</Link>
-                                <Link href={route('settings')} className="dropdown-item">Configurações</Link>
                                 <Link href={route('notifications')} className="dropdown-item">Notificações</Link>
                                 <Link href={route('fichas.index')} className="dropdown-item">Fichas</Link>
                                 <Link href={route('help')} className="dropdown-item">Ajuda</Link>
