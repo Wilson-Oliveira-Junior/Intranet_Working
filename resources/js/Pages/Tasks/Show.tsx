@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePage } from '@inertiajs/react';
+import { usePage, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import "../../../css/pages/TaskShow.css";
 
@@ -11,6 +11,18 @@ const TaskShow = () => {
         return isNaN(date.getTime()) ? 'Data Inválida' : date.toLocaleDateString();
     };
 
+    const handleStartTask = () => {
+        router.post(`/tasks/${task.id}/start`, {}, {
+            onSuccess: () => alert('Tarefa iniciada com sucesso!'),
+        });
+    };
+
+    const handleCompleteTask = () => {
+        router.post(`/tasks/${task.id}/complete`, {}, {
+            onSuccess: () => alert('Tarefa entregue com sucesso!'),
+        });
+    };
+
     return (
         <AuthenticatedLayout>
             <div className="task-show-container">
@@ -20,6 +32,18 @@ const TaskShow = () => {
                     <p><strong>Data Limite:</strong> {formatDate(task.date)}</p>
                     <p><strong>Prioridade:</strong> {task.priority}</p>
                     <p><strong>Status:</strong> {task.status}</p>
+                </div>
+                <div className="task-actions">
+                    {task.status === 'aberto' && (
+                        <button className="task-action-button start" onClick={handleStartTask}>
+                            Iniciar Tarefa
+                        </button>
+                    )}
+                    {task.status === 'trabalhando' && (
+                        <button className="task-action-button complete" onClick={handleCompleteTask}>
+                            Entregar Tarefa
+                        </button>
+                    )}
                 </div>
                 <div className="task-section">
                     <h2>Comentários</h2>

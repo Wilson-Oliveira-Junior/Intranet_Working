@@ -192,4 +192,31 @@ class TaskController extends Controller
 
         return response()->json(['message' => 'Tipo de Tarefa deletado com sucesso']);
     }
+
+    public function startTask($id)
+    {
+        $task = Schedule::findOrFail($id);
+        $task->status = Schedule::STATUS_WORKING;
+        $task->start_time = now();
+        $task->save();
+
+        return response()->json(['message' => 'Tarefa iniciada com sucesso.']);
+    }
+
+    public function completeTask($id)
+    {
+        $task = Schedule::findOrFail($id);
+
+        // Calculate hours worked
+        $startTime = new \DateTime($task->start_time);
+        $endTime = new \DateTime();
+        $interval = $startTime->diff($endTime);
+        $hoursWorked = $interval->h + ($interval->days * 24) + ($interval->i / 60);
+
+        $task->status = Schedule::STATUS_CLOSED;
+        $task->hours_worked = $hoursWorked;
+        $task->save();
+
+        return response()->json(['message' => 'Tarefa entregue com sucesso.']);
+    }
 }
