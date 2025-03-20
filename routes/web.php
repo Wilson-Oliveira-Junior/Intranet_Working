@@ -284,11 +284,12 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/documentos/{area}', function ($area) {
             return Inertia::render('Admin/DocumentsPage', [
-                'area' => ucfirst($area), // Passa a área com a primeira letra maiúscula
+                'area' => ucfirst($area),
             ]);
-        })->name('documentos.area');
+        })->name('documentos');
+        Route::get('/api/documents', [\App\Http\Controllers\DocumentController::class, 'index']);
+        Route::post('/api/documents/upload', [\App\Http\Controllers\DocumentController::class, 'upload']);
     });
-
 });
 
 // API Routes
@@ -313,12 +314,11 @@ Route::get('/css/app.css', function () {
     return response()->file(public_path('css/app.css'));
 });
 
-
 // Datas Comemorativas
- Route::resource('commemorative-dates', CommemorativeDateController::class);
+Route::resource('commemorative-dates', CommemorativeDateController::class);
 
 // Datas Comemorativas Fixas
- Route::resource('fixed-commemorative-dates', FixedCommemorativeDateController::class);
+Route::resource('fixed-commemorative-dates', FixedCommemorativeDateController::class);
 
 // Autenticação
 require __DIR__ . '/auth.php';
