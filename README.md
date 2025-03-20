@@ -9,6 +9,8 @@ A Intranet Working é um sistema interno desenvolvido para facilitar a comunica�
 - **Calendário de Eventos**: Agendamento e visualização de eventos e reuniões.
 - **Gestão de Projetos e Tarefas**: Criação, atribuição e acompanhamento de tarefas e projetos.
 - **Diretório de Funcionários**: Lista de funcionários com informações de contato e perfil.
+- **Relatórios Avançados**: Geração de relatórios detalhados para análise de dados.
+- **Integração com Ferramentas Externas**: Conexão com serviços como Google Drive, Slack e outros.
 
 ## Instalação
 Para instalar o projeto, siga os passos abaixo:
@@ -21,15 +23,15 @@ Para instalar o projeto, siga os passos abaixo:
 2. **Configurar estrutura de pastas**:
    Navegue até a pasta `config` e siga as instruções no arquivo `config.md` para ajustar as configurações necessárias.
 
-3. **Instalar dependências**:
+3. **Configurar o ambiente**:
+   Copie o arquivo `.env.example` para `.env` e ajuste as configurações de acordo com o seu ambiente.
+
+4. **Instalar dependências**:
    No terminal, navegue até a pasta do projeto e execute:
    ```sh
    composer install
    npm install
    ```
-
-4. **Configurar o ambiente**:
-   Copie o arquivo `.env.example` para `.env` e ajuste as configurações de acordo com o seu ambiente.
 
 5. **Gerar chave da aplicação**:
    ```sh
@@ -41,7 +43,14 @@ Para instalar o projeto, siga os passos abaixo:
    php artisan migrate --seed
    ```
 
-7. **Iniciar o servidor**:
+7. **Executar com Docker (opcional)**:
+   Caso prefira usar Docker, execute os comandos abaixo:
+   ```sh
+   docker-compose up -d
+   ```
+   Isso configurará o ambiente completo com containers para o servidor web, banco de dados e outros serviços necessários.
+
+8. **Iniciar o servidor (sem Docker)**:
    No terminal, execute:
    ```sh
    php artisan serve
@@ -52,8 +61,9 @@ Para instalar o projeto, siga os passos abaixo:
    ```
 
 ## Planos Futuros
-- **Dockerização**: Pretendemos colocar o projeto no Docker para simplificar a configuração e a implantação.
-- **Novas Funcionalidades**: Adicionar mais funcionalidades como integração com ferramentas externas, relatórios avançados e melhorias na interface do usuário.
+- **Melhorias na Interface do Usuário**: Tornar a interface mais intuitiva e responsiva.
+- **Automatização de Processos**: Adicionar automações para tarefas repetitivas.
+- **Suporte Multilíngue**: Permitir que o sistema seja usado em diferentes idiomas.
 
 ## Contribuição
 Se você deseja contribuir com o projeto, por favor, siga os passos abaixo:

@@ -216,6 +216,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/tarefas', [TaskController::class, 'tarefas'])->name('tasks.index');
     Route::get('/tasks/{id}', [TaskController::class, 'show'])->middleware(['auth', 'verified'])->name('tasks.show');
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.list');
+    Route::post('/tasks/{task}/start', [TaskController::class, 'startTask'])->middleware(['auth', 'verified'])->name('tasks.start');
+    Route::post('/tasks/{task}/complete', [TaskController::class, 'completeTask'])->middleware(['auth', 'verified'])->name('tasks.complete');
 
     // Tipos de Tarefas
     Route::get('/tipo-tarefa', [TaskController::class, 'indexTipoTarefa'])->name('tipo-tarefa.index');
