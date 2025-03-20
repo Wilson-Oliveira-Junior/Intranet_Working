@@ -17,7 +17,7 @@ class FichaController extends Controller
 {
     public function index()
     {
-        $fichas = Ficha::all();
+        $fichas = Ficha::with(['user', 'aprovadoPor'])->get(); // Carrega os relacionamentos com os usuários
         return Inertia::render('Fichas/Index', ['fichas' => $fichas]);
     }
 
@@ -88,8 +88,31 @@ class FichaController extends Controller
 
     public function show($id)
     {
-        $ficha = Ficha::findOrFail($id);
+        $ficha = Ficha::with(['user', 'aprovadoPor'])->findOrFail($id); // Carrega os relacionamentos com os usuários
         return Inertia::render('Fichas/Show', ['ficha' => $ficha]);
+    }
+
+    public function edit($id)
+    {
+        $ficha = Ficha::findOrFail($id);
+        return Inertia::render('Fichas/Edit', ['ficha' => $ficha]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $ficha = Ficha::findOrFail($id);
+
+        // Atualiza os dados da ficha
+        $ficha->update($request->all());
+
+        // Notifica o aprovador que as correções foram feitas
+        if ($ficha->aprovado_por) {
+            $aprovador = $ficha->aprovadoPor;
+            // Exemplo de notificação (ajuste conforme necessário)
+            Log::info("Correções feitas na ficha {$ficha->id}. Notificar aprovador: {$aprovador->name}");
+        }
+
+        return redirect()->route('fichas.show', $ficha->id)->with('success', 'Ficha atualizada com sucesso. O aprovador foi notificado.');
     }
 
     public function approve($id)

@@ -40,12 +40,12 @@ class Ficha extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id'); // Relacionamento com o usuário que criou a ficha
     }
 
     public function aprovadoPor()
     {
-        return $this->belongsTo(User::class, 'aprovado_por');
+        return $this->belongsTo(User::class, 'aprovado_por'); // Relacionamento com o usuário que aprovou a ficha
     }
 
     public function client()

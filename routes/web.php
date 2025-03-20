@@ -43,8 +43,11 @@ Route::get('/tasks-to-do-count', [AdminController::class, 'getTasksToDoCount']);
 Route::get('/tasks-delivered-count', [AdminController::class, 'getTasksDeliveredCount']);
 Route::get('/ramais', [AdminController::class, 'getRamais']);
 Route::get('/commemorative-dates-this-month', [AdminController::class, 'getCommemorativeDatesThisMonth']);
-Route::get('/pautas', [PautasController::class, 'index'])->middleware(['auth', 'verified'])->name('admin.pautas');
+Route::get('/pautas', [PautasController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('admin.pautas');
 Route::get('/pautas/{id}', [PautasController::class, 'show'])->middleware(['auth', 'verified'])->name('pautas.show');
+Route::post('/pautas', [PautasController::class, 'store'])->middleware(['auth', 'verified'])->name('pautas.store');
 // Error boundary route
 Route::get('/error-boundary', function () {
     return Inertia::render('ErrorBoundary');
@@ -277,6 +280,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/fichas/{id}/deny', [FichaController::class, 'deny'])->name('fichas.deny');
     Route::get('/buscar-dados-empresa/{cnpj}', [FichaController::class, 'buscarDadosEmpresa']);
     Route::get('/api/segmentos', [FichaController::class, 'getSegmentos']);
+    Route::get('/fichas/{id}/edit', [FichaController::class, 'edit'])->name('fichas.edit');
+    Route::put('/fichas/{id}', [FichaController::class, 'update'])->name('fichas.update');
 
 });
 

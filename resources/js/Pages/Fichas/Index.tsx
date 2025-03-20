@@ -36,6 +36,7 @@ const FichasIndex = ({ fichas }) => {
                         <tr>
                             <th>ID</th>
                             <th>Nome</th>
+                            <th>Criado por</th>
                             <th>Status</th>
                             <th>Ações</th>
                         </tr>
@@ -45,6 +46,7 @@ const FichasIndex = ({ fichas }) => {
                             <tr key={ficha.id}>
                                 <td>{ficha.id}</td>
                                 <td>{ficha.nome}</td>
+                                <td>{ficha.user?.name || 'N/A'}</td> {/* Exibe o nome do criador */}
                                 <td>
                                     <span className={`badge ${ficha.status === 'Autorizada' ? 'badge-success' : ficha.status === 'Reprovada' ? 'badge-danger' : 'badge-warning'}`}>
                                         {ficha.status}
@@ -57,6 +59,9 @@ const FichasIndex = ({ fichas }) => {
                                             <button onClick={() => handleApprove(ficha.id)} className="btn btn-success btn-sm mr-2">Aprovar</button>
                                             <button onClick={() => setSelectedFicha(ficha)} className="btn btn-danger btn-sm">Negar</button>
                                         </>
+                                    )}
+                                    {ficha.isEditable && (
+                                        <Link href={`/fichas/${ficha.id}/edit`} className="btn btn-warning btn-sm ml-2">Editar</Link>
                                     )}
                                 </td>
                             </tr>

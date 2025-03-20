@@ -15,45 +15,9 @@ class PautasController extends Controller
 
     public function index(Request $request)
     {
-        $dados = $request->all();
-        $vStatus = $dados['abertas'] ?? true;
-        $vPraMim = $dados['pramim'] ?? false;
-        $vQueCriei = $dados['quecriei'] ?? false;
-        $vMeuSetor = $dados['meusetor'] ?? false;
-        $vCompartilhado = $dados['compartilhado'] ?? false;
-        $vTodos = $dados['todos'] ?? false;
-
-        $orderby = $vStatus ? 'idUrgencia' : 'data_finalizado';
-        $order = $vStatus ? 'ASC' : 'DESC';
-        $orderby_2 = $vStatus ? 'created_at' : 'idUrgencia';
-        $order_2 = $vStatus ? 'ASC' : 'DESC';
-
-        $vPautas = Pauta::when($vStatus, function ($query) {
-                return $query->where('status', 0);
-            }, function ($query) {
-                return $query->where('status', 1);
-            })
-            ->when($vPraMim, function ($query) {
-                return $query->where('idresponsavel', Auth::id());
-            })
-            ->when($vQueCriei, function ($query) {
-                return $query->where('idcriadopor', Auth::id());
-            })
-            ->when($vMeuSetor, function ($query) {
-                return $query->where('setor', Auth::user()->setor);
-            })
-            ->when($vCompartilhado, function ($query) {
-                return $query->whereHas('compartilhados', function ($q) {
-                    $q->where('id_usuario', Auth::id());
-                });
-            })
-            ->orderBy($orderby, $order)
-            ->orderBy($orderby_2, $order_2)
-            ->paginate($this->intPaginacao);
-
-        return response()->json([
-            'pautas' => $vPautas,
-            'total' => $vPautas->total(),
+        $pautas = \App\Models\Pauta::paginate(20); // Adjust pagination as needed
+        return Inertia::render('Pautas/Index', [
+            'pautas' => $pautas,
         ]);
     }
 
@@ -76,7 +40,7 @@ class PautasController extends Controller
         $pauta->idUrgencia = $dados['urgencia'];
         $pauta->titulo = $dados['titulo'];
         $pauta->idprojeto = $dados['projetopauta'];
-        $pauta->idcriadopor = Auth::id();
+        $pauta->idcriadopor = Auth::id(); // Ensure the creator ID is set
         $pauta->idresponsavel = $dados['idresponsavel_pauta'];
         $pauta->data_desejada = $dados['datadesejada_tarefa'] ?? date('Y-m-d');
         $pauta->save();
