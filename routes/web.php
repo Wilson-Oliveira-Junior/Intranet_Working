@@ -290,6 +290,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/api/documents', [\App\Http\Controllers\DocumentController::class, 'index']);
         Route::post('/api/documents/upload', [\App\Http\Controllers\DocumentController::class, 'upload']);
     });
+
+    // Rota para Listagem de FTPs
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/listagem-ftps', [\App\Http\Controllers\FTPController::class, 'index'])->name('listagem-ftps');
+    });
 });
 
 // API Routes
