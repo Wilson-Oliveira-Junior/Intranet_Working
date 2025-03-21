@@ -327,3 +327,8 @@ Route::resource('fixed-commemorative-dates', FixedCommemorativeDateController::c
 
 // Autenticação
 require __DIR__ . '/auth.php';
+
+// Test error route
+Route::get('/test-error', function () {
+    abort(500, 'This is a test error to check Laravel error handling.');
+});
